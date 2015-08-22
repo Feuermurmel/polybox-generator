@@ -5,3 +5,5 @@
 /src/**/*.stl
 /src/**/*.pdf
 /src/**/*.d
+
+/venv/
