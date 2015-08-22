@@ -21,3 +21,11 @@ function generate_file() {
 # Call generate_file for each file to be generated.
 # E.g.:
 # generate_file src/test.scad echo "cube();"
+
+generate() {
+	PYTHONPATH=generator venv/bin/python -m generate_asy "$1" /dev/fd/3 3>&1 >&2
+}
+
+for i in src/polyhedra/*.json; do
+	generate_file "$(echo "$i" | sed -r 's,^src/polyhedra/(.*)\.json$,src/\1.asy,')" generate "$i"
+done
