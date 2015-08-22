@@ -1,0 +1,202 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[      7102,        193]
+NotebookOptionsPosition[      6129,        156]
+NotebookOutlinePosition[      6658,        175]
+CellTagsIndexPosition[      6615,        172]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"PolyhedronData", "[", "\"\<Archimedean\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.648646077029965*^9, 3.6486460982667303`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"\<\"Cuboctahedron\"\>", ",", "\<\"GreatRhombicosidodecahedron\"\>",
+    ",", "\<\"GreatRhombicuboctahedron\"\>", ",", "\<\"Icosidodecahedron\"\>",
+    ",", "\<\"SmallRhombicosidodecahedron\"\>", 
+   ",", "\<\"SmallRhombicuboctahedron\"\>", ",", "\<\"SnubCube\"\>", 
+   ",", "\<\"SnubDodecahedron\"\>", ",", "\<\"TruncatedCube\"\>", 
+   ",", "\<\"TruncatedDodecahedron\"\>", ",", "\<\"TruncatedIcosahedron\"\>", 
+   ",", "\<\"TruncatedOctahedron\"\>", ",", "\<\"TruncatedTetrahedron\"\>"}], 
+  "}"}]], "Output",
+ CellChangeTimes->{
+  3.648643376623534*^9, {3.6486460986057158`*^9, 3.648646116475017*^9}, 
+   3.648646324140733*^9, 3.648670412997014*^9, 3.648715689992193*^9, 
+   3.648715724641651*^9, 3.648718448588995*^9, 3.648718560419029*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"export", "[", 
+   RowBox[{"path_", ",", "name_"}], "]"}], ":=", 
+  RowBox[{"Export", "[", "\[IndentingNewLine]", 
+   RowBox[{"path", ",", "\[IndentingNewLine]", 
+    RowBox[{"{", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"\"\<vertices\>\"", "\[Rule]", 
+       RowBox[{"PolyhedronData", "[", 
+        RowBox[{"name", ",", "\"\<VertexCoordinates\>\""}], "]"}]}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"\"\<faces\>\"", "\[Rule]", 
+       RowBox[{
+        RowBox[{"PolyhedronData", "[", 
+         RowBox[{"name", ",", "\"\<FaceIndices\>\""}], "]"}], "-", "1"}]}]}], 
+     "\[IndentingNewLine]", "}"}]}], "\[IndentingNewLine]", "]"}]}]], "Input",\
+
+ CellChangeTimes->{{3.648645435960273*^9, 3.648645519159956*^9}, {
+  3.6486704081623363`*^9, 3.648670410952093*^9}, {3.6487157221859903`*^9, 
+  3.648715723249385*^9}, {3.64871844704605*^9, 3.648718447136817*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"export", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+    "\"\<../src/polyhedra/\>\"", "<>", "\"\<snub_dodecahedron.json\>\""}], 
+   ",", "\"\<SnubDodecahedron\>\""}], "]"}]], "Input",
+ CellChangeTimes->{{3.6486455439455442`*^9, 3.64864557465352*^9}, {
+  3.648646125212543*^9, 3.648646130051409*^9}, {3.648646320857842*^9, 
+  3.648646321922196*^9}}],
+
+Cell[BoxData["\<\"/Users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/\
+polyhedra/snub_dodecahedron.json\"\>"], "Output",
+ CellChangeTimes->{
+  3.648645557152766*^9, {3.64864611670827*^9, 3.6486461406948957`*^9}, {
+   3.6486463227711687`*^9, 3.6486463243217173`*^9}, 3.6486704136001368`*^9, 
+   3.6487156902182083`*^9, 3.648715724830752*^9, 3.648718448797823*^9, 
+   3.648718560591468*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"export", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+    "\"\<../src/polyhedra/\>\"", "<>", "\"\<cube.json\>\""}], ",", 
+   "\"\<Cube\>\""}], "]"}]], "Input",
+ CellChangeTimes->{{3.6486455439455442`*^9, 3.64864557465352*^9}, {
+  3.648646125212543*^9, 3.648646130051409*^9}, {3.648646320857842*^9, 
+  3.648646321922196*^9}, {3.6487156815052156`*^9, 3.64871568813778*^9}}],
+
+Cell[BoxData["\<\"/Users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/\
+polyhedra/cube.json\"\>"], "Output",
+ CellChangeTimes->{
+  3.648645557152766*^9, {3.64864611670827*^9, 3.6486461406948957`*^9}, {
+   3.6486463227711687`*^9, 3.6486463243217173`*^9}, 3.6486704136001368`*^9, 
+   3.648715690309099*^9, 3.648715724919366*^9, 3.648718448866247*^9, 
+   3.648718560664446*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"export", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+    "\"\<../src/polyhedra/\>\"", "<>", "\"\<tetrahedron.json\>\""}], ",", 
+   "\"\<Tetrahedron\>\""}], "]"}]], "Input",
+ CellChangeTimes->{{3.6486455439455442`*^9, 3.64864557465352*^9}, {
+  3.648646125212543*^9, 3.648646130051409*^9}, {3.648646320857842*^9, 
+  3.648646321922196*^9}, {3.6487156815052156`*^9, 3.64871568813778*^9}, {
+  3.6487185527222967`*^9, 3.64871855904743*^9}}],
+
+Cell[BoxData["\<\"/Users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/\
+polyhedra/tetrahedron.json\"\>"], "Output",
+ CellChangeTimes->{
+  3.648645557152766*^9, {3.64864611670827*^9, 3.6486461406948957`*^9}, {
+   3.6486463227711687`*^9, 3.6486463243217173`*^9}, 3.6486704136001368`*^9, 
+   3.648715690309099*^9, 3.648715724919366*^9, 3.648718448866247*^9, 
+   3.648718560752791*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"export", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+    "\"\<../src/polyhedra/\>\"", "<>", 
+    "\"\<small_rhombicosidodecahedron.json\>\""}], ",", 
+   "\"\<SmallRhombicosidodecahedron\>\""}], "]"}]], "Input",
+ CellChangeTimes->{{3.6486455439455442`*^9, 3.64864557465352*^9}, {
+  3.648646125212543*^9, 3.648646130051409*^9}, {3.648646320857842*^9, 
+  3.648646321922196*^9}, {3.6487156815052156`*^9, 3.64871568813778*^9}, {
+  3.6487185527222967`*^9, 3.64871855904743*^9}, {3.648902088899349*^9, 
+  3.648902097796731*^9}}],
+
+Cell[BoxData["\<\"/Users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/\
+polyhedra/small_rhombicosidodecahedron.json\"\>"], "Output",
+ CellChangeTimes->{
+  3.648645557152766*^9, {3.64864611670827*^9, 3.6486461406948957`*^9}, {
+   3.6486463227711687`*^9, 3.6486463243217173`*^9}, 3.6486704136001368`*^9, 
+   3.648715690309099*^9, 3.648715724919366*^9, 3.648718448866247*^9, 
+   3.648718560752791*^9, 3.6489021050819597`*^9, 3.6489042684630213`*^9}]
+}, Open  ]]
+},
+WindowSize->{785, 852},
+WindowMargins->{{28, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
+2013)",
+StyleDefinitions->FrontEnd`FileName[{$UserBaseDirectory, "SystemFiles", 
+   "FrontEnd", "StyleSheets"}, "My Default.nb", CharacterEncoding -> "UTF-8"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[579, 22, 153, 2, 29, "Input"],
+Cell[735, 26, 783, 13, 74, "Output"]
+}, Open  ]],
+Cell[1533, 42, 913, 20, 124, "Input"],
+Cell[CellGroupData[{
+Cell[2471, 66, 409, 9, 45, "Input"],
+Cell[2883, 77, 392, 6, 29, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3312, 88, 431, 9, 29, "Input"],
+Cell[3746, 99, 377, 6, 29, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4160, 110, 495, 10, 29, "Input"],
+Cell[4658, 122, 384, 6, 29, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5079, 133, 582, 12, 45, "Input"],
+Cell[5664, 147, 449, 6, 45, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
