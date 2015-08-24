@@ -105,15 +105,31 @@ class Path(_Transformable):
 		A list of 2-tuples containing the coordinates of all points in this path.
 		"""
 		
-		return [(x, y) for x, y, _ in self.m.T]
+		return [(x, y) for x, y, _ in self.m]
+
+
+def _point(x, y, z):
+	"""
+	Returns a Path instance containing a single point at the specified coordinate.
+	"""
+	
+	return Path(numpy.array([[x], [y], [z]]))
 
 
 def point(x, y):
 	"""
-	Returns a path containing a single point at the specified coordinate.
+	Returns a Path instance containing a single point at the specified coordinate.
 	"""
 	
-	return path([(x, y, 1)])
+	return _point(x, y, 1)
+
+
+def point_at_infinity(x, y):
+	"""
+	Returns a Path instance with a point located at an infinite distance of the origin in the direction specified by the vector `(x, y)`.
+	"""
+	
+	return _point(x, y, 0)
 
 
 def path(coordinates):
@@ -123,7 +139,7 @@ def path(coordinates):
 	:param coordinates: An interable of 2-tuples of floats.
 	"""
 	
-	return Path(numpy.array([(x, y, 1) for x, y in coordinates]).T)
+	return join_paths(point(*i) for i in coordinates)
 
 
 def join_paths(paths):
@@ -132,6 +148,10 @@ def join_paths(paths):
 	"""
 	
 	return Path(numpy.concatenate([i.m for i in paths], 1))
+
+
+# def _project_infinities(coordinates):
+	
 
 
 class Polygon(_Transformable):
@@ -189,6 +209,14 @@ class Polygon(_Transformable):
 	
 	def _transform(self, m : numpy.ndarray):
 		return type(self)([i._transform(m) for i in self.paths])
+	
+	@property
+	def finite(self):
+		"""
+		Returns whether none of the vertices of this polygon lie at infinite coordinates.
+		"""
+		
+		return all(i.finite for i in self.paths)
 
 
 def polygon(*paths):
@@ -223,3 +251,11 @@ def square():
 	"""
 	
 	return polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
+
+
+def half_plane(anchor_x, anchor_y, normal_x, normal_y):
+	"""
+	Return a Polygon instance representing the half-plane which is delimited by the line through `(anchor_x, anchor_y)` and `(anchor_x - normal_y, anchor_y + normal_x)`. The specified normal is pointing outward of the polygon from that line.
+	"""
+	
+	return point_at_infinity(-normal_y, normal_x) + point(anchor_x, anchor_y) + point_at_infinity(normal_y, -normal_x) + point_at_infinity(-normal_y, -normal_x)
