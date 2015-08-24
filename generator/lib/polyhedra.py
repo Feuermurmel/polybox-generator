@@ -1,5 +1,5 @@
 import json, numpy
-from . import util
+from . import util, paths
 
 
 def _grab_view_cycle(view, fn):
@@ -84,12 +84,36 @@ def edge_direction(view : PolyhedronView):
 	"""
 	The normalized vector pointing in the direction of the specified view's edge.
 	"""
+	
+	a, b = [i.vertex_coordinate for i in [view, view.next]]
+	
+	return util.normalize(b - a)
 
-@property
+
 def face_normal(view : PolyhedronView):
 	"""
 	The normalized vector representing the normal of the specified view's face pointing outwards of the polyhedron.
 	"""
+	
+	a, b, c = [i.vertex_coordinate for i in [view, view.next, view.next.next]]
+	
+	return util.normalize(numpy.cross(b - a, c - b))
+
+
+def get_planar_polygon(view : PolyhedronView):
+	"""
+	Return a paths.Polygon instance of the vertices of the specified view's face translated into a coordinate system which spans a plane through that face.
+	
+	The coordinate system is two-dimensional, right-angled and has the same unit length as the polyhedrons coordinate system. It's origin is at the view's vertex and it's x axis points along the view's edge.
+	"""
+	
+	vertex_coordinates = [i.vertex_coordinate for i in view.face_cycle]
+	a, b, c, *_ = vertex_coordinates
+	k1 = util.normalize(b - a)
+	k2 = util.normalize(numpy.cross(numpy.cross(b - a, c - b), k1))
+	p = numpy.dot(numpy.array(vertex_coordinates), numpy.vstack([k1, k2]).T)
+	
+	return paths.polygon(p)
 
 
 class Polyhedron:
@@ -154,18 +178,3 @@ class Polyhedron:
 		faces = data['faces']
 		
 		return cls(vertices, faces)
-
-
-def get_planar_polygon(view : PolyhedronView):
-	"""
-	Return the coordinates of the vertices of the specified view's face into a coordinate system which spans a plane through that face.
-	
-	The coordinate system is two-dimensional, right-angled and has the same unit length as the polyhedrons coordinate system.
-	"""
-	
-	vertex_coordinates = [i.vertex_coordinate for i in view.face_cycle]
-	a, b, c, *_ = vertex_coordinates
-	k1 = util.normalize(b - a)
-	k2 = util.normalize(numpy.cross(numpy.cross(b - a, c - b), k1))
-	
-	return [numpy.array([(numpy.dot(k1, v)), (numpy.dot(k2, v))]) for v in vertex_coordinates]

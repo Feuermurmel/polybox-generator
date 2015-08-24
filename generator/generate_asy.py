@@ -1,10 +1,9 @@
-import sys, math
-from lib import polyhedra, paths
-from lib.util import tau
+import sys, math, functools
+from lib import polyhedra, paths, export, util
 
 
 def well_height(thickness, angle):
-	if angle < tau / 4:
+	if angle < util.tau / 4:
 		return thickness / math.tan(angle)
 	else:
 		return 0
@@ -26,16 +25,18 @@ def get_inversion_points(length):
 def main(src_path, out_path):
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
 	
-	def iter_paths():
+	def iter_polygons():
 		for i, face in enumerate(polyhedron.faces):
-			yield paths.scale(50) * paths.move(i * 3) * paths.join_paths(paths.point(*j) for j in polyhedra.get_planar_polygon(face))
+			yield paths.scale(50) * paths.move(i * 3) * polyhedra.get_planar_polygon(face)
+	
+	polygon = functools.reduce(lambda x, y: x | y, iter_polygons())
 	
 	with open(out_path, 'w', encoding = 'utf-8') as file:
 		def write_line(line, *args):
 			print(line.format(*args), file = file)
 		
 		write_line('import _laser_cutting;')
-		write_line('_laser_cutting.cut({});', paths.to_asymptote_paths(list(iter_paths())))
+		write_line('_laser_cutting.cut({});', export.asymptote_expression(polygon))
 
 
 main(*sys.argv[1:])
