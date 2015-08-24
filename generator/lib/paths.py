@@ -27,6 +27,12 @@ class Transformation(_Transformable):
 
 
 def transform(xx, yx, tx, xy, yy, ty):
+	"""
+	Create a transformation which transforms a vector `(x, y)` using the following polynom:
+	
+	(x', y') = (xx * x + yx * y + tx, xy * x + yy * y + ty)
+	"""
+	
 	return Transformation(numpy.array([[xx, yx, tx], [xy, yy, ty], [0, 0, 1]]))
 
 
@@ -111,6 +117,12 @@ def point(x, y):
 
 
 def path(coordinates):
+	"""
+	Return a path using the specified coordinates.
+	
+	:param coordinates: An interable of 2-tuples of floats.
+	"""
+	
 	return Path(numpy.array([(x, y, 1) for x, y in coordinates]).T)
 
 
@@ -192,6 +204,10 @@ def polygon(*paths):
 
 
 def circle(n = 64):
+	"""
+	Return a polygon approximating a circle using a regular polygon with the specified number of sides.
+	"""
+	
 	def iter_points():
 		for i in range(n):
 			t = i * util.tau / n
@@ -202,4 +218,8 @@ def circle(n = 64):
 
 
 def square():
+	"""
+	Return a unit square with the lower left corner placed at the origin.
+	"""
+	
 	return polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
