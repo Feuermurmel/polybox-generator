@@ -1,4 +1,3 @@
-import collections, itertools, functools
 from . import paths
 
 
@@ -15,6 +14,10 @@ def _asymptote_path_array(x, depth):
 		return res
 	
 	def convert_element(element, depth):
+		if isinstance(element, paths.Vertex):
+			assert depth == 0
+			
+			return convert_path(paths.point(element), False)
 		if isinstance(element, paths.Path):
 			assert depth == 0
 			
@@ -39,6 +42,7 @@ def asymptote_expression(x, array_depth = 1):
 	Convert an object or a (possibly nested) list of objects to an Asymptote expression.
 	
 	The following types can be converted:
+	- paths.Vertex (forming a path consisting of a single point)
 	- paths.Path (forming an open path)
 	- paths.Polygon (forming an array of closed paths)
 	- Lists of all of the types in this list.
@@ -58,9 +62,17 @@ def openscad_polygon(polygon : paths.Polygon):
 	def _array(seq):
 		return '[{}]'.format(', '.join(seq))
 	
-	vertex_indices = collections.defaultdict(functools.partial(next, itertools.count()))
-	paths = [[vertex_indices[j] for j in i.vertices] for i in polygon.paths]
+	vertices = []
+	
+	def save_vertex(v):
+		index = len(vertices)
+		
+		vertices.append(v)
+		
+		return index
+	
+	paths = [[save_vertex(j) for j in i.vertices] for i in polygon.paths]
 	
 	return 'polygon({}, {});'.format(
-		_array(str(vertex_indices[i]) for i in range(len(vertex_indices))),
+		_array(_array(map(str, [i.x, i.y])) for i in vertices),
 		_array(_array(map(str, i)) for i in paths))

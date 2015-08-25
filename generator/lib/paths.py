@@ -74,6 +74,35 @@ def move(x = 0, y = 0):
 	return transform(1, 0, x, 0, 1, y)
 
 
+class Vertex(_Transformable):
+	def __init__(self, x : float, y : float, finite : bool):
+		self.x = x
+		self.y = y
+		self.finite = finite
+	
+	def __repr__(self):
+		return 'Vertex({}, {}, finite = {})'.format(self.x, self.y, self.finite)
+	
+	def _transform(self, m):
+		return path(self)._transform(m).vertices[0]
+
+
+def vertex(x, y):
+	"""
+	Returns a vertex at the specified coordinates.
+	"""
+	
+	return Vertex(x, y, False)
+
+
+def vertex_at_infinity(x, y):
+	"""
+	Returns a vertex infinitely far away from the origin in the specified direction.
+	"""
+	
+	return Vertex(x, y, True)
+
+
 class Path(_Transformable):
 	"""
 	Represents an open path which can be transformed and exported to Asymptote and OpenSCAD.
@@ -81,7 +110,7 @@ class Path(_Transformable):
 	You can join two paths like this:
 	
 	>>> p1 = path([(0, 0), (1, 1)])
-	>>> p2 = point([(2, 1)])
+	>>> p2 = path([(2, 1)])
 	>>> p1 + p2
 	"""
 	
@@ -102,10 +131,10 @@ class Path(_Transformable):
 	@property
 	def vertices(self):
 		"""
-		A list of 2-tuples containing the coordinates of all points in this path.
+		Return the vertices of this path as a list of Vertex instances.
 		"""
 		
-		return [(x, y) for x, y, _ in self.m]
+		return [Vertex(x, y, bool(z)) for x, y, z in self.m]
 
 
 def _point(x, y, z):
@@ -118,36 +147,35 @@ def _point(x, y, z):
 
 def point(x, y):
 	"""
-	Returns a Path instance containing a single point at the specified coordinate.
-	"""
-	
-	return _point(x, y, 1)
-
-
-def point_at_infinity(x, y):
-	"""
-	Returns a Path instance with a point located at an infinite distance of the origin in the direction specified by the vector `(x, y)`.
-	"""
-	
-	return _point(x, y, 0)
-
-
-def path(coordinates):
-	"""
 	Return a path using the specified coordinates.
 	
-	:param coordinates: An interable of 2-tuples of floats.
+	The arguments can either be `Vertex` instances or 2-tuples containing the arguments for `vertex()`.
 	"""
 	
-	return join_paths(point(*i) for i in coordinates)
+	def wrap_vertex(v):
+		if not isinstance(v, Vertex):
+			v = vertex(*v)
+		
+		return v.x, v.y, float(v.finite)
+	
+	return join_paths(numpy.array([wrap_vertex(i) for i in vertices]))
+
+	
+def _cast_path(p):
+	if not isinstance(p, Path):
+		p = path(*p)
+	
+	return p
 
 
-def join_paths(paths):
+def join_paths(*paths):
 	"""
-	Join a sequence of paths.
+	Join multiple paths into a single one.
+	
+	The arguments can either be `Path` instances or iterables of vertices. The vertices can be anything accepted by `path()`.
 	"""
 	
-	return Path(numpy.concatenate([i.m for i in paths], 1))
+	return Path(numpy.concatenate([_cast_path(i).m for i in paths]))
 
 
 # def _project_infinities(coordinates):
@@ -225,10 +253,10 @@ def polygon(*paths):
 	
 	Each of the specified paths is interpreted as being closed. If some of the polygons formed from paths overlap or a path self-intersects, a even-odd unwinding rule is applied to decide which parts belong to the area inside the final polygon.
 	
-	The arguments can either be Path instances or iterables of tuples. Any non-Path instance first wrapped using path().
+	The arguments can either be `Path` instances or iterables of vertices. The vertices can be anything accepted by `path()`.
 	"""
 	
-	return Polygon([(i if isinstance(i, Path) else path(i)) for i in paths])
+	return Polygon([_cast_path(i) for i in paths])
 
 
 def circle(n = 64):
