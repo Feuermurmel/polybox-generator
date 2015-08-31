@@ -4,7 +4,7 @@ from . import util
 
 class _Transformable(metaclass = abc.ABCMeta):
 	@abc.abstractmethod
-	def _transform(self, m : numpy.ndarray): pass
+	def _transform(self, transformation : 'Transformation'): pass
 
 
 class Transformation(_Transformable):
@@ -20,10 +20,18 @@ class Transformation(_Transformable):
 		self.m = m
 	
 	def __mul__(self, other : _Transformable):
-		return other._transform(self.m)
+		return other._transform(self)
 	
-	def _transform(self, m : numpy.ndarray):
-		return type(self)(numpy.dot(m, self.m))
+	def _transform(self, transformation):
+		return type(self)(numpy.dot(transformation.m, self.m))
+	
+	@property
+	def det(self):
+		"""
+		The determinant of this transformation's transformation matrix.
+		"""
+		
+		return numpy.linalg.det(self.m)
 
 
 def transform(xx, yx, tx, xy, yy, ty):
@@ -36,10 +44,16 @@ def transform(xx, yx, tx, xy, yy, ty):
 	return Transformation(numpy.array([[xx, yx, tx], [xy, yy, ty], [0, 0, 1]]))
 
 
-def rotate(angle):
+def rotate(angle = None, *, turns = None):
 	"""
 	Returns a transformation which rotates a path around the origin by the specified angle.
+	
+	`rotate(x)`: Rotate by the angle given in radians.
+	`rotate(turns = x)`: Rotate given by the angle given in multiples of full turns.
 	"""
+	
+	if angle is None:
+		angle = util.tau * turns
 	
 	c = math.cos(angle)
 	s = math.sin(angle)
@@ -83,8 +97,26 @@ class Vertex(_Transformable):
 	def __repr__(self):
 		return 'Vertex({}, {}, finite = {})'.format(self.x, self.y, self.finite)
 	
-	def _transform(self, m):
-		return path(self)._transform(m).vertices[0]
+	def __add__(self, other : 'Vertex'):
+		"""
+		Add the coordinate of this point to the coordinate of the specified point.
+		
+		If one of the points is at infinity, the other point will be ignored. If both points are at infinity, an exception is raised.
+		"""
+		
+		if self.finite:
+			if other.finite:
+				return type(self)(self.x + other.x, self.y + other.y, True)
+			else:
+				return other
+		else:
+			if other.finite:
+				return self
+			else:
+				raise Exception('Cannot add two vertices at infinity.')
+	
+	def _transform(self, transformation):
+		return path(self)._transform(transformation).vertices[0]
 
 
 def vertex(x, y):
@@ -92,7 +124,7 @@ def vertex(x, y):
 	Returns a vertex at the specified coordinates.
 	"""
 	
-	return Vertex(x, y, False)
+	return Vertex(x, y, True)
 
 
 def vertex_at_infinity(x, y):
@@ -100,7 +132,25 @@ def vertex_at_infinity(x, y):
 	Returns a vertex infinitely far away from the origin in the specified direction.
 	"""
 	
-	return Vertex(x, y, True)
+	assert x or y
+	
+	return Vertex(x, y, False)
+
+
+def _cast_vertex(v):
+	if not isinstance(v, Vertex):
+		v = vertex(*v)
+		
+	return v
+
+
+def _cast_direction_vertex(v):
+	v = _cast_vertex(v)
+	
+	if v.finite:
+		v = vertex_at_infinity(v.x, v.y)
+	
+	return v
 
 
 class Path(_Transformable):
@@ -115,7 +165,9 @@ class Path(_Transformable):
 	"""
 	
 	def __init__(self, m : numpy.ndarray):
-		assert m.shape[0] == 3
+		s1, s2 = m.shape
+		
+		assert s1 == 3
 		
 		self.m = m
 	
@@ -125,8 +177,16 @@ class Path(_Transformable):
 	def __repr__(self):
 		return 'Path({})'.format(self.m)
 	
-	def _transform(self, m : numpy.ndarray):
-		return type(self)(numpy.dot(m, self.m))
+	def _transform(self, transformation):
+		return type(self)(numpy.dot(transformation.m, self.m))
+	
+	@property
+	def reversed(self):
+		"""
+		This path with the order of it's points reversed.
+		"""
+		
+		return type(numpy.fliplr(self.m))
 	
 	@property
 	def vertices(self):
@@ -134,33 +194,53 @@ class Path(_Transformable):
 		Return the vertices of this path as a list of Vertex instances.
 		"""
 		
-		return [Vertex(x, y, bool(z)) for x, y, z in self.m]
-
-
-def _point(x, y, z):
-	"""
-	Returns a Path instance containing a single point at the specified coordinate.
-	"""
+		return [Vertex(x, y, bool(z)) for x, y, z in self.m.T]
 	
-	return Path(numpy.array([[x], [y], [z]]))
+	@property
+	def finite(self):
+		"""
+		Returns whether none of the vertices in this path lie at infinite coordinates.
+		"""
+		
+		return numpy.count_nonzero(self.m[2]) == self.m.shape[0]
 
 
-def point(x, y):
+def path(*vertices):
 	"""
 	Return a path using the specified coordinates.
 	
 	The arguments can either be `Vertex` instances or 2-tuples containing the arguments for `vertex()`.
 	"""
 	
-	def wrap_vertex(v):
-		if not isinstance(v, Vertex):
-			v = vertex(*v)
-		
-		return v.x, v.y, float(v.finite)
+	def iter_vertices():
+		for v in vertices:
+			v = _cast_vertex(v)
+			
+			yield v.x, v.y, v.finite
 	
-	return join_paths(numpy.array([wrap_vertex(i) for i in vertices]))
+	return Path(numpy.array(list(iter_vertices())).T)
 
+
+def line(anchor, direction):
+	"""
+	Return an infinite path representing the infinite line through the specified anchor and extending infinitely parallel to the specified direction infinitely in both directions infinitely.
 	
+	Infinitely.
+	
+	For suitable definitions of infinite.
+	
+	:param anchor: Vertex instance or tuple.
+	:param direction: Vertex instance or tuple.
+	"""
+	
+	anchor = _cast_vertex(anchor)
+	direction = _cast_direction_vertex(direction)
+	
+	assert not direction.finite
+	
+	return path(scale(-1) * direction, anchor, direction)
+
+
 def _cast_path(p):
 	if not isinstance(p, Path):
 		p = path(*p)
@@ -175,11 +255,86 @@ def join_paths(*paths):
 	The arguments can either be `Path` instances or iterables of vertices. The vertices can be anything accepted by `path()`.
 	"""
 	
-	return Path(numpy.concatenate([_cast_path(i).m for i in paths]))
+	return Path(numpy.concatenate([_cast_path(i).m for i in paths], 1))
 
 
-# def _project_infinities(coordinates):
+# See http://www.angusj.com/delphi/clipper/documentation/Docs/Overview/Rounding.htm
+_clipper_range = (1 << 62) - 1
+
+# Chosen by fair dice roll.
+_clipper_scale = 1 << 31
+_clipper_infinity = _clipper_range / _clipper_scale
+
+
+def _contains_point_at_infinity(m : numpy.ndarray):
+	return numpy.count_nonzero(m[2]) < m.shape[0]
+
+
+_infinity_quadrant_intersections = [
+	(lambda px, py, dx, dy: (_clipper_infinity, py + (_clipper_infinity - px) * dy / dx), (_clipper_infinity, _clipper_infinity)),
+	(lambda px, py, dx, dy: (px + (_clipper_infinity - py) * dx / dy, _clipper_infinity), (-_clipper_infinity, _clipper_infinity)),
+	(lambda px, py, dx, dy: (-_clipper_infinity, py - (_clipper_infinity + px) * dy / dx), (-_clipper_infinity, -_clipper_infinity)),
+	(lambda px, py, dx, dy: (px - (_clipper_infinity + py) * dx / dy, -_clipper_infinity), (_clipper_infinity, -_clipper_infinity))]
+
+
+def _get_infinity_quadrant(x, y):
+	"""
+	Partitions the plane into 4 quadrants, rotated by tau / 8 relative to the quadrants of the coordinate system. Quadrants are numbered 0 through 3 and specify the four cones in the direction of the positive x axis, the positive y axis, the negative x axis and the negative y axis respectively.
+	"""
 	
+	# Did I say that I like compact code?
+	return 3 * (x < -y) ^ (x < y)
+
+
+def _project_infinity(quadrant, point, direction):
+	fn, _ = _infinity_quadrant_intersections[quadrant]
+	px, py = point
+	dx, dy = direction
+	
+	return fn(px, py, dx, dy)
+
+
+def _get_infinity_quadrant_corner(quadrant):
+	_, corner = _infinity_quadrant_intersections[quadrant]
+	
+	return corner
+
+
+def _transform_to_clipper(m : numpy.ndarray):
+	def iter_vertices():
+		infos = [((x, y), None if finite else _get_infinity_quadrant(x, y)) for x, y, finite in m.T]
+		
+		for (p1, q1), (p2, q2) in zip(infos, infos[1:] + infos[:1]):
+			if q2 is None:
+				if q1 is not None:
+					yield _project_infinity(q1, p2, p1)
+				
+				yield p2
+			else:
+				if q1 is None:
+					yield _project_infinity(q2, p1, p2)
+				else:
+					# Iterate from q1 to q2 cyclically.
+					for i in range(q1, (q2 - q1) % 4 + q1):
+						yield _get_infinity_quadrant_corner(i % 4)
+	
+	def scale(x):
+		# TODO: We should instead probably throw an exception if we get a value out of range here.
+		return max(-_clipper_range, min(_clipper_range, round(_clipper_scale * x)))
+	
+	return [(scale(x), scale(y)) for x, y in iter_vertices()]
+
+
+def _transform_from_clipper(vertices : list):
+	def iter_coordinates():
+		for x, y in vertices:
+			px = x / _clipper_scale
+			py = y / _clipper_scale
+			finite = -_clipper_range < x < _clipper_range and -_clipper_range < y < _clipper_range
+			
+			yield px, py, finite
+	
+	return numpy.array(list(iter_coordinates())).T
 
 
 class Polygon(_Transformable):
@@ -194,12 +349,16 @@ class Polygon(_Transformable):
 	>>> p1 & p2 # Take the intersection.
 	>>> p1 / p2 # Subtract p2 from p1.
 	>>> p1 ^ p2 # Take the exclusive intersection.
+	>>> ~p1 # Take the complement.
 	"""
 	
 	def __init__(self, paths):
 		assert isinstance(paths, list)
 		
-		self.paths = paths
+		self._paths = paths
+	
+	def __invert__(self):
+		return plane() / self
 	
 	def __or__(self, other : 'Polygon'):
 		return self._combine(other, pyclipper.CT_UNION)
@@ -214,29 +373,34 @@ class Polygon(_Transformable):
 		return self._combine(other, pyclipper.CT_DIFFERENCE)
 	
 	def _combine(self, other : 'Polygon', operation):
-		def scale_to(x):
-			return round(x * (1 << 32))
-		
-		def scale_from(x):
-			return x / (1 << 32)
-		
-		def scale(coordinates, fn):
-			return [(fn(x), fn(y)) for x, y in coordinates]
-		
 		pc = pyclipper.Pyclipper()
 		
 		for i in self.paths:
-			pc.AddPath(scale(i.vertices, scale_to), pyclipper.PT_SUBJECT, True)
+			pc.AddPath(_transform_to_clipper(i.m), pyclipper.PT_SUBJECT, True)
 		
 		for i in other.paths:
-			pc.AddPath(scale(i.vertices, scale_to), pyclipper.PT_CLIP, True)
+			pc.AddPath(_transform_to_clipper(i.m), pyclipper.PT_CLIP, True)
 		
 		solution = pc.Execute(operation, pyclipper.PFT_EVENODD, pyclipper.PFT_EVENODD)
 		
-		return type(self)([path(scale(i, scale_from)) for i in solution])
+		return type(self)([Path(_transform_from_clipper(i)) for i in solution])
 	
-	def _transform(self, m : numpy.ndarray):
-		return type(self)([i._transform(m) for i in self.paths])
+	def _transform(self, transformation):
+		paths = [i._transform(transformation) for i in self.paths]
+		
+		if transformation.det < 0:
+			# This transformation would change the winding direction of paths and would this invert parts of the polygon which have points at infinity. Thus we reverse all paths here.
+			paths = [i.reversed for i in paths]
+		
+		return type(self)(paths)
+	
+	@property
+	def paths(self):
+		"""
+		List of paths describing the boundaries of all disconnected parts of this polygon.
+		"""
+		
+		return self._paths
 	
 	@property
 	def finite(self):
@@ -281,9 +445,17 @@ def square():
 	return polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
 
 
-def half_plane(anchor_x, anchor_y, normal_x, normal_y):
+def half_plane(anchor, direction):
 	"""
-	Return a Polygon instance representing the half-plane which is delimited by the line through `(anchor_x, anchor_y)` and `(anchor_x - normal_y, anchor_y + normal_x)`. The specified normal is pointing outward of the polygon from that line.
+	Return a Polygon instance representing the half-plane which is delimited by the line through the specified anchor and running parallel to the specified direction. In the specified direction, the polygon is to the left of that line. 
 	"""
 	
-	return point_at_infinity(-normal_y, normal_x) + point(anchor_x, anchor_y) + point_at_infinity(normal_y, -normal_x) + point_at_infinity(-normal_y, -normal_x)
+	return polygon(line(anchor, direction))
+
+
+def plane():
+	"""
+	The everything.
+	"""
+	
+	return polygon([vertex_at_infinity(1, 0), vertex_at_infinity(-1, 0)])
