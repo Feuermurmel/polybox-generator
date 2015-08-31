@@ -6,7 +6,14 @@ def _asymptote_path_array(x, depth):
 		return '{{ {} }}'.format(', '.join(seq))
 	
 	def convert_path(element, closed):
-		res = ' -- '.join('({}mm, {}mm)'.format(*i) for i in element.vertices)
+		def iter_pairs():
+			for i in element.vertices:
+				if not i.finite:
+					raise Exception('Path contains points at infinity: {}'.format(element))
+				
+				yield '({}mm, {}mm)'.format(i.x, i.y)
+		
+		res = ' -- '.join(iter_pairs())
 		
 		if closed:
 			res += ' -- cycle'
