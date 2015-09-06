@@ -1,2 +1,5 @@
 *.asy
 !_*.asy
+
+*.scad
+!_*.scad
