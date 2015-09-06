@@ -28,7 +28,8 @@ generate() {
 }
 
 for i in src/polyhedra/*.json; do
-	name=$(echo "$i" | sed -r 's,^src/polyhedra/(.*)\.json$,\1,')
+	name=${i#src/polyhedra/}
+	name=${name%.json}
 	
 	generate_file "src/$name.asy" generate_asy "$i"
 	
