@@ -1,8 +1,12 @@
-import os, math, contextlib, numpy
+import sys, os, math, contextlib, numpy
 
 
 # "We get further from truth when we obscure what we say." -- https://www.youtube.com/watch?v=FtxmFlMLYRI
 tau = 2 * math.pi
+
+
+def log(message, *args):
+	print(message.format(*args), file = sys.stderr)
 
 
 def normalize(v):
@@ -75,3 +79,10 @@ def write_file(path, data : bytes):
 def write_text_file(path, data : str):
 	with writing_text_file(path) as file:
 		file.write(data)
+
+
+@contextlib.contextmanager
+def line_writer(path):
+	with writing_text_file(path) as file:
+		def write_line(line, *args):
+			print(line.format(*args), file = file)
