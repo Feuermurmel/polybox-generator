@@ -22,7 +22,7 @@ setup_venv() {
 	VIRTUALENV_COMMAND=$(find_command virtualenv{-3{.{5,4},},})
 	
 	rm -rf "$VENV_PATH"
-	"$VIRTUALENV_COMMAND" -p "$PYTHON_COMMAND" "$VENV_PATH"
+	"$VIRTUALENV_COMMAND" -p "$PYTHON_COMMAND" --system-site-packages "$VENV_PATH"
 	. "$VENV_PATH/bin/activate"
 }
 
