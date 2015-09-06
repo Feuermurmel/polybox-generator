@@ -100,6 +100,18 @@ def face_normal(view : PolyhedronView):
 	return util.normalize(numpy.cross(b - a, c - b))
 
 
+def local_coordinates(view : PolyhedronView):
+	"""
+	"""
+
+	a, b, c = [i.vertex_coordinate for i in [view, view.next, view.next.next]]
+	k1 = util.normalize(b - a)
+	k2 = util.normalize(numpy.cross(numpy.cross(b - a, c - b), k1))
+	k3 = util.normalize(numpy.cross(k1, k2))
+
+	return [k1, k2, k3]
+
+
 def get_planar_polygon(view : PolyhedronView):
 	"""
 	Return a paths.Polygon instance of the vertices of the specified view's face translated into a coordinate system which spans a plane through that face.
@@ -108,9 +120,7 @@ def get_planar_polygon(view : PolyhedronView):
 	"""
 	
 	vertex_coordinates = [i.vertex_coordinate for i in view.face_cycle]
-	a, b, c, *_ = vertex_coordinates
-	k1 = util.normalize(b - a)
-	k2 = util.normalize(numpy.cross(numpy.cross(b - a, c - b), k1))
+	k1, k2, _ = local_coordinates(view)
 	p = numpy.dot(numpy.array(vertex_coordinates), numpy.vstack([k1, k2]).T)
 	
 	return paths.polygon(p)
