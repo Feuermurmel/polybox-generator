@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[      6853,        175]
-NotebookOptionsPosition[      6129,        148]
-NotebookOutlinePosition[      6658,        167]
-CellTagsIndexPosition[      6615,        164]
+NotebookDataLength[     21436,        415]
+NotebookOptionsPosition[     20820,        392]
+NotebookOutlinePosition[     21349,        411]
+CellTagsIndexPosition[     21306,        408]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -84,55 +84,292 @@ Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{"exportPolyhedron", "/@", 
-  RowBox[{"PolyhedronData", "[", "\"\<Platonic\>\"", "]"}]}]], "Input",
+  RowBox[{"PolyhedronData", "[", "\"\<Convex\>\"", "]"}]}]], "Input",
  CellChangeTimes->{{3.648646077029965*^9, 3.6486460982667303`*^9}, {
    3.650569721572424*^9, 3.650569722786983*^9}, {3.6505699531038218`*^9, 
    3.6505699767603683`*^9}, {3.65057003311553*^9, 3.6505700461813087`*^9}, 
-   3.650570313411777*^9, {3.650571786845511*^9, 3.650571788180244*^9}}],
+   3.650570313411777*^9}],
 
 Cell[BoxData[
  RowBox[{"{", 
   RowBox[{"\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/\
-polyhedra/cube.json\"\>", 
+polyhedra/acute_golden_rhombohedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+antiprism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+antiprism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+antiprism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+antiprism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+antiprism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+antiprism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+antiprism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+augmented_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+augmented_hexagonal_prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+augmented_pentagonal_prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+augmented_sphenocorona.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+augmented_triangular_prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+augmented_tridiminished_icosahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+augmented_truncated_cube.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+augmented_truncated_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+augmented_truncated_tetrahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+biaugmented_pentagonal_prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+biaugmented_triangular_prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+biaugmented_truncated_cube.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+bigyrate_diminished_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+bilunabirotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+cube.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+cuboctahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+deltoidal_hexecontahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+deltoidal_icositetrahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+diminished_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+dipyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+dipyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+disdyakis_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+disdyakis_triacontahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+disphenocingulum.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 dodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-icosahedron.json\"\>", 
+duerers_solid.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-octahedron.json\"\>", 
+elongated_dodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-tetrahedron.json\"\>"}], "}"}]], "Output",
- CellChangeTimes->{3.65057179681374*^9}]
-}, Open  ]],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[
- RowBox[{"exportPolyhedron", "/@", 
-  RowBox[{"PolyhedronData", "[", "\"\<Archimedean\>\"", "]"}]}]], "Input",
- CellChangeTimes->{{3.648646077029965*^9, 3.6486460982667303`*^9}, {
-   3.650569721572424*^9, 3.650569722786983*^9}, {3.6505699531038218`*^9, 
-   3.6505699767603683`*^9}, {3.65057003311553*^9, 3.6505700461813087`*^9}, 
-   3.650570313411777*^9, {3.650571786845511*^9, 3.650571795597127*^9}}],
-
-Cell[BoxData[
- RowBox[{"{", 
-  RowBox[{"\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/\
-polyhedra/cuboctahedron.json\"\>", 
+elongated_pentagonal_cupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_pentagonal_dipyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_pentagonal_gyrobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_pentagonal_gyrobirotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_pentagonal_gyrocupolarotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_pentagonal_orthobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_pentagonal_orthobirotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_pentagonal_orthocupolarotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_pentagonal_pyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_pentagonal_rotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_square_cupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_square_dipyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_square_gyrobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_square_pyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_triangular_cupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_triangular_dipyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_triangular_gyrobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_triangular_orthobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+elongated_triangular_pyramid.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 great_rhombicosidodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 great_rhombicuboctahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyrate_bidiminished_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyrate_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyrobifastigium.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_pentagonal_bicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_pentagonal_birotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_pentagonal_cupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_pentagonal_cupolarotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_pentagonal_pyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_pentagonal_rotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_square_bicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_square_cupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_square_dipyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_square_pyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_triangular_bicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+gyroelongated_triangular_cupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+hebesphenomegacorona.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+icosahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 icosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+metabiaugmented_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+metabiaugmented_hexagonal_prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+metabiaugmented_truncated_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+metabidiminished_icosahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+metabidiminished_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+metabigyrate_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+metagyrate_diminished_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+obtuse_golden_rhombohedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+octahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+parabiaugmented_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+parabiaugmented_hexagonal_prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+parabiaugmented_truncated_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+parabidiminished_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+parabigyrate_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+paragyrate_diminished_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentagonal_cupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentagonal_gyrobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentagonal_gyrocupolarotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentagonal_hexecontahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentagonal_icositetrahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentagonal_orthobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentagonal_orthobirotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentagonal_orthocupolarotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentagonal_rotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pentakis_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+pyramid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+rhombic_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+rhombic_enneacontahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+rhombic_icosahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+rhombic_triacontahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 small_rhombicosidodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 small_rhombicuboctahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+small_triakis_octahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 snub_cube.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+snub_disphenoid.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 snub_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+snub_square_antiprism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+sphenocorona.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+sphenomegacorona.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+square_cupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+square_gyrobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+square_orthobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+squashed_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+tetrahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+tetrakis_hexahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+triakis_icosahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+triakis_tetrahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+triangular_cupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+triangular_hebesphenorotunda.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+triangular_orthobicupola.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+triaugmented_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+triaugmented_hexagonal_prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+triaugmented_triangular_prism.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+triaugmented_truncated_dodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+tridiminished_icosahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+tridiminished_rhombicosidodecahedron.json\"\>", 
+   ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
+trigyrate_rhombicosidodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 truncated_cube.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
@@ -143,7 +380,14 @@ truncated_icosahedron.json\"\>",
 truncated_octahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 truncated_tetrahedron.json\"\>"}], "}"}]], "Output",
- CellChangeTimes->{3.650571797087655*^9}]
+ CellChangeTimes->{
+  3.648643376623534*^9, {3.6486460986057158`*^9, 3.648646116475017*^9}, 
+   3.648646324140733*^9, 3.648670412997014*^9, 3.648715689992193*^9, 
+   3.648715724641651*^9, 3.648718448588995*^9, 3.648718560419029*^9, 
+   3.650569724802371*^9, {3.6505699553026943`*^9, 3.65056995828414*^9}, 
+   3.650569988820792*^9, {3.650570023087528*^9, 3.650570039162561*^9}, {
+   3.65057031625066*^9, 3.650570339385405*^9}, 3.65057037881849*^9, {
+   3.650570453483267*^9, 3.650570468370278*^9}, 3.650571656187746*^9}]
 }, Open  ]]
 },
 WindowSize->{785, 852},
@@ -170,12 +414,8 @@ Cell[557, 20, 727, 18, 93, "Input"],
 Cell[1287, 40, 800, 16, 45, "Input"],
 Cell[2090, 58, 965, 22, 93, "Input"],
 Cell[CellGroupData[{
-Cell[3080, 84, 412, 6, 29, "Input"],
-Cell[3495, 92, 603, 12, 93, "Output"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[4135, 109, 415, 6, 29, "Input"],
-Cell[4553, 117, 1560, 28, 333, "Output"]
+Cell[3080, 84, 364, 6, 29, "Input"],
+Cell[3447, 92, 17357, 297, 3757, "Output"]
 }, Open  ]]
 }
 ]
