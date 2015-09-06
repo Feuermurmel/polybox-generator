@@ -1,3 +1,4 @@
+import functools, operator
 from lib import paths, export, util
 
 
@@ -10,15 +11,11 @@ def main():
 		print('draw({}, 0.1mm + black);'.format(export.asymptote_expression(paths.scale(20) * p)), file = file)
 		print('draw({}, 0.1mm + black);'.format(export.asymptote_expression(paths.scale(20) * c)), file = file)
 	
-	h1 = paths.half_plane([-.2, 0], [-1, 2])
-	h2 = paths.half_plane([.2, 0], [1, 2])
+	h = [paths.rotate(util.tau * i / 25) * paths.half_plane((-.02, 0), (0, 1)) for i in range(25)]
 	
 	with util.writing_text_file('src/test/b.asy') as file:
-		print('fill({}, red + white);'.format(export.asymptote_expression(paths.scale(20) * (c & (h1 | h2)))), file = file)
-		print('fill({}, blue + white);'.format(export.asymptote_expression(paths.scale(20) * (c & (h1 & h2)))), file = file)
+		print('fill({}, red + white);'.format(export.asymptote_expression(paths.scale(20) * (c & functools.reduce(operator.__xor__, h)))), file = file)
 		print('draw({}, 0.1mm + black);'.format(export.asymptote_expression(paths.scale(20) * c)), file = file)
-	
-	print(export.openscad_polygon(paths.scale(20) * (c & (h1 | h2))))
 
 
 main()
