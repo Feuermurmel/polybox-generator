@@ -18,14 +18,25 @@ function generate_file() {
 	fi
 }
 
-# Call generate_file for each file to be generated.
-# E.g.:
-# generate_file src/test.scad echo "cube();"
-
-generate() {
+# TODO: Migrate to generate().
+generate_asy() {
 	PYTHONPATH=generator venv/bin/python -m generate_asy "$1" /dev/fd/3 3>&1 >&2
 }
 
+generate() {
+	PYTHONPATH=generator venv/bin/python -m "generate.$1" "$2"
+}
+
 for i in src/polyhedra/*.json; do
-	generate_file "$(echo "$i" | sed -r 's,^src/polyhedra/(.*)\.json$,src/\1.asy,')" generate "$i"
+	name=$(echo "$i" | sed -r 's,^src/polyhedra/(.*)\.json$,\1,')
+	
+	generate_file "src/$name.asy" generate_asy "$i"
+	
+	for j in ; do
+		generate_file "src/$j/$name.asy" generate "$j" "$i"
+	done
+	
+	for j in model stellation; do
+		generate_file "src/$j/$name.scad" generate "$j" "$i"
+	done
 done
