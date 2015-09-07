@@ -102,6 +102,7 @@ def face_normal(view : PolyhedronView):
 
 def local_coordinates(view : PolyhedronView):
 	"""
+	Construct a face-local orthonormal coordinate system for the given view.
 	"""
 
 	a, b, c = [i.vertex_coordinate for i in [view, view.next, view.next.next]]
@@ -110,6 +111,16 @@ def local_coordinates(view : PolyhedronView):
 	k3 = util.normalize(numpy.cross(k1, k2))
 
 	return [k1, k2, k3]
+
+
+def projector(basis):
+	"""
+	Projection onto a subspace with given basis, assuming the basis is orthonormal.
+	"""
+
+	K = numpy.column_stack(basis)
+	P = numpy.dot(K, K.T)
+	return P
 
 
 def get_planar_polygon(view : PolyhedronView):
@@ -121,8 +132,9 @@ def get_planar_polygon(view : PolyhedronView):
 	
 	vertex_coordinates = [i.vertex_coordinate for i in view.face_cycle]
 	k1, k2, _ = local_coordinates(view)
-	p = numpy.dot(numpy.array(vertex_coordinates), numpy.vstack([k1, k2]).T)
-	
+	P = projector([k1, k2])
+	s = numpy.dot(P, vertex_coordinates[0])
+	p = numpy.dot(numpy.array(vertex_coordinates) - s, numpy.column_stack([k1, k2]))
 	return paths.polygon(p)
 
 
