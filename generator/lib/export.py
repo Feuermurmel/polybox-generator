@@ -41,7 +41,7 @@ def _asymptote_path_array(x, depth):
 	else:
 		prefix = '(path)'
 	
-	return prefix + convert_element(x, depth)
+	return prefix + ' ' + convert_element(x, depth)
 
 
 def asymptote_expression(x, array_depth = 1):
