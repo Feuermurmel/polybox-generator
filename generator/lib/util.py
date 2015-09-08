@@ -79,10 +79,3 @@ def write_file(path, data : bytes):
 def write_text_file(path, data : str):
 	with writing_text_file(path) as file:
 		file.write(data)
-
-
-@contextlib.contextmanager
-def line_writer(path):
-	with writing_text_file(path) as file:
-		def write_line(line, *args):
-			print(line.format(*args), file = file)

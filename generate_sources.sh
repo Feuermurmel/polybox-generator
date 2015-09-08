@@ -30,7 +30,7 @@ for i in src/polyhedra/*.json; do
 		generate_file "src/$j/$name.asy" generate "$j" "$i"
 	done
 	
-	for j in model stellation; do
+	for j in models stellations; do
 		generate_file "src/$j/$name.scad" generate "$j" "$i"
 	done
 done
