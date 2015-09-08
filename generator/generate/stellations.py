@@ -1,5 +1,6 @@
 import sys
-from ._helpers import *
+from lib import polyhedra
+from ._helpers import write_line, write_call, write_group
 
 
 def main(src_path):
@@ -7,13 +8,16 @@ def main(src_path):
 	
 	write_line('use <../_util.scad>')
 	
-	with write_group('render()'):
+	with write_group('render'):
 		for i in polyhedron.faces:
-			with write_group('intersection()'):
-				write_half_space(i, False)
+			with write_group('intersection'):
+				with write_group('multmatrix', polyhedra.face_coordinate_system(i)):
+					write_call('half_space')
 				
 				for j in i.face_cycle:
-					write_half_space(j.opposite)
+					with write_group('multmatrix', polyhedra.face_coordinate_system(j.opposite)):
+						with write_group('scale', [1, 1, -1]):
+							write_call('half_space')
 
 
 main(*sys.argv[1:])
