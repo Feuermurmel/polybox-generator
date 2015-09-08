@@ -1,3 +1,4 @@
+import numpy
 from . import paths
 
 
@@ -83,3 +84,12 @@ def openscad_polygon(polygon : paths.Polygon):
 	return 'polygon({}, {});'.format(
 		_array(_array(map(str, [i.x, i.y])) for i in vertices),
 		_array(_array(map(str, i)) for i in paths))
+
+
+def openscad_expression(expression):
+	if isinstance(expression, (int, float, numpy.number)):
+		return str(expression)
+	elif isinstance(expression, (tuple, list, numpy.ndarray)):
+		return '[{}]'.format(', '.join(map(openscad_expression, expression)))
+	else:
+		raise Exception('Unsupported expression type: {}'.format(type(expression)))
