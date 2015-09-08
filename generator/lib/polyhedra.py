@@ -1,5 +1,5 @@
 import json, numpy
-from . import util, paths
+from . import util, linalg, paths
 
 
 def _grab_view_cycle(view, fn):
@@ -86,8 +86,8 @@ def edge_direction(view : PolyhedronView):
 	"""
 	
 	a, b = [i.vertex_coordinate for i in [view, view.next]]
-	
-	return util.normalize(b - a)
+
+	return linalg.normalize(b - a)
 
 
 def face_normal(view : PolyhedronView):
@@ -96,8 +96,8 @@ def face_normal(view : PolyhedronView):
 	"""
 	
 	a, b, c = [i.vertex_coordinate for i in [view, view.next, view.next.next]]
-	
-	return util.normalize(numpy.cross(b - a, c - b))
+
+	return linalg.normalize(numpy.cross(b - a, c - b))
 
 
 def local_coordinates(view : PolyhedronView):
@@ -106,9 +106,9 @@ def local_coordinates(view : PolyhedronView):
 	"""
 
 	a, b, c = [i.vertex_coordinate for i in [view, view.next, view.next.next]]
-	k1 = util.normalize(b - a)
-	k2 = util.normalize(numpy.cross(numpy.cross(b - a, c - b), k1))
-	k3 = util.normalize(numpy.cross(k1, k2))
+	k1 = linalg.normalize(b - a)
+	k2 = linalg.normalize(numpy.cross(numpy.cross(b - a, c - b), k1))
+	k3 = linalg.normalize(numpy.cross(k1, k2))
 
 	return [k1, k2, k3]
 
@@ -148,7 +148,7 @@ def get_planar_polygon(view : PolyhedronView):
 	
 	vertex_coordinates = [i.vertex_coordinate for i in view.face_cycle]
 	k1, k2, _ = local_coordinates(view)
-	P = projector([k1, k2])
+	P = linalg.projector([k1, k2])
 	s = numpy.dot(P, vertex_coordinates[0])
 	p = numpy.dot(numpy.array(vertex_coordinates) - s, numpy.column_stack([k1, k2]))
 	return paths.polygon(p)

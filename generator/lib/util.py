@@ -1,4 +1,4 @@
-import sys, os, math, contextlib, numpy
+import sys, os, math, contextlib
 
 
 # "We get further from truth when we obscure what we say." -- https://www.youtube.com/watch?v=FtxmFlMLYRI
@@ -7,10 +7,6 @@ tau = 2 * math.pi
 
 def log(message, *args):
 	print(message.format(*args), file = sys.stderr)
-
-
-def normalize(v):
-	return v / numpy.linalg.norm(v)
 
 
 @contextlib.contextmanager
