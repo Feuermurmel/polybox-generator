@@ -22,7 +22,7 @@ def get_inversion_points(length):
 	return [i * length / num_inversions for i in range(1, num_inversions)]
 
 
-def main(src_path, out_path):
+def main(src_path):
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
 	
 	def iter_polygons():
@@ -31,12 +31,8 @@ def main(src_path, out_path):
 	
 	polygon = functools.reduce(lambda x, y: x | y, iter_polygons())
 	
-	with open(out_path, 'w', encoding = 'utf-8') as file:
-		def write_line(line, *args):
-			print(line.format(*args), file = file)
-		
-		write_line('import _laser_cutting;')
-		write_line('_laser_cutting.cut({});', export.asymptote_expression(polygon))
+	print('import _laser_cutting;')
+	print('_laser_cutting.cut({});'.format(export.asymptote_expression(polygon)))
 
 
 main(*sys.argv[1:])

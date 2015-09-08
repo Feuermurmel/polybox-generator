@@ -20,7 +20,7 @@ function generate_file() {
 
 # TODO: Migrate to generate().
 generate_asy() {
-	PYTHONPATH=generator venv/bin/python -m generate_asy "$1" /dev/fd/3 3>&1 >&2
+	PYTHONPATH=generator venv/bin/python -m generate_asy "$1"
 }
 
 generate() {
