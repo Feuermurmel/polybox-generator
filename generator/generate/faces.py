@@ -31,7 +31,7 @@ def main(src_path):
 	
 	polygon = functools.reduce(lambda x, y: x | y, iter_polygons())
 	
-	print('import _laser_cutting;')
+	print('import "../_laser_cutting" as _laser_cutting;')
 	print('_laser_cutting.cut({});'.format(export.asymptote_expression(polygon)))
 
 

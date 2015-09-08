@@ -18,11 +18,6 @@ function generate_file() {
 	fi
 }
 
-# TODO: Migrate to generate().
-generate_asy() {
-	PYTHONPATH=generator venv/bin/python -m generate_asy "$1"
-}
-
 generate() {
 	PYTHONPATH=generator venv/bin/python -m "generate.$1" "$2"
 }
@@ -31,9 +26,7 @@ for i in src/polyhedra/*.json; do
 	name=${i#src/polyhedra/}
 	name=${name%.json}
 	
-	generate_file "src/$name.asy" generate_asy "$i"
-	
-	for j in ; do
+	for j in faces; do
 		generate_file "src/$j/$name.asy" generate "$j" "$i"
 	done
 	
