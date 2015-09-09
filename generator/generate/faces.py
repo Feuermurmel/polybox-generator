@@ -90,12 +90,6 @@ def main(src_path):
 
 	c = paths.circle()
 
-	# def iter_polygons():
-	# 	for i, face in enumerate(polyhedron.faces):
-	# 		yield paths.scale(50) * paths.move(i * 5) * polyhedra.get_planar_polygon(face)
-
-	# polygon = functools.reduce(lambda x, y: x | y, iter_polygons())
-
 	def iter_stellations():
 		for i, face in enumerate(polyhedron.faces):
 			s = stellation_over_view(face)
