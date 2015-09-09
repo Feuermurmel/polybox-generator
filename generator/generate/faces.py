@@ -106,7 +106,7 @@ def main(src_path):
 	def write_line(line, *args):
 		print(line.format(*args))
 
-	write_line('import _laser_cutting;')
+	write_line('import "../_laser_cutting" as _laser_cutting;')
 	write_line('fill({}, red + white);', export.asymptote_expression(stellation))
 	write_line('draw({}, black);', export.asymptote_expression(stellation))
 
