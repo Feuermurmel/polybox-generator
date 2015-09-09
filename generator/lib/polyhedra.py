@@ -100,7 +100,7 @@ def face_normal(view : PolyhedronView):
 	return linalg.normalize(numpy.cross(b - a, c - b))
 
 
-def local_coordinates(view : PolyhedronView):
+def view_local_coordinates(view : PolyhedronView):
 	"""
 	Construct a face-local orthonormal coordinate system for the given view.
 	"""
@@ -111,16 +111,6 @@ def local_coordinates(view : PolyhedronView):
 	k3 = linalg.normalize(numpy.cross(k1, k2))
 
 	return [k1, k2, k3]
-
-
-def projector(basis):
-	"""
-	Projection onto a subspace with given basis, assuming the basis is orthonormal.
-	"""
-
-	K = numpy.column_stack(basis)
-	P = numpy.dot(K, K.T)
-	return P
 
 
 def face_coordinate_system(view : PolyhedronView):
