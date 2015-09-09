@@ -39,7 +39,6 @@ def stellation_over_edge(polyview):
 		v = neighbour.vertex_coordinate
 
 		if linalg.norm(numpy.cross(n, m)) < linalg.parallel_eps:
-			print("Parallel faces detected")
 			continue
 		else:
 			s, r = linalg.intersect((u, k1, k2), (v, l1, l2))
