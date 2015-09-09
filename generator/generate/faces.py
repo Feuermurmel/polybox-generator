@@ -104,14 +104,12 @@ def main(src_path):
 
 	stellation = functools.reduce(lambda x, y: x | y, iter_stellations())
 
-	with open(out_path, 'w', encoding = 'utf-8') as file:
-		def write_line(line, *args):
-			print(line.format(*args), file = file)
+	def write_line(line, *args):
+		print(line.format(*args))
 
-		write_line('import _laser_cutting;')
-		#write_line('_laser_cutting.cut({});', export.asymptote_expression(polygon))
-		write_line('fill({}, red + white);', export.asymptote_expression(stellation))
-		write_line('draw({}, black);', export.asymptote_expression(stellation))
+	write_line('import _laser_cutting;')
+	write_line('fill({}, red + white);', export.asymptote_expression(stellation))
+	write_line('draw({}, black);', export.asymptote_expression(stellation))
 
 
 main(*sys.argv[1:])
