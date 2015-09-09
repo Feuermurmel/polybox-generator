@@ -88,15 +88,30 @@ def stellation_over_view(polyview):
 
 def main(src_path):
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
-	
-	def iter_polygons():
+
+	c = paths.circle()
+
+	# def iter_polygons():
+	# 	for i, face in enumerate(polyhedron.faces):
+	# 		yield paths.scale(50) * paths.move(i * 5) * polyhedra.get_planar_polygon(face)
+
+	# polygon = functools.reduce(lambda x, y: x | y, iter_polygons())
+
+	def iter_stellations():
 		for i, face in enumerate(polyhedron.faces):
-			yield paths.scale(50) * paths.move(i * 3) * polyhedra.get_planar_polygon(face)
-	
-	polygon = functools.reduce(lambda x, y: x | y, iter_polygons())
-	
-	print('import "../_laser_cutting" as _laser_cutting;')
-	print('_laser_cutting.cut({});'.format(export.asymptote_expression(polygon)))
+			s = stellation_over_view(face)
+			yield paths.move(i * 250) * ((paths.scale(200) * c) & (paths.scale(50) * s))
+
+	stellation = functools.reduce(lambda x, y: x | y, iter_stellations())
+
+	with open(out_path, 'w', encoding = 'utf-8') as file:
+		def write_line(line, *args):
+			print(line.format(*args), file = file)
+
+		write_line('import _laser_cutting;')
+		#write_line('_laser_cutting.cut({});', export.asymptote_expression(polygon))
+		write_line('fill({}, red + white);', export.asymptote_expression(stellation))
+		write_line('draw({}, black);', export.asymptote_expression(stellation))
 
 
 main(*sys.argv[1:])
