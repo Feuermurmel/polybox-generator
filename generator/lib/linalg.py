@@ -1,6 +1,11 @@
 import numpy
 import numpy.linalg
 
+parallel_eps = 1e-6
+
+
+norm = numpy.linalg.norm
+
 
 def normalize(v):
 	"""
@@ -43,3 +48,12 @@ def intersect(P1, P2):
 	p0 = numpy.cross(d2*n1 - d1*n2, numpy.cross(n1,n2)) / numpy.linalg.norm(numpy.cross(n1, n2))**2
 
 	return p0, n3
+
+
+def rot_cw(v):
+	return numpy.array([ v[1],
+			    -v[0]])
+
+def rot_ccw(v):
+	return numpy.array([-v[1],
+			     v[0]])
