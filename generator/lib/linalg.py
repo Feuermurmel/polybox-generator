@@ -1,7 +1,7 @@
 import numpy
 import numpy.linalg
 
-parallel_eps = 1e-6
+parallel_eps = 1e-10
 
 
 norm = numpy.linalg.norm
