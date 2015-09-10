@@ -120,13 +120,7 @@ def face_coordinate_system(view : PolyhedronView):
 	The coordinate system of a face is defined as the right-angled, right-handed coordinate system whose origin is in the view's vertex, whose x-axis points along the view's edge and whose z-axis points in the direction of the view's faces' normal outwards of the polyhedron.
 	"""
 	
-	k1, k2, k3 = local_coordinates(view)
-	v = view.vertex_coordinate
-	
-	rotation = numpy.linalg.inv(numpy.array([[k1[0], k1[1], k1[2], 0], [k2[0], k2[1], k2[2], 0], [k3[0], k3[1], k3[2], 0], [0, 0, 0, 1]]))
-	translation = numpy.array([[1, 0, 0, v[0]], [0, 1, 0, v[1]], [0, 0, 1, v[2]], [0, 0, 0, 1]])
-	
-	return numpy.dot(translation, rotation)
+	return numpy.row_stack([numpy.column_stack(local_coordinates(view) + [view.vertex_coordinate]), [0, 0, 0, 1]])
 
 
 def get_planar_polygon(view : PolyhedronView):
