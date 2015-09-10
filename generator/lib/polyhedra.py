@@ -46,7 +46,7 @@ class PolyhedronView:
 		return self._next_view
 	
 	@property
-	def opposite(self):
+	def opposite(self) -> 'PolyhedronView':
 		"""
 		Return the reversed view for this view's edge.
 		
@@ -56,7 +56,7 @@ class PolyhedronView:
 		return self._opposite_view
 	
 	@property
-	def adjacent(self) -> 'PolyhedronView':
+	def adjacent(self):
 		"""
 		Returns the second element of self.vertex_cycle.
 		"""
