@@ -1,5 +1,5 @@
 import json, numpy
-from . import util, linalg, paths
+from . import linalg, paths
 
 
 def _grab_view_cycle(view, fn):

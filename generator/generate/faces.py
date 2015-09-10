@@ -1,5 +1,5 @@
-import sys, math, functools
-from lib import polyhedra, stellations, paths, export, util
+import sys, functools
+from lib import polyhedra, stellations, paths, export
 
 
 def main(src_path):

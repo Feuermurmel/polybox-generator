@@ -1,5 +1,5 @@
-import contextlib, itertools
-from lib import polyhedra, util, export
+import contextlib
+from lib import export
 
 
 _indentation_level = 0

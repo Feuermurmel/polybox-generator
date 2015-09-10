@@ -1,4 +1,4 @@
-import sys, numpy
+import sys
 from lib import polyhedra
 from ._helpers import write_line, write_call, write_group
 
