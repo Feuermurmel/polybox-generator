@@ -1,19 +1,29 @@
-import sys, functools
+import sys, functools, math, numpy
 from lib import polyhedra, stellations, paths, export
 from ._helpers import write_line
+
+
+def arrange_shapes(shapes, size = 5, gap = 0.2):
+	width = math.ceil(math.sqrt(len(shapes)))
+	clip = paths.scale(size) * paths.move(-1 / 2, -1 / 2) * paths.square()
+	
+	def iter_arranged_shapes():
+		for i, shape in enumerate(shapes):
+			y, x = divmod(i, width)
+			
+			yield paths.move((size + gap) * x, -(size + gap) * y) * (shape & clip)
+	
+	return functools.reduce(lambda x, y: x | y, iter_arranged_shapes())
 
 
 def main(src_path):
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
 	
-	c = paths.circle()
-	
 	def iter_stellations():
-		for i, face in enumerate(polyhedron.faces):
-			s = stellations.stellation_over_view(face)
-			yield paths.move(i * 250) * ((paths.scale(200) * c) & (paths.scale(50) * s))
+		for face in polyhedron.faces:
+			yield stellations.stellation_over_view(face)
 	
-	stellation = functools.reduce(lambda x, y: x | y, iter_stellations())
+	stellation = paths.scale(20) * arrange_shapes(list(iter_stellations()))
 	
 	write_line('import "../_laser_cutting" as _laser_cutting;')
 	write_line('fill({}, red + white);', export.asymptote_expression(stellation))
