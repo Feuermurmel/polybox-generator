@@ -3,9 +3,9 @@ from lib import polyhedra, stellations, paths, export
 from ._helpers import write_line
 
 
-def arrange_shapes(shapes, size = 5, gap = 0.2):
+def arrange_shapes(shapes, size = 5, gap = 0.1):
 	width = math.ceil(math.sqrt(len(shapes)))
-	clip = paths.scale(size) * paths.move(-1 / 2, -1 / 2) * paths.square()
+	clip = paths.scale(size / 2) * paths.circle()
 	
 	def iter_arranged_shapes():
 		for i, shape in enumerate(shapes):
