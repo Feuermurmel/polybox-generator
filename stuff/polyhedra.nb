@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[     21436,        415]
-NotebookOptionsPosition[     20820,        392]
-NotebookOutlinePosition[     21349,        411]
-CellTagsIndexPosition[     21306,        408]
+NotebookDataLength[     21814,        419]
+NotebookOptionsPosition[     21198,        396]
+NotebookOutlinePosition[     21727,        415]
+CellTagsIndexPosition[     21684,        412]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -30,13 +30,13 @@ Cell[BoxData[{
        RowBox[{
         RowBox[{"a", ":", 
          RowBox[{
-         "RegularExpression", "[", "\"\<[[:upper:]][[:lower:]]*\>\"", "]"}]}],
-         "\[RuleDelayed]", 
+         "RegularExpression", "[", "\"\<[[:upper:]][^[:upper:]]*\>\"", 
+          "]"}]}], "\[RuleDelayed]", 
         RowBox[{"ToLowerCase", "[", "a", "]"}]}]}], "]"}], ",", "\"\<_\>\""}],
      "]"}], "]"}]}]}], "Input",
  CellChangeTimes->{{3.650569657572612*^9, 3.650569676572283*^9}, {
   3.6505697120195932`*^9, 3.650569713822337*^9}, {3.650570000841888*^9, 
-  3.650570017664763*^9}}],
+  3.650570017664763*^9}, {3.651003435472191*^9, 3.651003464409383*^9}}],
 
 Cell[BoxData[{
  RowBox[{"Clear", "[", "export", "]"}], "\[IndentingNewLine]", 
@@ -88,26 +88,28 @@ Cell[BoxData[
  CellChangeTimes->{{3.648646077029965*^9, 3.6486460982667303`*^9}, {
    3.650569721572424*^9, 3.650569722786983*^9}, {3.6505699531038218`*^9, 
    3.6505699767603683`*^9}, {3.65057003311553*^9, 3.6505700461813087`*^9}, 
-   3.650570313411777*^9}],
+   3.650570313411777*^9, {3.651003141588204*^9, 3.6510031432800303`*^9}, {
+   3.65100321054779*^9, 3.651003211603756*^9}, {3.651003266074376*^9, 
+   3.651003276280801*^9}, {3.651003391609385*^9, 3.651003394437099*^9}}],
 
 Cell[BoxData[
  RowBox[{"{", 
   RowBox[{"\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/\
 polyhedra/acute_golden_rhombohedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-antiprism.json\"\>", 
+antiprism4.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-antiprism.json\"\>", 
+antiprism5.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-antiprism.json\"\>", 
+antiprism6.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-antiprism.json\"\>", 
+antiprism7.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-antiprism.json\"\>", 
+antiprism8.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-antiprism.json\"\>", 
+antiprism9.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-antiprism.json\"\>", 
+antiprism10.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 augmented_dodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
@@ -147,9 +149,9 @@ deltoidal_icositetrahedron.json\"\>",
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 diminished_rhombicosidodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-dipyramid.json\"\>", 
+dipyramid3.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-dipyramid.json\"\>", 
+dipyramid5.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 disdyakis_dodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
@@ -291,23 +293,23 @@ pentagonal_rotunda.json\"\>",
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 pentakis_dodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-prism.json\"\>", 
+prism3.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-prism.json\"\>", 
+prism5.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-prism.json\"\>", 
+prism6.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-prism.json\"\>", 
+prism7.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-prism.json\"\>", 
+prism8.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-prism.json\"\>", 
+prism9.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-prism.json\"\>", 
+prism10.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-pyramid.json\"\>", 
+pyramid4.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
-pyramid.json\"\>", 
+pyramid5.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
 rhombic_dodecahedron.json\"\>", 
    ",", "\<\"/users/michi/Desktop/3D/Designs/Polyhedra/stuff/../src/polyhedra/\
@@ -387,7 +389,9 @@ truncated_tetrahedron.json\"\>"}], "}"}]], "Output",
    3.650569724802371*^9, {3.6505699553026943`*^9, 3.65056995828414*^9}, 
    3.650569988820792*^9, {3.650570023087528*^9, 3.650570039162561*^9}, {
    3.65057031625066*^9, 3.650570339385405*^9}, 3.65057037881849*^9, {
-   3.650570453483267*^9, 3.650570468370278*^9}, 3.650571656187746*^9}]
+   3.650570453483267*^9, 3.650570468370278*^9}, 3.650571656187746*^9, 
+   3.6510031477577*^9, 3.65100321797713*^9, 3.65100328065285*^9, {
+   3.651003471387199*^9, 3.651003497356308*^9}}]
 }, Open  ]]
 },
 WindowSize->{785, 852},
@@ -410,12 +414,12 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[557, 20, 727, 18, 93, "Input"],
-Cell[1287, 40, 800, 16, 45, "Input"],
-Cell[2090, 58, 965, 22, 93, "Input"],
+Cell[557, 20, 776, 18, 93, "Input"],
+Cell[1336, 40, 800, 16, 45, "Input"],
+Cell[2139, 58, 965, 22, 93, "Input"],
 Cell[CellGroupData[{
-Cell[3080, 84, 364, 6, 29, "Input"],
-Cell[3447, 92, 17357, 297, 3757, "Output"]
+Cell[3129, 84, 557, 8, 29, "Input"],
+Cell[3689, 94, 17493, 299, 3757, "Output"]
 }, Open  ]]
 }
 ]
