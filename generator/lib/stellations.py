@@ -5,17 +5,17 @@ from lib import polyhedra, paths, linalg
 def stellation_over_edge(polyview):
 	"""
 	"""
-	k1, k2, n = polyhedra.view_local_coordinates(polyview)
+	k1, k2, n = polyhedra.view_local_onb(polyview)
 	u = polyview.vertex_coordinate
 
 	opposite = polyview.opposite
-	l1, l2, m = polyhedra.view_local_coordinates(opposite)
+	l1, l2, m = polyhedra.view_local_onb(opposite)
 	yield (u, k1, -m)
 
 	for face in opposite.face_cycle:
 		neighbour = face.opposite
 
-		l1, l2, m = polyhedra.view_local_coordinates(neighbour)
+		l1, l2, m = polyhedra.view_local_onb(neighbour)
 		v = neighbour.vertex_coordinate
 
 		if not linalg.norm(numpy.cross(n, m)) < linalg.parallel_eps:
@@ -27,7 +27,7 @@ def line_to_face_coordinates(view, lines):
 	"""
 	"""
 	# TODO: Factor out common face projection
-	k1, k2, _ = polyhedra.view_local_coordinates(view)
+	k1, k2, _ = polyhedra.view_local_onb(view)
 	T = numpy.column_stack([k1, k2])
 	P = linalg.projector([k1, k2])
 	d = numpy.dot(P, view.vertex_coordinate).reshape((1,3))

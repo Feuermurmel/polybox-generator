@@ -100,9 +100,9 @@ def face_normal(view : PolyhedronView):
 	return linalg.normalize(numpy.cross(b - a, c - b))
 
 
-def view_local_coordinates(view : PolyhedronView):
+def view_local_onb(view : PolyhedronView):
 	"""
-	Construct a face-local orthonormal coordinate system for the given view.
+	Construct a view-local orthonormal basis of `R^3` for the given view.
 	"""
 
 	a, b, c = [i.vertex_coordinate for i in [view, view.next, view.next.next]]
@@ -119,8 +119,8 @@ def face_coordinate_system(view : PolyhedronView):
 	
 	The coordinate system of a face is defined as the right-angled, right-handed coordinate system whose origin is in the view's vertex, whose x-axis points along the view's edge and whose z-axis points in the direction of the view's faces' normal outwards of the polyhedron.
 	"""
-	
-	return numpy.row_stack([numpy.column_stack(view_local_coordinates(view) + [view.vertex_coordinate]), [0, 0, 0, 1]])
+
+	return numpy.row_stack([numpy.column_stack(view_local_onb(view) + [view.vertex_coordinate]), [0, 0, 0, 1]])
 
 
 def get_planar_polygon(view : PolyhedronView):
@@ -131,7 +131,7 @@ def get_planar_polygon(view : PolyhedronView):
 	"""
 	
 	vertex_coordinates = [i.vertex_coordinate for i in view.face_cycle]
-	k1, k2, _ = view_local_coordinates(view)
+	k1, k2, _ = view_local_onb(view)
 	P = linalg.projector([k1, k2])
 	s = numpy.dot(P, vertex_coordinates[0])
 	p = numpy.dot(numpy.array(vertex_coordinates) - s, numpy.column_stack([k1, k2]))
