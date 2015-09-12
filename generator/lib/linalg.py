@@ -24,7 +24,7 @@ def projector(basis):
 	return P
 
 
-def intersect(P1, P2):
+def intersect_planes(P1, P2):
 	"""
 	Compute the intersection line of two planes P1 and P2 in parametric form.
 	"""
