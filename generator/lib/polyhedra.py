@@ -138,6 +138,15 @@ def get_planar_polygon(view : PolyhedronView):
 	return paths.polygon(p)
 
 
+def dihedral_angle(view1 : PolyhedronView, view2 : PolyhedronView):
+	"""
+	"""
+	n1 = face_normal(view1)
+	n2 = face_normal(view2)
+	theta = numpy.arccos(numpy.dot(n1, n2))
+	return theta
+
+
 class Polyhedron:
 	def __init__(self, vertices, faces):
 		"""
