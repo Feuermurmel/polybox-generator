@@ -39,7 +39,6 @@ def get_polyhedron_orientation(polyhedron : polyhedra.Polyhedron):
 
 def main():
 	dir = 'src/polyhedra'
-	dir = '/data/Math/polyhedra'
 
 	for i in os.listdir(dir):
 		if i.endswith('.json'):
