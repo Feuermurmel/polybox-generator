@@ -17,13 +17,17 @@ def get_polyhedron_orientation(polyhedron : polyhedra.Polyhedron):
 		vertex_views = { k for j in i.face_cycle for k in j.vertex_cycle }
 		transform_from_face = numpy.linalg.inv(polyhedra.face_coordinate_system(i))
 
-		for j in set(polyhedron.vertices) - vertex_views:
-			_, _, z, _ = numpy.dot(transform_from_face, numpy.hstack([j.vertex_coordinate, 1]))
+		vertex_set = set(polyhedron.vertices) - vertex_views
+		V = numpy.ones((4,len(vertex_set)))
+		for j, v in enumerate(vertex_set):
+			V[:3,j] = v.vertex_coordinate
 
-			if z > 0:
-				has_outside_vertices = True
-			else:
-				has_inside_vertices = True
+		R = numpy.dot(transform_from_face, V)
+
+		if numpy.any(R[2,:]) > 0:
+			has_outside_vertices = True
+		else:
+			has_inside_vertices = True
 
 	if not has_outside_vertices:
 		return Orientation.all_inside
