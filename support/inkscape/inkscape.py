@@ -72,21 +72,26 @@ class InkscapeCommandLine(object):
 	
 	def _go_to_layer(self, layer, with_selection = False):
 		if self._current_layer_index is None:
-			# Initialize to a known state.
-			self._current_layer_index = len(self._layers) - 1
+			# Initialize to a known state. We cannot assume that any layer is selected and thus we need as many LayerPrev as we have layers.
+			self._current_layer_index = len(self._layers)
 			self._go_to_layer(self._layers[0])
 		
 		target_index = self._layers.index(layer)
 		
-		while True:
-			if self._current_layer_index < target_index:
+		if self._current_layer_index < target_index:
+			for _ in range(target_index - self._current_layer_index):
 				self.apply_to_document('LayerMoveToNext' if with_selection else 'LayerNext')
-				self._current_layer_index += 1
-			elif self._current_layer_index > target_index:
+		elif self._current_layer_index > target_index:
+			for _ in range(self._current_layer_index - target_index):
 				self.apply_to_document('LayerMoveToPrev' if with_selection else 'LayerPrev')
-				self._current_layer_index -= 1
-			else:
-				break
+		else:
+			return
+		
+		if with_selection:
+			# When using LayerMoveToNext and LayerMoveToPrev, inkscape does not reliably select the next/previous layer.
+			self._current_layer_index = None
+		else:
+			self._current_layer_index = target_index
 	
 	def duplicate_layer(self, layer):
 		self.apply_to_layer(layer, 'LayerDuplicate')

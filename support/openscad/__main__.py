@@ -1,16 +1,13 @@
-import os, sys
-from lib import util
+import os
+from lib import util, make
 
 
 def _openscad(in_path, out_path, deps_path):
 	util.command([os.environ['OPENSCAD'], '-o', out_path, '-d', deps_path, in_path])
 
 
-def _write_dependencies(path, target, dependencies):
-	util.write_file(path, '{}: {}\n'.format(target, ' '.join(dependencies)).encode())
-
-
-def main(in_path, out_path, deps_path):
+@util.main
+def main(in_path, out_path):
 	cwd = os.getcwd()
 	
 	def relpath(path):
@@ -41,14 +38,5 @@ def main(in_path, out_path, deps_path):
 		ignored_files = set(map(relpath, [in_path, temp_deps_path, temp_mk_path, temp_out_path]))
 		
 		# Write output files.
-		_write_dependencies(deps_path, relpath(out_path), deps - ignored_files)
-		os.rename(temp_out_path, out_path)
-
-
-try:
-	main(*sys.argv[1:])
-except util.UserError as e:
-	print 'Error:', e
-	sys.exit(1)
-except KeyboardInterrupt:
-	sys.exit(2)
+		make.write_dependencies(out_path + '.d', out_path, deps - ignored_files)
+		util.rename_atomic(temp_out_path, out_path)

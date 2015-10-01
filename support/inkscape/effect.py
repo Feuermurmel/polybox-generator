@@ -2,12 +2,14 @@
 Based on code from Aaron Spike. See http://www.bobcookdev.com/inkscape/inkscape-dxf.html
 """
 
-import pkgutil, os, re, collections
+import pkgutil, os, re, collections, itertools
+from lxml import etree
+from lib import util
 from . import inkex, simpletransform, cubicsuperpath, cspsubdiv, inkscape
 
 
 def _get_unit_factors_map():
-	# Fluctuates somewhat between Inkscape releases.
+	# Fluctuates somewhat between Inkscape releases _and_ between SVG version.
 	pixels_per_inch = 96.
 	pixels_per_mm = pixels_per_inch / 25.4
 	
@@ -32,81 +34,101 @@ class ExportEffect(inkex.Effect):
 		inkex.Effect.__init__(self)
 		
 		self._flatness = float(os.environ['DXF_FLATNESS'])
+		
 		self._layers = None
-		self._layers_by_inkscape_name = None
-		
-		self._paths = [] # Contains (layer : Layer | None, points : List[(float, float)])
+		self._paths = None
 	
-	def _get_user_unit(self):
+	def _get_document_scale(self):
 		"""
-		Return the size in pixels of the unit used for measures without an explicit unit.
+		Return scaling factor applied to the document because of a viewBox setting. This currently ignores any setting of a preserveAspectRatio attribute (like Inkscape).
 		"""
 		
-		document_height = self._measure_to_pixels(self._get_document_height_attr())
+		document_height = self._get_height()
+		view_box = self._get_view_box()
+		
+		if view_box is None or document_height is None:
+			return 1
+		else:
+			_, _, _, view_box_height = view_box
+			
+			return document_height / view_box_height
+	
+	def _get_document_height(self):
+		"""
+		Get the height of the document in pixels in the document coordinate system as it is interpreted by Inkscape.
+		"""
+		
+		view_box = self._get_view_box()
+		document_height = self._get_height()
+		
+		if view_box is not None:
+			_, _, _, view_box_height = view_box
+			
+			return view_box_height
+		elif document_height is not None:
+			return document_height
+		else:
+			return 0
+	
+	def _get_height(self):
+		height_attr = self.document.getroot().get('height')
+		
+		if height_attr is None:
+			return None
+		else:
+			return self._measure_to_pixels(height_attr)
+	
+	def _get_view_box(self):
 		view_box_attr = self.document.getroot().get('viewBox')
 		
-		if view_box_attr:
-			_, _, _, view_box_height = map(float, view_box_attr.split())
+		if view_box_attr is None:
+			return None
 		else:
-			view_box_height = document_height
-		
-		return document_height / view_box_height
+			return [float(i) for i in view_box_attr.split()]
 	
-	def _get_document_unit(self):
-		"""
-		Return the size in pixels that the user is working with in Inkscape.
-		"""
-		
-		inkscape_unit_attrs = self.document.getroot().xpath('./sodipodi:namedview/@inkscape:document-units', namespaces = inkex.NSS)
-		
-		if inkscape_unit_attrs:
-			unit = inkscape_unit_attrs[0]
-		else:
-			_, unit = self._parse_measure(self._get_document_height_attr())
-		
-		return self._get_unit_factor(unit)
-	
-	def _get_document_height_attr(self):
-		return self.document.getroot().xpath('@height', namespaces = inkex.NSS)[0]
-	
-	def _add_path(self, layer, path):
-		"""
-		Warning: Fucks up path.
-		"""
-		
-		cspsubdiv.subdiv(path, self._flatness)
-		
-		# path contains two control point coordinates and the actual coordinates per point.
-		self._paths.append((layer, [i for _, i, _ in path]))
-	
-	def _add_shape(self, node, document_transform, element_transform):
+	def _get_shape_paths(self, node, transform):
 		shape = cubicsuperpath.parsePath(node.get('d'))
-		layer = self._layers_by_inkscape_name.get(self._get_inkscape_layer_name(node))
 		
 		transform = simpletransform.composeTransform(
-			document_transform,
-			simpletransform.composeParents(node, element_transform))
+			transform,
+			simpletransform.composeParents(node, [[1, 0, 0], [0, 1, 0]]))
 		
 		simpletransform.applyTransformToPath(transform, shape)
 		
-		for path in shape:
-			self._add_path(layer, path)
+		def iter_paths():
+			for path in shape:
+				cspsubdiv.subdiv(path, self._flatness)
+				
+				# path contains two control point coordinates and the actual coordinates per point.
+				yield [i for _, i, _ in path]
+		
+		return list(iter_paths())
 	
 	def effect(self):
-		self._layers = inkscape.get_inkscape_layers(self.svg_file)
-		self._layers_by_inkscape_name = { i.inkscape_name: i for i in self._layers }
+		document_height = self._get_document_height()
+		document_scale = self._get_document_scale()
 		
-		user_unit = self._get_user_unit()
-		document_height = self._measure_to_pixels(self._get_document_height_attr())
+		transform = simpletransform.composeTransform(
+			[[document_scale, 0, 0], [0, document_scale, 0]],
+			[[1, 0, 0], [0, -1, document_height]])
 		
-		document_transform = [[1, 0, 0], [0, -1, document_height]]
-		element_transform = [[user_unit, 0, 0], [0, user_unit, 0]]
+		layers = inkscape.get_inkscape_layers(self.svg_file)
+		layers_by_inkscape_name = { i.inkscape_name: i for i in layers }
 		
-		for node in self.document.getroot().xpath('//svg:path', namespaces = inkex.NSS):
-			self._add_shape(node, document_transform, element_transform)
+		def iter_paths():
+			for node in self.document.getroot().xpath('//svg:path', namespaces = inkex.NSS):
+				layer = layers_by_inkscape_name.get(self._get_inkscape_layer_name(node))
+				
+				for path in self._get_shape_paths(node, transform):
+					yield layer, path
+		
+		self._layers = layers
+		self._paths = list(iter_paths())
 	
 	def write_dxf(self, file):
-		document_unit = self._get_document_unit()
+		# Scales pixels to millimeters. This is the predominant unit in CAD.
+		unit_factor = self._unit_factors['mm']
+		
 		layer_indices = { l: i for i, l in enumerate(self._layers) }
 		
 		file.write(pkgutil.get_data(__name__, 'dxf_header.txt'))
@@ -115,24 +137,25 @@ class ExportEffect(inkex.Effect):
 			print >> file, code
 			print >> file, value
 		
-		handle = 256
+		handle_iter = itertools.count(256)
 		
 		for layer, path in self._paths:
 			for (x1, y1), (x2, y2) in zip(path, path[1:]):
 				write_instruction(0, 'LINE')
-				write_instruction(8, layer.export_name)
-				write_instruction(62, layer_indices.get(layer, 0))
-				write_instruction(5, '{:x}'.format(handle))
+				
+				if layer is not None:
+					write_instruction(8, layer.export_name)
+					write_instruction(62, layer_indices.get(layer, 0))
+				
+				write_instruction(5, '{:x}'.format(next(handle_iter)))
 				write_instruction(100, 'AcDbEntity')
 				write_instruction(100, 'AcDbLine')
-				write_instruction(10, repr(x1 / document_unit))
-				write_instruction(20, repr(y1 / document_unit))
+				write_instruction(10, repr(x1 / unit_factor))
+				write_instruction(20, repr(y1 / unit_factor))
 				write_instruction(30, 0.0)
-				write_instruction(11, repr(x2 / document_unit))
-				write_instruction(21, repr(y2 / document_unit))
+				write_instruction(11, repr(x2 / unit_factor))
+				write_instruction(21, repr(y2 / unit_factor))
 				write_instruction(31, 0.0)
-				
-				handle += 1
 		
 		file.write(pkgutil.get_data(__name__, 'dxf_footer.txt'))
 	
@@ -140,30 +163,36 @@ class ExportEffect(inkex.Effect):
 		def write_line(format, *args):
 			print >> file, format.format(*args) + ';'
 		
-		# Scales pixels to points.
+		# Scales pixels to points. Asymptote uses points by default.
 		unit_factor = self._unit_factors['pt']
-		lines_by_layer_name = collections.defaultdict(list)
+		
+		paths_by_layer = collections.defaultdict(list)
+		variable_names = []
 		
 		for layer, path in self._paths:
-			lines_by_layer_name[self._asymptote_identifier_from_layer(layer)].append(path)
+			paths_by_layer[layer].append(path)
 		
-		for layer_name, paths in sorted(lines_by_layer_name.items()):
-			write_line('path[] {}', layer_name)
+		for layer in self._layers + [None]:
+			paths = paths_by_layer[layer]
+			variable_name = self._asymptote_identifier_from_layer(layer)
+			write_line('path[] {}', variable_name)
+			
+			variable_names.append(variable_name)
 			
 			for path in paths:
 				point_strs = ['({}, {})'.format(x / unit_factor, y / unit_factor) for x, y in path]
 				
-				# Hack. We should determine from whether Z or z was used to close the path in the SVG document.
+				# Hack. We should determine this from whether Z or z was used to close the path in the SVG document.
 				if path[0] == path[-1]:
 					point_strs[-1] = 'cycle'
 				
-				write_line('{}.push({})', layer_name, ' -- '.join(point_strs))
+				write_line('{}.push({})', variable_name, ' -- '.join(point_strs))
 		
-		if self._asymptote_all_paths_name not in lines_by_layer_name:
+		if self._asymptote_all_paths_name not in variable_names:
 			write_line('path[] {}', self._asymptote_all_paths_name)
 			
-			for layer_name in sorted(lines_by_layer_name):
-				write_line('{}.append({})', self._asymptote_all_paths_name, layer_name)
+			for i in variable_names:
+				write_line('{}.append({})', self._asymptote_all_paths_name, i)
 	
 	@classmethod
 	def _parse_measure(cls, string):
@@ -180,14 +209,14 @@ class ExportEffect(inkex.Effect):
 		return value, unit
 	
 	@classmethod
-	def _measure_to_pixels(cls, string, default_unit_factor = None):
+	def _measure_to_pixels(cls, string):
 		"""
-		Parse a string containing a measure and return it's value converted to pixels. If the measure has no unit, it will be assumed that the unit has the size of the specified number of pixels.
+		Parse a string containing a measure and return it's value converted to pixels.
 		"""
 		
 		value, unit = cls._parse_measure(string)
 		
-		return value * cls._get_unit_factor(unit, default_unit_factor)
+		return value * cls._get_unit_factor(unit)
 	
 	@classmethod
 	def _get_inkscape_layer_name(cls, node):
@@ -202,12 +231,9 @@ class ExportEffect(inkex.Effect):
 		return None
 	
 	@classmethod
-	def _get_unit_factor(cls, unit, default = None):
+	def _get_unit_factor(cls, unit):
 		if unit is None:
-			if default is None:
-				default = 1
-			
-			return default
+			return 1
 		else:
 			return cls._unit_factors[unit]
 	
@@ -217,3 +243,22 @@ class ExportEffect(inkex.Effect):
 			return '_'
 		else:
 			return re.sub('[^a-zA-Z0-9]', '_', layer.export_name)
+	
+	@classmethod
+	def check_document_units(cls, path):
+		with open(path, 'r') as file:
+			p = etree.XMLParser(huge_tree = True)
+			document = etree.parse(file, parser = p)
+		
+		height_attr = document.getroot().get('height')
+		
+		if height_attr is None:
+			raise util.UserError('SVG document has no height attribute. See https://github.com/Feuermurmel/openscad-template/wiki/Absolute-Measurements')
+		
+		_, height_unit = cls._parse_measure(height_attr)
+		
+		if height_unit is None or height_unit == 'px':
+			raise util.UserError('Height of SVG document is not an absolute measure. See https://github.com/Feuermurmel/openscad-template/wiki/Absolute-Measurements')
+		
+		if document.getroot().get('viewBox') is None:
+			raise util.UserError('SVG document has no viewBox attribute. See https://github.com/Feuermurmel/openscad-template/wiki/Absolute-Measurements')
