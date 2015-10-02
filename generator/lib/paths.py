@@ -265,16 +265,17 @@ _clipper_range = (1 << 62) - 1
 _clipper_scale = 1 << 31
 _clipper_infinity = _clipper_range / _clipper_scale
 
+_quadrant_intersections = [
+	lambda px, py, dx, dy: (_clipper_infinity, py + (_clipper_infinity - px) * dy / dx),
+	lambda px, py, dx, dy: (px + (_clipper_infinity - py) * dx / dy, _clipper_infinity), (-_clipper_infinity, _clipper_infinity),
+	lambda px, py, dx, dy: (-_clipper_infinity, py - (_clipper_infinity + px) * dy / dx),
+	lambda px, py, dx, dy: (px - (_clipper_infinity + py) * dx / dy, -_clipper_infinity)]
 
-def _contains_point_at_infinity(m : numpy.ndarray):
-	return numpy.count_nonzero(m[2]) < m.shape[0]
-
-
-_infinity_quadrant_intersections = [
-	(lambda px, py, dx, dy: (_clipper_infinity, py + (_clipper_infinity - px) * dy / dx), (_clipper_infinity, _clipper_infinity)),
-	(lambda px, py, dx, dy: (px + (_clipper_infinity - py) * dx / dy, _clipper_infinity), (-_clipper_infinity, _clipper_infinity)),
-	(lambda px, py, dx, dy: (-_clipper_infinity, py - (_clipper_infinity + px) * dy / dx), (-_clipper_infinity, -_clipper_infinity)),
-	(lambda px, py, dx, dy: (px - (_clipper_infinity + py) * dx / dy, -_clipper_infinity), (_clipper_infinity, -_clipper_infinity))]
+_quadrant_corners = [
+	(_clipper_infinity, _clipper_infinity),
+	(-_clipper_infinity, _clipper_infinity),
+	(-_clipper_infinity, -_clipper_infinity),
+	(_clipper_infinity, -_clipper_infinity)]
 
 
 def _get_infinity_quadrant(x, y):
@@ -287,24 +288,22 @@ def _get_infinity_quadrant(x, y):
 
 
 def _project_infinity(quadrant, point, direction):
-	fn, _ = _infinity_quadrant_intersections[quadrant]
 	px, py = point
 	dx, dy = direction
 	
-	return fn(px, py, dx, dy)
+	return _quadrant_intersections[quadrant](px, py, dx, dy)
 
 
-def _get_infinity_quadrant_corner(quadrant):
-	_, corner = _infinity_quadrant_intersections[quadrant]
-	
-	return corner
+def _iter_cyclic_pairs(seq : list):
+	return ((seq[i - 1], seq[i]) for i in range(len(seq)))
 
 
 def _transform_to_clipper(m : numpy.ndarray):
 	def iter_vertices():
+		# List of tuples with the coordinate of each vertex and either None (for finite positions) or the face index (for infinite positions).
 		infos = [((x, y), None if finite else _get_infinity_quadrant(x, y)) for x, y, finite in m.T]
 		
-		for (p1, q1), (p2, q2) in zip(infos, infos[1:] + infos[:1]):
+		for (p1, q1), (p2, q2) in _iter_cyclic_pairs(infos):
 			if q2 is None:
 				if q1 is not None:
 					yield _project_infinity(q1, p2, p1)
@@ -316,11 +315,15 @@ def _transform_to_clipper(m : numpy.ndarray):
 				else:
 					# Iterate from q1 to q2 cyclically.
 					for i in range(q1, (q2 - q1) % 4 + q1):
-						yield _get_infinity_quadrant_corner(i % 4)
+						yield _quadrant_corners[i % 4]
 	
 	def scale(x):
-		# TODO: We should instead probably throw an exception if we get a value out of range here.
-		return max(-_clipper_range, min(_clipper_range, round(_clipper_scale * x)))
+		res = _clipper_scale * x
+		
+		if res > _clipper_range or -res > _clipper_range:
+			raise Exception('Coordinate {} is outside of range supported by Clipper.'.format(x))
+		
+		return res
 	
 	return [(scale(x), scale(y)) for x, y in iter_vertices()]
 
