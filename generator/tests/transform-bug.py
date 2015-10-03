@@ -7,10 +7,10 @@ def main():
     S = paths.square()
 
     # OK:
-    t = paths.transform(1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    #t = paths.transform(1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
 
     # Fail:
-    #t = paths.transform(-1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    t = paths.transform(-1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
 
     St = t * S
 
