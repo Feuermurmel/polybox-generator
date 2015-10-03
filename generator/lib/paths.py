@@ -185,9 +185,9 @@ class Path(_Transformable):
 		"""
 		This path with the order of it's points reversed.
 		"""
-		
-		return type(numpy.fliplr(self.m))
-	
+
+		return type(self)(numpy.fliplr(self.m))
+
 	@property
 	def vertices(self):
 		"""
