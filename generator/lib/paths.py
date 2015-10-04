@@ -1,5 +1,5 @@
-import math, abc, numpy, pyclipper
-from . import util
+import math, abc, numpy, pyclipper, operator
+from . import util, linalg
 
 
 class _Transformable(metaclass = abc.ABCMeta):
@@ -263,19 +263,26 @@ _clipper_range = (1 << 62) - 1
 
 # Chosen by fair dice roll.
 _clipper_scale = 1 << 31
-_clipper_infinity = _clipper_range / _clipper_scale
 
 _quadrant_intersections = [
-	lambda px, py, dx, dy: (_clipper_infinity, py + (_clipper_infinity - px) * dy / dx),
-	lambda px, py, dx, dy: (px + (_clipper_infinity - py) * dx / dy, _clipper_infinity), (-_clipper_infinity, _clipper_infinity),
-	lambda px, py, dx, dy: (-_clipper_infinity, py - (_clipper_infinity + px) * dy / dx),
-	lambda px, py, dx, dy: (px - (_clipper_infinity + py) * dx / dy, -_clipper_infinity)]
+	lambda px, py, dx, dy: (_clipper_range, py + (_clipper_range - px) * dy / dx),
+	lambda px, py, dx, dy: (px + (_clipper_range - py) * dx / dy, _clipper_range),
+	lambda px, py, dx, dy: (-_clipper_range, py - (_clipper_range + px) * dy / dx),
+	lambda px, py, dx, dy: (px - (_clipper_range + py) * dx / dy, -_clipper_range)]
 
 _quadrant_corners = [
-	(_clipper_infinity, _clipper_infinity),
-	(-_clipper_infinity, _clipper_infinity),
-	(-_clipper_infinity, -_clipper_infinity),
-	(_clipper_infinity, -_clipper_infinity)]
+	(_clipper_range, _clipper_range),
+	(-_clipper_range, _clipper_range),
+	(-_clipper_range, -_clipper_range),
+	(_clipper_range, -_clipper_range)]
+
+
+def _get_clipper_range_edges(x, y):
+	return [
+		x >= _clipper_range,
+		y >= _clipper_range,
+		-x >= _clipper_range,
+		-y >= _clipper_range]
 
 
 def _get_infinity_quadrant(x, y):
@@ -287,55 +294,109 @@ def _get_infinity_quadrant(x, y):
 	return 3 * (x < -y) ^ (x < y)
 
 
-def _project_infinity(quadrant, point, direction):
-	px, py = point
-	dx, dy = direction
-	
-	return _quadrant_intersections[quadrant](px, py, dx, dy)
-
-
 def _iter_cyclic_pairs(seq : list):
 	return ((seq[i - 1], seq[i]) for i in range(len(seq)))
 
 
 def _transform_to_clipper(m : numpy.ndarray):
-	def iter_vertices():
-		# List of tuples with the coordinate of each vertex and either None (for finite positions) or the face index (for infinite positions).
-		infos = [((x, y), None if finite else _get_infinity_quadrant(x, y)) for x, y, finite in m.T]
+	def scale_coordinate(x):
+		res = int(round(_clipper_scale * x))
 		
-		for (p1, q1), (p2, q2) in _iter_cyclic_pairs(infos):
-			if q2 is None:
-				if q1 is not None:
-					yield _project_infinity(q1, p2, p1)
-				
-				yield p2
-			else:
-				if q1 is None:
-					yield _project_infinity(q2, p1, p2)
-				else:
-					# Iterate from q1 to q2 cyclically.
-					for i in range(q1, (q2 - q1) % 4 + q1):
-						yield _quadrant_corners[i % 4]
-	
-	def scale(x):
-		res = _clipper_scale * x
-		
-		if res > _clipper_range or -res > _clipper_range:
+		if not (-_clipper_range < res < _clipper_range):
 			raise Exception('Coordinate {} is outside of range supported by Clipper.'.format(x))
 		
 		return res
 	
-	return [(scale(x), scale(y)) for x, y in iter_vertices()]
+	def scale(p):
+		return numpy.array([scale_coordinate(i) for i in p])
+	
+	def project_to_edge(p, d):
+		p1, p2 = p
+		d1, d2 = d
+		
+		if d1:
+			e2 = p2 + (_clipper_range - p1) * d2 / d1
+			
+			if math.isfinite(e2):
+				return int(round(e2))
+		
+		return _clipper_range
+	
+	def project_infinity(p : numpy.ndarray, d : numpy.ndarray):
+		sign = numpy.round(numpy.sign(d)).astype(numpy.int64)
+		pq = p * sign
+		dq = d * sign
+		
+		ex = project_to_edge(pq[::-1], dq[::-1])
+		ey = project_to_edge(pq, dq)
+		
+		return numpy.array([min(i, _clipper_range) for i in [ex, ey]]) * sign
+	
+	def iter_projections():
+		for (p1, f1), (p2, f2) in _iter_cyclic_pairs([(i[:2], i[2]) for i in m.T]):
+			if f2:
+				if not f1:
+					yield (project_infinity(scale(p2), p1)), False
+				
+				yield (scale(p2)), True
+			elif f1:
+				yield (project_infinity(scale(p1), p2)), False
+	
+	def iter_vertices():
+		for (p1, f1), (p2, f2) in _iter_cyclic_pairs(list(iter_projections())):
+			if f2:
+				if not f1:
+					yield p1
+				
+				yield p2
+			elif f1:
+				yield p2
+			else:
+				q1 = _get_infinity_quadrant(*p1)
+				q2 = _get_infinity_quadrant(*p2)
+				
+				for i in range(q1, (q2 - q1) % 4 + q1):
+					yield numpy.array(_quadrant_corners[i % 4])
+	
+	return list(iter_vertices())
 
 
 def _transform_from_clipper(vertices : list):
-	def iter_coordinates():
+	def unscale(x, y):
+		return x / _clipper_scale, y / _clipper_scale, True
+	
+	def unproject_infinity(infinity, point):
+		x, y = linalg.normalize(numpy.array(infinity) - numpy.array(point))
+		
+		return x, y, False
+	
+	def iter_infos():
 		for x, y in vertices:
-			px = x / _clipper_scale
-			py = y / _clipper_scale
-			finite = -_clipper_range < x < _clipper_range and -_clipper_range < y < _clipper_range
+			# Currently pyclipper will return values outside the allowed range of pyclipper, thus we have to test using >=.
+			quadrant_edges = _get_clipper_range_edges(x, y)
 			
-			yield px, py, finite
+			yield (x, y), quadrant_edges if any(quadrant_edges) else None
+	
+	def handle_pair(p1, q1, p2, q2):
+		if q2 is None:
+			if q1 is not None:
+				yield unproject_infinity(p1, p2)
+			
+			yield unscale(*p2)
+		elif q1 is None:
+			yield unproject_infinity(p2, p1)
+		elif not any(map(operator.and_, q1, q2)):
+			x1, y1 = p1
+			x2, y2 = p2
+			p = (x1 + x2) / 2, (y1 + y2) / 2
+			
+			# Introduce a new, finite point in the middle of the line.
+			yield from handle_pair(p1, q1, p, None)
+			yield from handle_pair(p, None, p2, q2)
+	
+	def iter_coordinates():
+		for (p1, q1), (p2, q2) in _iter_cyclic_pairs(list(iter_infos())):
+			yield from handle_pair(p1, q1, p2, q2)
 	
 	return numpy.array(list(iter_coordinates())).T
 
@@ -357,6 +418,7 @@ class Polygon(_Transformable):
 	
 	def __init__(self, paths):
 		assert isinstance(paths, list)
+		assert all(len(i.vertices) > 2 for i in paths)
 		
 		self._paths = paths
 	
