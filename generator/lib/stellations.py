@@ -89,17 +89,28 @@ def make_teeth():
 	return Sm, Sh
 
 
-def teeth_length():
-	# TODO: Compute based on dihedral Angle
-	hin = 0.05
-	hout = 2.0
+def teeth_length(polyview):
+	d = 0.1
+
+	theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
+
+	if theta <= numpy.pi/2.0:
+		hin = 0.0
+	else:
+		hin = d / numpy.tan(numpy.pi - theta)
+
+	hout = d / numpy.sin(numpy.pi-theta)
+
+	# Manual override
+	#hin = 0.05
+	#hout = 2.0
 
 	return hin, hout
 
 
-def make_V():
+def make_V(polyview):
 	Sm, Sh = make_teeth()
-	hin, hout = teeth_length()
+	hin, hout = teeth_length(polyview)
 
 	H = paths.half_plane((0,  0),    ( 1, 0))
 	I = paths.half_plane((0,  hin),  ( 1, 0))
@@ -116,7 +127,7 @@ def face_V(polyview):
 	v = polyhedra.get_planar_coordinates(polyview)
 	n = len(v)
 
-	Vi, Hi = make_V()
+	Vi, Hi = make_V(polyview)
 
 	V = []
 	H = []
