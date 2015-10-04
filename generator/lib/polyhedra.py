@@ -143,7 +143,7 @@ def dihedral_angle(view1 : PolyhedronView, view2 : PolyhedronView):
 	"""
 	n1 = face_normal(view1)
 	n2 = face_normal(view2)
-	theta = numpy.arccos(numpy.dot(n1, n2))
+	theta = numpy.pi - numpy.arccos(numpy.dot(n1, n2))
 	return theta
 
 
