@@ -89,19 +89,24 @@ def make_teeth():
 	return Sm, Sh
 
 
-def make_V():
-	Sm, Sh = make_teeth()
-
+def teeth_length():
 	# TODO: Compute based on dihedral Angle
 	hin = 0.05
 	hout = 2.0
+
+	return hin, hout
+
+
+def make_V():
+	Sm, Sh = make_teeth()
+	hin, hout = teeth_length()
 
 	H = paths.half_plane((0,  0),    ( 1, 0))
 	I = paths.half_plane((0,  hin),  ( 1, 0))
 	O = paths.half_plane((0, -hout), (-1, 0))
 
-	To = (Sm | I) / O
-	Ti = (Sh | O) / I
+	To = Sm / O
+	Ti = Sh / I
 	V = (H / Ti) | To
 
 	return V, H
