@@ -2,6 +2,11 @@ import functools, numpy, operator
 from lib import polyhedra, paths, linalg
 from lib import util
 
+
+# Ugly fix for broen bool ops
+eps = 0.000001
+
+
 def stellation_over_edge(polyview):
 	"""
 	"""
@@ -71,7 +76,7 @@ def times():
 
 def make_strip(t1, t2):
 	h1 = paths.half_plane((t1, 0), (0, -1))
-	h2 = paths.half_plane((t2, 0), (0.001,  1))
+	h2 = paths.half_plane((t2, 0), (eps,  1))
 	return h1 & h2
 
 
@@ -100,6 +105,9 @@ def teeth_length(polyview):
 		hin = d / numpy.tan(numpy.pi - theta)
 
 	hout = d / numpy.sin(numpy.pi-theta)
+
+	hin += eps
+	hout += eps
 
 	# Manual override
 	#hin = 0.05
