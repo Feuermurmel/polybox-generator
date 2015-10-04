@@ -6,19 +6,19 @@ from ._helpers import write_line
 def arrange_shapes(shapes, size = 5, gap = 0.1):
 	width = math.ceil(math.sqrt(len(shapes)))
 	clip = paths.scale(size / 2) * paths.circle()
-
+	
 	def iter_arranged_shapes():
 		for i, shape in enumerate(shapes):
 			y, x = divmod(i, width)
-
+			
 			yield paths.move((size + gap) * x, -(size + gap) * y) * (shape & clip)
-
+	
 	return functools.reduce(lambda x, y: x | y, iter_arranged_shapes())
 
 
 def main(src_path):
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
-
+	
 	def iter_stellations():
 		for face in polyhedron.faces:
 			# TODO: Hack to get the offset of the view's vertex relative to the center of the view's face.
