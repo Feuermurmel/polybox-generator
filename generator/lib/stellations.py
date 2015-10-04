@@ -119,19 +119,18 @@ def face_V(polyview):
 	for i in range(n):
 		# ugly linalg here
 		a = v[i]
-		# b = v[(i+1)%n]
-		# k1 = b - a
-		# k2 = linalg.normalize(linalg.rot_cw(k1))
+		b = v[(i+1)%n]
+		k1 = b - a
+		k2 = linalg.normalize(linalg.rot_ccw(k1))
 
 		# General affine transform
-		# M = numpy.column_stack([k1, k2])
-		# #M = numpy.linalg.inv(M)
-		# tt = paths.transform(M[0,0], M[0,1], a[0], M[1,0], M[1,1], a[1])
+		M = numpy.column_stack([k1, k2])
+		tt = paths.transform(M[0,0], M[0,1], a[0], M[1,0], M[1,1], a[1])
 
 		# Rotate and move
-		t1 = paths.rotate(turns=i/n)
-		t2 = paths.move(a[0], a[1])
-		tt = t2 * t1
+		#t1 = paths.rotate(turns=i/n)
+		#t2 = paths.move(a[0], a[1])
+		#tt = t2 * t1
 
 		Vit = tt * Vi
 		V.append(Vit)
