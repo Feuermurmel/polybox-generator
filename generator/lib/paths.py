@@ -210,6 +210,8 @@ def path(*vertices):
 	Return a path using the specified coordinates.
 	
 	The arguments can either be `Vertex` instances or 2-tuples containing the arguments for `vertex()`.
+	
+	Please not that a path without any vertices, when used in a polygon, is interpreted as the area of the whole plane. The reasoning behind this is that a (convex) polygon ca be interpreted as the intersection of the set of half-spaces created by converting each edge into a half-space. The intersection of zero half-planes is the full plane. (And it was a convenient hack solving the problem of representing the whole plane.) 
 	"""
 	
 	def iter_vertices():
@@ -218,7 +220,7 @@ def path(*vertices):
 			
 			yield v.x, v.y, v.finite
 	
-	return Path(numpy.array(list(iter_vertices())).T)
+	return Path(numpy.array(list(iter_vertices())).reshape((-1, 3)).T)
 
 
 def line(anchor, direction):
@@ -338,30 +340,38 @@ def _transform_to_clipper(m : numpy.ndarray):
 				if not f1:
 					yield (project_infinity(scale(p2), p1)), False
 				
-				yield (scale(p2)), True
+				yield scale(p2), True
 			elif f1:
 				yield (project_infinity(scale(p1), p2)), False
 	
 	def iter_vertices():
-		for (p1, f1), (p2, f2) in _iter_cyclic_pairs(list(iter_projections())):
-			if f2:
-				if not f1:
-					yield p1
-				
-				yield p2
-			elif f1:
-				yield p2
-			else:
-				q1 = _get_infinity_quadrant(*p1)
-				q2 = _get_infinity_quadrant(*p2)
-				
-				for i in range(q1, (q2 - q1) % 4 + q1):
-					yield numpy.array(_quadrant_corners[i % 4])
+		projections = list(iter_projections())
+		
+		if projections:
+			for (p1, f1), (p2, f2) in _iter_cyclic_pairs(projections):
+				# TODO: Simplify this.
+				if f2:
+					if not f1:
+						yield p1
+					
+					yield p2
+				elif f1:
+					yield p2
+				else:
+					q1 = _get_infinity_quadrant(*p1)
+					q2 = _get_infinity_quadrant(*p2)
+					
+					for i in range(q1, (q2 - q1) % 4 + q1):
+						yield numpy.array(_quadrant_corners[i % 4])
+		else:
+			# The whole plane.
+			for i in range(4):
+				yield numpy.array(_quadrant_corners[i])
 	
 	return list(iter_vertices())
 
 
-def _transform_from_clipper(vertices : list):
+def _transform_from_clipper(vertices : list) -> numpy.ndarray:
 	def unscale(x, y):
 		return x / _clipper_scale, y / _clipper_scale, True
 	
@@ -398,7 +408,7 @@ def _transform_from_clipper(vertices : list):
 		for (p1, q1), (p2, q2) in _iter_cyclic_pairs(list(iter_infos())):
 			yield from handle_pair(p1, q1, p2, q2)
 	
-	return numpy.array(list(iter_coordinates())).T
+	return numpy.array(list(iter_coordinates())).reshape((-1, 3)).T
 
 
 class Polygon(_Transformable):
@@ -418,7 +428,16 @@ class Polygon(_Transformable):
 	
 	def __init__(self, paths):
 		assert isinstance(paths, list)
-		assert all(len(i.vertices) > 2 for i in paths)
+		
+		for i in paths:
+			vertices = i.vertices
+			
+			if vertices:
+				if len(vertices) < 3:
+					raise ValueError('Paths must be empty or have at least 3 vertices: {}'.format(i))
+				
+				if not any(j.finite for j in vertices):
+					raise ValueError('Non-empty paths must have at least 1 finite vertex: {}'.format(i))
 		
 		self._paths = paths
 	
@@ -523,4 +542,4 @@ def plane():
 	The everything.
 	"""
 	
-	return polygon([vertex_at_infinity(1, 0), vertex_at_infinity(-1, 0)])
+	return polygon([])

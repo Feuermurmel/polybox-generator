@@ -1,6 +1,6 @@
 import sys, functools, math, numpy
 from lib import polyhedra, stellations, paths, export
-from ._helpers import write_line
+from generate._helpers import write_line
 
 
 def arrange_shapes(shapes, size = 5, gap = 0.1):
