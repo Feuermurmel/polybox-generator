@@ -8,11 +8,8 @@ def _asymptote_path_array(x, depth):
 	
 	def convert_path(element, closed):
 		def iter_pairs():
-			for i in element.vertices:
-				if not i.finite:
-					raise Exception('Path contains points at infinity: {}'.format(element))
-				
-				yield '({}mm, {}mm)'.format(i.x, i.y)
+			for x, y in element.vertices:
+				yield '({}mm, {}mm)'.format(x, y)
 		
 		res = ' -- '.join(iter_pairs())
 		
@@ -22,11 +19,11 @@ def _asymptote_path_array(x, depth):
 		return res
 	
 	def convert_element(element, depth):
-		if isinstance(element, paths.Vertex):
+		if isinstance(element, tuple):
 			assert depth == 0
 			
-			return convert_path(paths.path([element]), False)
-		if isinstance(element, paths.Path):
+			return convert_path(paths.path(element), False)
+		elif isinstance(element, paths.Path):
 			assert depth == 0
 			
 			return convert_path(element, False)
@@ -82,7 +79,7 @@ def openscad_polygon(polygon : paths.Polygon):
 	paths = [[save_vertex(j) for j in i.vertices] for i in polygon.paths]
 	
 	return 'polygon({}, {});'.format(
-		_array(_array(map(str, [i.x, i.y])) for i in vertices),
+		_array(_array(map(str, i)) for i in vertices),
 		_array(_array(map(str, i)) for i in paths))
 
 

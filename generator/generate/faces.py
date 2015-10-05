@@ -23,7 +23,7 @@ def main(src_path):
 	def iter_stellations():
 		for face in polyhedron.faces:
 			# TODO: Hack to get the offset of the view's vertex relative to the center of the view's face.
-			c = -numpy.mean([[i.x, i.y] for i in polyhedra.get_planar_polygon(face).paths[0].vertices], 0)
+			c = -numpy.mean(polyhedra.get_planar_polygon(face).paths[0].vertices, 0)
 			
 			yield paths.move(*c) * stellations.stellation_over_view(face)
 	
