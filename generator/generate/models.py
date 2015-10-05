@@ -1,8 +1,8 @@
-import sys
-from lib import polyhedra
+from lib import polyhedra, util
 from ._helpers import write_line, write_call, write_group
 
 
+@util.main
 def main(src_path):
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
 	
@@ -16,7 +16,3 @@ def main(src_path):
 				with write_group('multmatrix', t):
 					with write_group('scale', [1, 1, -1]):
 						write_call('half_space')
-				
-
-
-main(*sys.argv[1:])

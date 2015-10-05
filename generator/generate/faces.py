@@ -1,5 +1,5 @@
-import sys, functools, math, numpy
-from lib import polyhedra, stellations, paths, export
+import functools, math, numpy
+from lib import polyhedra, stellations, paths, export, util
 from generate._helpers import write_line
 
 
@@ -16,6 +16,7 @@ def arrange_shapes(shapes, size = 5, gap = 0.1):
 	return functools.reduce(lambda x, y: x | y, iter_arranged_shapes())
 
 
+@util.main
 def main(src_path):
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
 	
@@ -31,6 +32,3 @@ def main(src_path):
 	write_line('import "../_laser_cutting" as _laser_cutting;')
 	write_line('fill({}, red + white);', export.asymptote_expression(stellation))
 	write_line('draw({}, black);', export.asymptote_expression(stellation))
-
-
-main(*sys.argv[1:])

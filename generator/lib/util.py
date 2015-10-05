@@ -1,4 +1,4 @@
-import sys, os, math, contextlib
+import sys, os, math, contextlib, inspect
 
 
 # "We get further from truth when we obscure what we say." -- https://www.youtube.com/watch?v=FtxmFlMLYRI
@@ -7,6 +7,38 @@ tau = 2 * math.pi
 
 def log(message, *args):
 	print(message.format(*args), file = sys.stderr)
+
+
+class UserError(Exception):
+	"""
+	Error that should be reported to the user. Throwing this exception will not print a stack trace.
+	"""
+	
+	def __init__(self, message, *args):
+		super().__init__(message.format(*args))
+
+
+def main(fn):
+	"""
+	Decorator for "main" functions. Decorates a function that should be called when the containing module is run as a script (e.g. via python -m <module>).
+	"""
+	
+	frame = inspect.currentframe().f_back
+	
+	def wrapped_fn(*args, **kwargs):
+		try:
+			fn(*args, **kwargs)
+		except UserError as e:
+			log('Error: {}', e)
+			sys.exit(1)
+		except KeyboardInterrupt:
+			sys.exit(2)
+	
+	if frame.f_globals['__name__'] == '__main__':
+		wrapped_fn(*sys.argv[1:])
+	
+	# Allow the main function also to be called explicitly
+	return wrapped_fn
 
 
 @contextlib.contextmanager
