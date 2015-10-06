@@ -1,5 +1,10 @@
 import functools, numpy, operator
 from lib import polyhedra, paths, linalg
+from lib import util
+
+
+# Ugly fix for broen bool ops
+eps = 0.000001
 
 
 def stellation_over_edge(polyview):
@@ -10,7 +15,7 @@ def stellation_over_edge(polyview):
 
 	opposite = polyview.opposite
 	l1, l2, m = polyhedra.view_local_onb(opposite)
-	yield (u, k1, -m)
+	#yield (u, k1, -m)
 
 	for face in opposite.face_cycle:
 		neighbour = face.opposite
@@ -59,5 +64,111 @@ def stellation_over_view(polyview):
 		lines = line_to_face_coordinates(polyview, lines)
 		cells.append(compute_halfplanes(lines))
 
-	stellation = functools.reduce(operator.__xor__, cells)
+
+	#stellation = functools.reduce(operator.__xor__, cells)
+	stellation = cells
 	return stellation
+
+
+def times():
+	return [0.0, 0.1, 0.4, 0.5, 0.6, 0.9]
+
+
+def make_strip(t1, t2):
+	h1 = paths.half_plane((t1, 0), (0, -1))
+	h2 = paths.half_plane((t2, 0), (eps,  1))
+	return h1 & h2
+
+
+def make_teeth():
+	A = make_strip(0, 1)
+
+	Sm = []
+	T = times()
+	for t1, t2 in zip(T[::2], T[1::2]):
+		Sm.append(make_strip(t1, t2))
+
+	Sm = functools.reduce(operator.__or__, Sm)
+	Sh = (~Sm) & A
+
+	return Sm, Sh
+
+
+def teeth_length(polyview):
+	d = 0.1
+
+	theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
+
+	if theta <= numpy.pi/2.0:
+		hin = 0.0
+	else:
+		hin = d / numpy.tan(numpy.pi - theta)
+
+	hout = d / numpy.sin(numpy.pi-theta)
+
+	hin += eps
+	hout += eps
+
+	# Manual override
+	#hin = 0.05
+	#hout = 2.0
+
+	return hin, hout
+
+
+def make_V(polyview):
+	Sm, Sh = make_teeth()
+	hin, hout = teeth_length(polyview)
+
+	H = paths.half_plane((0,  0),    ( 1, 0))
+	I = paths.half_plane((0,  hin),  ( 1, 0))
+	O = paths.half_plane((0, -hout), (-1, 0))
+
+	To = Sm / O
+	Ti = Sh / I
+	V = (H / Ti) | To
+
+	return V, H
+
+
+def face_V(polyview):
+	v = polyhedra.get_planar_coordinates(polyview)
+	n = len(v)
+
+	Vi, Hi = make_V(polyview)
+
+	V = []
+	H = []
+
+	for i in range(n):
+		# ugly linalg here
+		a = v[i]
+		b = v[(i+1)%n]
+		k1 = b - a
+		k2 = linalg.normalize(linalg.rot_ccw(k1))
+
+		# General affine transform
+		M = numpy.column_stack([k1, k2])
+		tt = paths.transform(M[0,0], M[0,1], a[0], M[1,0], M[1,1], a[1])
+
+		# Rotate and move
+		#t1 = paths.rotate(turns=i/n)
+		#t2 = paths.move(a[0], a[1])
+		#tt = t2 * t1
+
+		Vit = tt * Vi
+		V.append(Vit)
+		Hit = tt * Hi
+		H.append(Hit)
+
+	return V, H
+
+
+def stellation_over_face(polyview):
+	A = paths.plane()
+	V, H = face_V(polyview)
+	S = stellation_over_view(polyview)
+	Ri = [~(Vi & (Hi | Si)) for Vi, Hi, Si in zip(V,H,S)]
+	R = functools.reduce(operator.__or__, Ri)
+
+	return A / R
