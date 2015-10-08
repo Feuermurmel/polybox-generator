@@ -30,6 +30,7 @@ setup_venv() {
 	PYTHON_COMMAND=$(find_command python3{.{5,4},})
 	
 	setup_venv venv "$PYTHON_COMMAND"
-	pip install --pre 'https://github.com/Feuermurmel/pyclipper/archive/master.zip'
-	pip install --pre numpy
+	pip install cython
+	pip install 'https://github.com/Feuermurmel/pyclipper/archive/master.zip'
+	pip install numpy
 )
