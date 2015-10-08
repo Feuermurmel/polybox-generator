@@ -6,10 +6,10 @@ def main():
 
     S = paths.square()
 
-    # OK:
-    #t = paths.transform(1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    # OK
+    t = paths.transform(1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
 
-    # Fail:
+    # Fail (fixed)
     t = paths.transform(-1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
 
     St = t * S

@@ -12,7 +12,7 @@ def main():
     # OK
     hin = 0.1
 
-    # Fail
+    # Fail (fixed)
     hin = 0.0
 
     # Bool ops

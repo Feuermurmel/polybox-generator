@@ -17,12 +17,12 @@ def main():
     h1 = paths.half_plane((-0.5, 0), (0,         -1))
     h2 = paths.half_plane(( 0.5, 0), (0.0000001,  1))
 
-    # Wrong!
-    # h1 = paths.half_plane((-0.5, 0), (0, -1))
-    # h2 = paths.half_plane(( 0.5, 0), (0,  1))
+    # Fail (fixed)
+    h1 = paths.half_plane((-0.5, 0), (0, -1))
+    h2 = paths.half_plane(( 0.5, 0), (0,  1))
 
-    # h1 = paths.half_plane((0,  0.5), (-1, 0))
-    # h2 = paths.half_plane((0, -0.5), ( 1, 0))
+    h1 = paths.half_plane((0,  0.5), (-1, 0))
+    h2 = paths.half_plane((0, -0.5), ( 1, 0))
 
     x = h1 & h2
 
