@@ -82,15 +82,10 @@ def make_strip(t1, t2):
 
 def make_teeth():
 	A = make_strip(0, 1)
-
-	Sm = []
 	T = times()
-	for t1, t2 in zip(T[::2], T[1::2]):
-		Sm.append(make_strip(t1, t2))
-
+	Sm = [make_strip(t1, t2) for t1, t2 in zip(T[::2], T[1::2])]
 	Sm = functools.reduce(operator.__or__, Sm)
 	Sh = (~Sm) & A
-
 	return Sm, Sh
 
 
