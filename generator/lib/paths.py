@@ -1,10 +1,10 @@
-import math, abc, numpy, pyclipper, operator
-from . import util, linalg
+import math, abc, numpy, pyclipper, fractions
+from . import util
 
 
 class _Transformable(metaclass = abc.ABCMeta):
 	@abc.abstractmethod
-	def _transform(self, transformation : 'Transformation'): pass
+	def _transform(self, transformation : numpy.ndarray): pass
 
 
 class Transformation(_Transformable):
@@ -20,10 +20,10 @@ class Transformation(_Transformable):
 		self.m = m
 	
 	def __mul__(self, other : _Transformable):
-		return other._transform(self)
+		return other._transform(self.m)
 	
-	def _transform(self, transformation):
-		return type(self)(numpy.dot(transformation.m, self.m))
+	def _transform(self, tm):
+		return type(self)(numpy.dot(tm, self.m))
 	
 	@property
 	def det(self):
@@ -88,79 +88,14 @@ def move(x = 0, y = 0):
 	return transform(1, 0, x, 0, 1, y)
 
 
-class Vertex(_Transformable):
-	def __init__(self, x : float, y : float, finite : bool):
-		self.x = x
-		self.y = y
-		self.finite = finite
-	
-	def __repr__(self):
-		return 'Vertex({}, {}, finite = {})'.format(self.x, self.y, self.finite)
-	
-	def __add__(self, other : 'Vertex'):
-		"""
-		Add the coordinate of this point to the coordinate of the specified point.
-		
-		If one of the points is at infinity, the other point will be ignored. If both points are at infinity, an exception is raised.
-		"""
-		
-		if self.finite:
-			if other.finite:
-				return type(self)(self.x + other.x, self.y + other.y, True)
-			else:
-				return other
-		else:
-			if other.finite:
-				return self
-			else:
-				raise Exception('Cannot add two vertices at infinity.')
-	
-	def _transform(self, transformation):
-		return path(self)._transform(transformation).vertices[0]
-
-
-def vertex(x, y):
-	"""
-	Returns a vertex at the specified coordinates.
-	"""
-	
-	return Vertex(x, y, True)
-
-
-def vertex_at_infinity(x, y):
-	"""
-	Returns a vertex infinitely far away from the origin in the specified direction.
-	"""
-	
-	assert x or y
-	
-	return Vertex(x, y, False)
-
-
-def _cast_vertex(v):
-	if not isinstance(v, Vertex):
-		v = vertex(*v)
-		
-	return v
-
-
-def _cast_direction_vertex(v):
-	v = _cast_vertex(v)
-	
-	if v.finite:
-		v = vertex_at_infinity(v.x, v.y)
-	
-	return v
-
-
 class Path(_Transformable):
 	"""
 	Represents an open path which can be transformed and exported to Asymptote and OpenSCAD.
 	
 	You can join two paths like this:
 	
-	>>> p1 = path([(0, 0), (1, 1)])
-	>>> p2 = path([(2, 1)])
+	>>> p1 = path((0, 0), (1, 1))
+	>>> p2 = path((2, 1))
 	>>> p1 + p2
 	"""
 	
@@ -172,7 +107,7 @@ class Path(_Transformable):
 		self.m = m
 	
 	def __add__(self, other):
-		return join_paths([self, other])
+		return join_paths(self, other)
 	
 	def __repr__(self):
 		return 'Path({})'.format(self.m)
@@ -194,7 +129,7 @@ class Path(_Transformable):
 		Return the vertices of this path as a list of Vertex instances.
 		"""
 		
-		return [Vertex(x, y, bool(z)) for x, y, z in self.m.T]
+		return [(x, y) for x, y, _ in self.m.T]
 	
 	@property
 	def finite(self):
@@ -205,6 +140,19 @@ class Path(_Transformable):
 		return numpy.count_nonzero(self.m[2]) == self.m.shape[0]
 
 
+_the_one = numpy.array([1], numpy.float64)
+_the_zero = numpy.array([0], numpy.float64)
+
+
+def _cast_vertex(v, direction = False):
+	arr = numpy.array(v, numpy.float64)
+	
+	assert arr.shape == (2,)
+	assert not direction or numpy.count_nonzero(arr)
+	
+	return numpy.concatenate((arr, _the_zero if direction else _the_one))
+
+		
 def path(*vertices):
 	"""
 	Return a path using the specified coordinates.
@@ -216,31 +164,9 @@ def path(*vertices):
 	
 	def iter_vertices():
 		for v in vertices:
-			v = _cast_vertex(v)
-			
-			yield v.x, v.y, v.finite
+			yield _cast_vertex(v)
 	
 	return Path(numpy.array(list(iter_vertices())).reshape((-1, 3)).T)
-
-
-def line(anchor, direction):
-	"""
-	Return an infinite path representing the infinite line through the specified anchor and extending infinitely parallel to the specified direction infinitely in both directions infinitely.
-	
-	Infinitely.
-	
-	For suitable definitions of infinite.
-	
-	:param anchor: Vertex instance or tuple.
-	:param direction: Vertex instance or tuple.
-	"""
-	
-	anchor = _cast_vertex(anchor)
-	direction = _cast_direction_vertex(direction)
-	
-	assert not direction.finite
-	
-	return path(scale(-1) * direction, anchor, direction)
 
 
 def _cast_path(p):
@@ -266,149 +192,11 @@ _clipper_range = (1 << 62) - 1
 # Chosen by fair dice roll.
 _clipper_scale = 1 << 31
 
-_quadrant_intersections = [
-	lambda px, py, dx, dy: (_clipper_range, py + (_clipper_range - px) * dy / dx),
-	lambda px, py, dx, dy: (px + (_clipper_range - py) * dx / dy, _clipper_range),
-	lambda px, py, dx, dy: (-_clipper_range, py - (_clipper_range + px) * dy / dx),
-	lambda px, py, dx, dy: (px - (_clipper_range + py) * dx / dy, -_clipper_range)]
-
 _quadrant_corners = [
 	(_clipper_range, _clipper_range),
 	(-_clipper_range, _clipper_range),
 	(-_clipper_range, -_clipper_range),
 	(_clipper_range, -_clipper_range)]
-
-
-def _get_clipper_range_edges(x, y):
-	return [
-		x >= _clipper_range,
-		y >= _clipper_range,
-		-x >= _clipper_range,
-		-y >= _clipper_range]
-
-
-def _get_infinity_quadrant(x, y):
-	"""
-	Partitions the plane into 4 quadrants, rotated by tau / 8 relative to the quadrants of the coordinate system. Quadrants are numbered 0 through 3 and specify the four cones in the direction of the positive x axis, the positive y axis, the negative x axis and the negative y axis respectively.
-	"""
-	
-	# Did I say that I like compact code?
-	return 3 * (x < -y) ^ (x < y)
-
-
-def _iter_cyclic_pairs(seq : list):
-	return ((seq[i - 1], seq[i]) for i in range(len(seq)))
-
-
-def _transform_to_clipper(m : numpy.ndarray):
-	def scale_coordinate(x):
-		res = int(round(_clipper_scale * x))
-		
-		if not (-_clipper_range < res < _clipper_range):
-			raise Exception('Coordinate {} is outside of range supported by Clipper.'.format(x))
-		
-		return res
-	
-	def scale(p):
-		return numpy.array([scale_coordinate(i) for i in p])
-	
-	def project_to_edge(p, d):
-		p1, p2 = p
-		d1, d2 = d
-		
-		if d1:
-			e2 = p2 + (_clipper_range - p1) * d2 / d1
-			
-			if math.isfinite(e2):
-				return int(round(e2))
-		
-		return _clipper_range
-	
-	def project_infinity(p : numpy.ndarray, d : numpy.ndarray):
-		sign = numpy.round(numpy.sign(d)).astype(numpy.int64)
-		pq = p * sign
-		dq = d * sign
-		
-		ex = project_to_edge(pq[::-1], dq[::-1])
-		ey = project_to_edge(pq, dq)
-		
-		return numpy.array([min(i, _clipper_range) for i in [ex, ey]]) * sign
-	
-	def iter_projections():
-		for (p1, f1), (p2, f2) in _iter_cyclic_pairs([(i[:2], i[2]) for i in m.T]):
-			if f2:
-				if not f1:
-					yield (project_infinity(scale(p2), p1)), False
-				
-				yield scale(p2), True
-			elif f1:
-				yield (project_infinity(scale(p1), p2)), False
-	
-	def iter_vertices():
-		projections = list(iter_projections())
-		
-		if projections:
-			for (p1, f1), (p2, f2) in _iter_cyclic_pairs(projections):
-				# TODO: Simplify this.
-				if f2:
-					if not f1:
-						yield p1
-					
-					yield p2
-				elif f1:
-					yield p2
-				else:
-					q1 = _get_infinity_quadrant(*p1)
-					q2 = _get_infinity_quadrant(*p2)
-					
-					for i in range(q1, (q2 - q1) % 4 + q1):
-						yield numpy.array(_quadrant_corners[i % 4])
-		else:
-			# The whole plane.
-			for i in range(4):
-				yield numpy.array(_quadrant_corners[i])
-	
-	return list(iter_vertices())
-
-
-def _transform_from_clipper(vertices : list) -> numpy.ndarray:
-	def unscale(x, y):
-		return x / _clipper_scale, y / _clipper_scale, True
-	
-	def unproject_infinity(infinity, point):
-		x, y = linalg.normalize(numpy.array(infinity) - numpy.array(point))
-		
-		return x, y, False
-	
-	def iter_infos():
-		for x, y in vertices:
-			# Currently pyclipper will return values outside the allowed range of pyclipper, thus we have to test using >=.
-			quadrant_edges = _get_clipper_range_edges(x, y)
-			
-			yield (x, y), quadrant_edges if any(quadrant_edges) else None
-	
-	def handle_pair(p1, q1, p2, q2):
-		if q2 is None:
-			if q1 is not None:
-				yield unproject_infinity(p1, p2)
-			
-			yield unscale(*p2)
-		elif q1 is None:
-			yield unproject_infinity(p2, p1)
-		elif not any(map(operator.and_, q1, q2)):
-			x1, y1 = p1
-			x2, y2 = p2
-			p = (x1 + x2) / 2, (y1 + y2) / 2
-			
-			# Introduce a new, finite point in the middle of the line.
-			yield from handle_pair(p1, q1, p, None)
-			yield from handle_pair(p, None, p2, q2)
-	
-	def iter_coordinates():
-		for (p1, q1), (p2, q2) in _iter_cyclic_pairs(list(iter_infos())):
-			yield from handle_pair(p1, q1, p2, q2)
-	
-	return numpy.array(list(iter_coordinates())).reshape((-1, 3)).T
 
 
 class Polygon(_Transformable):
@@ -426,21 +214,6 @@ class Polygon(_Transformable):
 	>>> ~p1 # Take the complement.
 	"""
 	
-	def __init__(self, paths):
-		assert isinstance(paths, list)
-		
-		for i in paths:
-			vertices = i.vertices
-			
-			if vertices:
-				if len(vertices) < 3:
-					raise ValueError('Paths must be empty or have at least 3 vertices: {}'.format(i))
-				
-				if not any(j.finite for j in vertices):
-					raise ValueError('Non-empty paths must have at least 1 finite vertex: {}'.format(i))
-		
-		self._paths = paths
-	
 	def __invert__(self):
 		return plane() / self
 	
@@ -457,42 +230,244 @@ class Polygon(_Transformable):
 		return self._combine(other, pyclipper.CT_DIFFERENCE)
 	
 	def _combine(self, other : 'Polygon', operation):
-		pc = pyclipper.Pyclipper()
-		
-		for i in self.paths:
-			pc.AddPath(_transform_to_clipper(i.m), pyclipper.PT_SUBJECT, True)
-		
-		for i in other.paths:
-			pc.AddPath(_transform_to_clipper(i.m), pyclipper.PT_CLIP, True)
-		
-		solution = pc.Execute(operation, pyclipper.PFT_EVENODD, pyclipper.PFT_EVENODD)
-		
-		return type(self)([Path(_transform_from_clipper(i)) for i in solution])
+		return _CombinedPolygon(self, other, operation)
 	
-	def _transform(self, transformation):
-		paths = [i._transform(transformation) for i in self.paths]
-		
-		if transformation.det < 0:
-			# This transformation would change the winding direction of paths and would this invert parts of the polygon which have points at infinity. Thus we reverse all paths here.
-			paths = [i.reversed for i in paths]
-		
-		return type(self)(paths)
+	def _transform(self, tm : numpy.ndarray):
+		return _TransformedPolygon(self, tm)
+	
+	@abc.abstractmethod
+	def _get_pyclipper_paths(self, tm : numpy.ndarray) -> list:
+		pass
 	
 	@property
+	@abc.abstractmethod
 	def paths(self):
 		"""
 		List of paths describing the boundaries of all disconnected parts of this polygon.
-		"""
 		
-		return self._paths
+		Accessing this property on a composite polygon will lead to all intermediate operations and transformations being executed. The resulting polygon must be finite, otherwise an exception will be thrown.
+		"""
+	
+	@classmethod
+	def _transform_coordinate(cls, tm : numpy.ndarray, v : numpy.ndarray):
+		x, y, _ = numpy.dot(tm, v)
+		
+		return fractions.Fraction.from_float(x), fractions.Fraction.from_float(y)
+	
+	@classmethod
+	def _scale_point(cls, tm : numpy.ndarray, p : numpy.ndarray):
+		x, y = cls._transform_coordinate(tm, p)
+		
+		return cls._scale(x), cls._scale(y)
+	
+	@classmethod
+	def _scale(cls, x):
+		res = round(_clipper_scale * x)
+		
+		if not (-_clipper_range < res < _clipper_range):
+			raise Exception('Coordinate {} is outside of range supported by Clipper.'.format(x))
+		
+		return res
+
+
+class _ConcretePolygon(Polygon):
+	def __init__(self, paths):
+		assert isinstance(paths, list)
+		
+		for i in paths:
+			_, n = i.m.shape
+			
+			if n < 3:
+				raise ValueError('Paths must have at least 3 vertices: {}'.format(i))
+		
+		self._paths = paths
+	
+	def _get_pyclipper_paths(self, tm: numpy.ndarray):
+		def _iter_paths():
+			for i in self._paths:
+				def _iter_vertices():
+					path = [self._scale_point(tm, j) for j in i.m.T]
+					prev = path[-1]
+					
+					for j in path:
+						if j != prev:
+							prev = j
+							
+							yield j
+				
+				vertices = list(_iter_vertices())
+				
+				if len(vertices) > 2:
+					yield vertices
+		
+		return list(_iter_paths())
 	
 	@property
-	def finite(self):
-		"""
-		Returns whether none of the vertices of this polygon lie at infinite coordinates.
-		"""
+	def paths(self):
+		return self._paths
+
+
+class _CompositePolygon(Polygon):
+	def __init__(self):
+		self._cached_paths = None
+	
+	@property
+	def paths(self):
+		if self._cached_paths is None:
+			self._cached_paths = self._render()
 		
-		return all(i.finite for i in self.paths)
+		return self._cached_paths
+	
+	def _render(self):
+		paths = self._get_pyclipper_paths(numpy.eye(3))
+		
+		def _iter_paths():
+			for i in paths:
+				def _iter_vertices():
+					path = [(self._unscale(x), self._unscale(y)) for x, y in i]
+					prev = path[-1]
+					
+					for j in path:
+						if j != prev:
+							prev = j
+							
+							yield j
+				
+				vertices = list(_iter_vertices())
+				
+				if len(vertices) > 2:
+					yield path(*vertices)
+		
+		return list(_iter_paths())
+	
+	@classmethod
+	def _unscale(cls, x):
+		if not (-_clipper_range < x < _clipper_range):
+			raise Exception('Result contains vertices at infinity.')
+		
+		return x / _clipper_scale
+
+
+class _TransformedPolygon(_CompositePolygon):
+	def __init__(self, polygon : Polygon, tm : numpy.ndarray):
+		super().__init__()
+		
+		assert isinstance(tm, numpy.ndarray)
+		
+		self._polygon = polygon
+		self._tm = tm
+	
+	def _get_pyclipper_paths(self, tm : numpy.ndarray):
+		return self._polygon._get_pyclipper_paths(numpy.dot(tm, self._tm))
+
+
+class _CombinedPolygon(_CompositePolygon):
+	def __init__(self, left : Polygon, right : Polygon, operation):
+		super().__init__()
+		
+		self._left = left
+		self._right = right
+		self._operation = operation
+	
+	def _get_pyclipper_paths(self, tm: numpy.ndarray):
+		pc = pyclipper.Pyclipper()
+		# pc.StrictlySimple = True
+		
+		for i in self._left._get_pyclipper_paths(tm):
+			pc.AddPath(i, pyclipper.PT_SUBJECT, True)
+		
+		for i in self._right._get_pyclipper_paths(tm):
+			pc.AddPath(i, pyclipper.PT_CLIP, True)
+		
+		solution = pc.Execute(self._operation, pyclipper.PFT_EVENODD, pyclipper.PFT_EVENODD)
+		
+		# Clipper can return paths that it itself considers invalid as input. ._.
+		assert all(-_clipper_range <= k <= _clipper_range for i in solution for j in i for k in j), solution
+		assert all(len(i) > 2 for i in solution)
+		
+		return solution
+
+
+class _HalfPlane(_CompositePolygon):
+	"""
+	Special Polygon which represents a half-plane.
+	"""
+	
+	def __init__(self, anchor : numpy.ndarray, direction : numpy.ndarray):
+		super().__init__()
+		
+		self._anchor = anchor
+		self._direction = direction
+	
+	def _get_pyclipper_paths(self, tm : numpy.ndarray):
+		px, py = self._scale_point(tm, self._anchor)
+		dx, dy = self._transform_coordinate(tm, self._direction)
+		
+		e1x, e1y = self._project_infinity(px, py, dx, dy)
+		e2x, e2y = self._project_infinity(px, py, -dx, -dy)
+		
+		r1 = self._get_clipper_range_edges(e1x, e1y)
+		r2 = self._get_clipper_range_edges(e2x, e2y)
+		
+		def iter_points():
+			i = 0
+			
+			yield e1x, e1y
+			
+			while not r1[i % 4]:
+				i += 1
+			
+			while r1[i % 4]:
+				i += 1
+			
+			i -= 1
+			
+			while not r2[i % 4]:
+				yield _quadrant_corners[i % 4]
+				i += 1
+			
+			yield e2x, e2y
+		
+		return [list(iter_points())]
+	
+	@classmethod
+	def _project_to_edge(cls, p1, p2, d1, d2):
+		if d1:
+			return min(round(p2 + (_clipper_range - p1) * d2 / d1), _clipper_range)
+		else:
+			return _clipper_range
+	
+	@classmethod
+	def _project_infinity(cls, px, py, dx, dy):
+		sx = -1 if dx < 0 else 1
+		sy = -1 if dy < 0 else 1
+		
+		pqx = px * sx
+		pqy = py * sy
+		dqx = dx * sx
+		dqy = dy * sy
+		
+		ex = cls._project_to_edge(pqy, pqx, dqy, dqx)
+		ey = cls._project_to_edge(pqx, pqy, dqx, dqy)
+		
+		return ex * sx, ey * sy
+	
+	@classmethod
+	def _get_clipper_range_edges(cls, x, y):
+		return [
+			x == _clipper_range,
+			y == _clipper_range,
+			-x == _clipper_range,
+			-y == _clipper_range]
+
+
+class _Plane(_CompositePolygon):
+	"""
+	Special Polygon which represents the whole plane.
+	"""
+	
+	def _get_pyclipper_paths(self, tm : numpy.ndarray):
+		return [_quadrant_corners]
 
 
 def polygon(*paths):
@@ -504,7 +479,7 @@ def polygon(*paths):
 	The arguments can either be `Path` instances or iterables of vertices. The vertices can be anything accepted by `path()`.
 	"""
 	
-	return Polygon([_cast_path(i) for i in paths])
+	return _ConcretePolygon([_cast_path(i) for i in paths])
 
 
 def circle(n = 64):
@@ -531,10 +506,10 @@ def square():
 
 def half_plane(anchor, direction):
 	"""
-	Return a Polygon instance representing the half-plane which is delimited by the line through the specified anchor and running parallel to the specified direction. In the specified direction, the polygon is to the left of that line.
+	Return a Polygon instance representing the half-plane which is delimited by the line through the specified anchor and running orthogonal to the specified direction. The specified direction points outward of the half-plane.
 	"""
 	
-	return polygon(line(anchor, direction))
+	return _HalfPlane(_cast_vertex(anchor), _cast_vertex(direction, True))
 
 
 def plane():
@@ -542,4 +517,4 @@ def plane():
 	The everything.
 	"""
 	
-	return polygon([])
+	return _Plane()

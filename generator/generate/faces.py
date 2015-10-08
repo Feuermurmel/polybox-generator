@@ -1,4 +1,4 @@
-import functools, math, numpy
+import sys, functools, math, numpy
 from lib import polyhedra, stellations, paths, export, util
 from generate._helpers import write_line
 
@@ -23,7 +23,7 @@ def main(src_path):
 	def iter_stellations():
 		for face in polyhedron.faces:
 			# TODO: Hack to get the offset of the view's vertex relative to the center of the view's face.
-			c = -numpy.mean([[i.x, i.y] for i in polyhedra.get_planar_polygon(face).paths[0].vertices], 0)
+			c = -numpy.mean(polyhedra.get_planar_polygon(face).paths[0].vertices, 0)
 
 			yield paths.move(*c) * stellations.stellation_over_face(face)
 
@@ -32,7 +32,7 @@ def main(src_path):
 	def iter_faces():
 		for face in polyhedron.faces:
 			# TODO: Hack to get the offset of the view's vertex relative to the center of the view's face.
-			c = -numpy.mean([[i.x, i.y] for i in polyhedra.get_planar_polygon(face).paths[0].vertices], 0)
+			c = -numpy.mean(polyhedra.get_planar_polygon(face).paths[0].vertices, 0)
 
 			yield paths.move(*c) * polyhedra.get_planar_polygon(face)
 
@@ -44,3 +44,6 @@ def main(src_path):
 	write_line('fill({}, red + white);', export.asymptote_expression(stellation))
 	write_line('draw({}, black);', export.asymptote_expression(stellation))
 	write_line('draw({}, gray);', export.asymptote_expression(faces))
+
+
+main(*sys.argv[1:])
