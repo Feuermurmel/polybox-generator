@@ -115,12 +115,35 @@ def view_local_onb(view : PolyhedronView):
 
 def face_coordinate_system(view : PolyhedronView):
 	"""
-	Return a transformation matrix which, when applied to the homogeneous coordinates of a point in the coordinate system of a face, will transform those coordinates to the coordinate system of the polyhedron.
-	
-	The coordinate system of a face is defined as the right-angled, right-handed coordinate system whose origin is in the view's vertex, whose x-axis points along the view's edge and whose z-axis points in the direction of the view's faces' normal outwards of the polyhedron.
+	Return a transformation matrix which, when applied to the homogeneous coordinates
+	of a point in the coordinate system of a face, will transform those coordinates
+	to the coordinate system of the polyhedron.
+
+	The coordinate system of a face is defined as the right-angled, right-handed
+	coordinate system whose origin is in the view's vertex, whose x-axis points
+	along the view's edge and whose z-axis points in the direction of the view's
+	faces' normal outwards of the polyhedron.
 	"""
 
 	return numpy.row_stack([numpy.column_stack(view_local_onb(view) + [view.vertex_coordinate]), [0, 0, 0, 1]])
+
+
+def get_planar_coordinates(view : PolyhedronView):
+	"""
+	Return a paths.Polygon instance of the vertices of the specified view's face
+	translated into a coordinate system which spans a plane through that face.
+
+	The coordinate system is two-dimensional, right-angled and has the same unit
+	length as the polyhedrons coordinate system. It's origin is at the view's
+	vertex and it's x axis points along the view's edge.
+	"""
+
+	vertex_coordinates = [i.vertex_coordinate for i in view.face_cycle]
+	k1, k2, _ = view_local_onb(view)
+	P = linalg.projector([k1, k2])
+	s = numpy.dot(P, vertex_coordinates[0])
+	p = numpy.dot(numpy.array(vertex_coordinates) - s, numpy.column_stack([k1, k2]))
+	return list(map(lambda v: v.reshape(-1), numpy.vsplit(p, len(vertex_coordinates))))
 
 
 def get_planar_polygon(view : PolyhedronView):

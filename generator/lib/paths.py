@@ -531,7 +531,7 @@ def square():
 
 def half_plane(anchor, direction):
 	"""
-	Return a Polygon instance representing the half-plane which is delimited by the line through the specified anchor and running parallel to the specified direction. In the specified direction, the polygon is to the left of that line. 
+	Return a Polygon instance representing the half-plane which is delimited by the line through the specified anchor and running parallel to the specified direction. In the specified direction, the polygon is to the left of that line.
 	"""
 	
 	return polygon(line(anchor, direction))
