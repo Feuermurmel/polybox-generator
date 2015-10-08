@@ -135,12 +135,12 @@ def face_V(polyview):
 	v = polyhedra.get_planar_coordinates(polyview)
 	n = len(v)
 
-	Vi, Hi = make_V(polyview)
-
 	V = []
 	H = []
 
-	for i in range(n):
+	for i, view in enumerate(polyview.face_cycle):
+		Vi, Hi = make_V(view)
+
 		# ugly linalg here
 		a = v[i]
 		b = v[(i+1)%n]
@@ -149,17 +149,10 @@ def face_V(polyview):
 
 		# General affine transform
 		M = numpy.column_stack([k1, k2])
-		tt = paths.transform(M[0,0], M[0,1], a[0], M[1,0], M[1,1], a[1])
+		T = paths.transform(M[0,0], M[0,1], a[0], M[1,0], M[1,1], a[1])
 
-		# Rotate and move
-		#t1 = paths.rotate(turns=i/n)
-		#t2 = paths.move(a[0], a[1])
-		#tt = t2 * t1
-
-		Vit = tt * Vi
-		V.append(Vit)
-		Hit = tt * Hi
-		H.append(Hit)
+		V.append(T * Vi)
+		H.append(T * Hi)
 
 	return V, H
 
