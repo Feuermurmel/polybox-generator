@@ -28,7 +28,9 @@ class PolyhedronView:
 		# These are filled by the Polyhedron.__init__()
 		self._next_view = None
 		self._opposite_view = None
-	
+
+		self._codata = {}
+
 	@property
 	def vertex_coordinate(self):
 		"""
@@ -196,8 +198,18 @@ class Polyhedron:
 		:param vertices: List of coordinate triples.
 		:param faces: List of lists of vertex indexes.
 		"""
-		
-		views_by_face = [[((j1, j2), PolyhedronView(vertices[j1])) for j1, j2 in zip(i, i[1:] + i[:1])] for i in faces]
+
+		views_by_face = []
+		for fi, i in enumerate(faces):
+			facei = []
+			for j1, j2 in zip(i, i[1:] + i[:1]):
+				V = PolyhedronView(vertices[j1])
+				V._codata["face"] = fi
+				V._codata["vertex"] = j1
+				V._codata["edge"] = (j1,j2)
+				facei.append( ((j1, j2), V) )
+			views_by_face.append(facei)
+
 		views_by_edge = dict(j for i in views_by_face for j in i)
 		
 		# Setup face cycles and opposite views.
