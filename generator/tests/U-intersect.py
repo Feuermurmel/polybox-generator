@@ -23,13 +23,13 @@ def main():
 
     V = H / T
 
-    with util.writing_text_file('src/U-intersect.asy') as file:
+    with export.writing_asymptote_file('src/U-intersect.asy') as file:
         print('settings.outformat="pdf";', file = file)
-        print('fill({}, (blue + white) + opacity(0.6));'.format(export.asymptote_expression(paths.scale(20) * (H & c))), file = file)
-        print('fill({}, (red + white) + opacity(0.6));'.format(export.asymptote_expression(paths.scale(20) * (T & c))), file = file)
-        print('fill({}, (green + white) + opacity(0.6));'.format(export.asymptote_expression(paths.scale(20) * (V & c))), file = file)
-        print('draw({}, 0.1mm + black);'.format(export.asymptote_expression(paths.scale(20) * (V & c))), file = file)
-        print('draw({}, 0.1mm + black);'.format(export.asymptote_expression(paths.scale(20) * (T & c))), file = file)
-        print('draw({}, 0.1mm + black);'.format(export.asymptote_expression(paths.scale(20) * c)), file = file)
+        file.write('fill({}, (blue + white) + opacity(0.6));', paths.scale(20) * (H & c))
+        file.write('fill({}, (red + white) + opacity(0.6));', paths.scale(20) * (T & c))
+        file.write('fill({}, (green + white) + opacity(0.6));', paths.scale(20) * (V & c))
+        file.write('draw({}, 0.1mm + black);', paths.scale(20) * (V & c))
+        file.write('draw({}, 0.1mm + black);', paths.scale(20) * (T & c))
+        file.write('draw({}, 0.1mm + black);', paths.scale(20) * c)
 
 main()
