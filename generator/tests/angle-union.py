@@ -7,10 +7,10 @@ def main():
     T = paths.rotate(turns=1/5)
     h1 = paths.half_plane((0, 0.1), (1, 0))
 
-    # Ok
+    # OK
     h2 = T * h1
 
-    # Fail
+    # Fail (fixed)
     h2 = T * T * h1
 
     x = h1 | h2
