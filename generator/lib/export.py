@@ -1,66 +1,105 @@
-import numpy
-from . import paths
+import numpy, abc, itertools, io, contextlib
+from . import paths, util
 
 
-def _asymptote_path_array(x, depth):
-	def _array(seq):
-		return '{{ {} }}'.format(', '.join(seq))
+# TODO: Create subclass for OpenSCAD.
+class File:
+	"""
+	Context manager which yields a File instance. The statements written to that instance are written to a file at the specified path.
+	"""
 	
-	def convert_path(element, closed):
+	def __init__(self, file : io.TextIOBase):
+		self.file = file
+		self.variable_id_iter = itertools.count()
+	
+	def _write_line(self, line : str):
+		print(line, file = self.file)
+	
+	def get_variable_name(self):
+		return '_var_{}'.format(next(self.variable_id_iter))
+	
+	@abc.abstractmethod
+	def write(self, statement, *args): pass
+
+
+class AsymptoteFile(File):
+	def _serialize_path(self, path, closed):
 		def iter_pairs():
-			for x, y in element.vertices:
+			for x, y in path.vertices:
 				yield '({}mm, {}mm)'.format(x, y)
+			
+			if closed:
+				yield 'cycle'
 		
-		res = ' -- '.join(iter_pairs())
+		variable = self.get_variable_name()
 		
-		if closed:
-			res += ' -- cycle'
+		self.write('path {};', variable)
 		
-		return res
+		for i in _group(iter_pairs(), 500):
+			self.write('{} = {} -- {};', variable, variable, ' -- '.join(i))
+		
+		return variable
 	
-	def convert_element(element, depth):
-		if isinstance(element, tuple):
-			assert depth == 0
+	def _serialize_array(self, type, value, depth, close_paths):
+		if depth:
+			type += '[]' * depth
+			variable = self.get_variable_name()
 			
-			return convert_path(paths.path(element), False)
-		elif isinstance(element, paths.Path):
-			assert depth == 0
+			self.write('{} {};', type, variable)
 			
-			return convert_path(element, False)
-		elif isinstance(element, paths.Polygon):
-			assert depth == 1
+			for i in _group(value, 500):
+				self.write('{}.append(new {} {{ {} }});', variable, type, ', '.join(self._serialize_array(type, j, depth - 1, close_paths) for j in i))
 			
-			return _array(convert_path(i, True) for i in element.paths)
+			return variable
 		else:
-			return _array(convert_element(i, depth - 1) for i in element)
+			return self._serialize_value(value, close_paths)
 	
-	if depth:
-		prefix = 'new path' + '[]' * depth
-	else:
-		prefix = '(path)'
+	def _serialize_value(self, value, close_paths):
+		if isinstance(value, paths.Path):
+			return self._serialize_path(value, closed = close_paths)
+		elif isinstance(value, paths.Polygon):
+			return self._serialize_array('path', value.paths, 1, True)
+		else:
+			# Let str.format() deal with it.
+			return value
 	
-	return prefix + ' ' + convert_element(x, depth)
+	def declare_array(self, type, elements, depth = 1):
+		return self._serialize_array(type, elements, depth, False)
+	
+	def write(self, statement, *args):
+		"""
+		Write a statement to the file.
+		
+		The specified statement is formatted with the specified arguments using str.format(). The following types of arguments are handled specially:
+		
+		- paths.Path (forming an open path)
+		- paths.Polygon (forming an array of closed paths)
+		
+		Other types are serialized using the default behavior of str.format().
+		"""
+		
+		self._write_line(statement.format(*[self._serialize_value(i, False) for i in args]))
 
 
-def asymptote_expression(x, array_depth = 1):
-	"""
-	Convert an object or a (possibly nested) list of objects to an Asymptote expression.
+@contextlib.contextmanager
+def writing_asymptote_file(path):
+	with util.writing_text_file(path) as file:
+		yield AsymptoteFile(file)
+
+
+def _group(iterable, count):
+	accu = []
 	
-	The following types can be converted:
-	- paths.Vertex (forming a path consisting of a single point)
-	- paths.Path (forming an open path)
-	- paths.Polygon (forming an array of closed paths)
-	- Lists of all of the types in this list.
+	for i in iterable:
+		if len(accu) >= count:
+			yield accu
+			
+			accu = []
+		
+		accu.append(i)
 	
-	Unless x is an instance of paths.Path or paths.Polygon, array_depth must be set to the depth of the generated path array. If x is a list, array_depth is assumed to be 1. This works for a list of paths.Path instances. If e.g. a list of paths.Polygon instances should be converted, array_depth needs to be set to 2.
-	"""
-	
-	if isinstance(x, paths.Path):
-		return _asymptote_path_array(x, 0)
-	elif isinstance(x, paths.Polygon):
-		return _asymptote_path_array(x, 1)
-	else:
-		return _asymptote_path_array(x, array_depth)
+	if accu:
+		yield accu
 
 
 def openscad_polygon(polygon : paths.Polygon):
