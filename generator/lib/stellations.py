@@ -65,7 +65,7 @@ def stellation_over_view(polyview):
 	return stellation
 
 
-def times():
+def times(polyview):
 	return [0.0, 0.1, 0.4, 0.5, 0.6, 0.9]
 
 
@@ -75,9 +75,9 @@ def make_strip(t1, t2):
 	return h1 & h2
 
 
-def make_teeth():
+def make_teeth(polyview):
 	A = make_strip(0, 1)
-	T = times()
+	T = times(polyview)
 	Sm = [make_strip(t1, t2) for t1, t2 in zip(T[::2], T[1::2])]
 	Sm = functools.reduce(operator.__or__, Sm)
 	Sh = (~Sm) & A
@@ -104,7 +104,7 @@ def teeth_length(polyview):
 
 
 def make_V(polyview):
-	Sm, Sh = make_teeth()
+	Sm, Sh = make_teeth(polyview)
 	hin, hout = teeth_length(polyview)
 
 	H = paths.half_plane((0,  0),    ( 1, 0))
