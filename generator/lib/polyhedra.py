@@ -202,7 +202,15 @@ class Polyhedron:
 		self._faces = [i[0][1] for i in views_by_face]
 		self._edges = [e for i in views_by_face for (v1, v2), e in i if v1 < v2]
 		self._vertices = list({ v: f for i in views_by_face for (v, _), f in i }.values())
-	
+
+		E = len(self._vertices)
+		K = len(self._edges)
+		F = len(self._faces)
+		for v in self._all_views:
+			v._codata["E"] = E
+			v._codata["F"] = F
+			v._codata["K"] = K
+
 	@property
 	def all_views(self):
 		"""
