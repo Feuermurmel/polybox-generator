@@ -231,6 +231,10 @@ class Polyhedron:
 			v._codata["F"] = F
 			v._codata["K"] = K
 
+		for i, e in enumerate(self._edges):
+			e._codata["edgenr"] = i
+			e.opposite._codata["edgenr"] = i
+
 	@property
 	def all_views(self):
 		"""
