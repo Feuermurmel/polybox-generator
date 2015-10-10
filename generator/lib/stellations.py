@@ -181,10 +181,9 @@ def antisymmetrize(f):
 	return numpy.hstack([f, -f[::-1]])
 
 def generate_pulses(polyview):
-	edge = sorted(polyview._codata["edge"])
+	E = polyview._codata["edgenr"]
 	N = polyview._codata["E"]
-	N = int(numpy.ceil(numpy.log2(2*N**2)))
-	C = cantor_pair(*edge)
-	X = antisymmetrize(bin_slots(C, N))
+	N = int(numpy.ceil(numpy.log2(N)))
+	X = antisymmetrize(bin_slots(E, N))
 	P = [(i*1/N/2, 1/N/2, x) for i, x in enumerate(X)]
 	return P
