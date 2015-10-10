@@ -3,7 +3,7 @@ from lib import polyhedra, stellations, paths, export, util
 from generate._helpers import write_line
 
 
-def arrange_shapes(shapes, size = 5*20, gap = 0.1):
+def arrange_shapes(shapes, size = 5*50, gap = 0.1):
 	width = math.ceil(math.sqrt(len(shapes)))
 	clip = paths.scale(size / 2) * paths.circle()
 
@@ -17,7 +17,7 @@ def arrange_shapes(shapes, size = 5*20, gap = 0.1):
 
 @util.main
 def main(src_path):
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=40)
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=50)
 
 	def iter_stellations():
 		for face in polyhedron.faces:
@@ -35,7 +35,7 @@ def main(src_path):
 
 
 	stellation = arrange_shapes(list(iter_stellations()))
-	#faces = arrange_shapes(list(iter_faces()))
+	faces = arrange_shapes(list(iter_faces()))
 
 	write_line('import "../_laser_cutting" as _laser_cutting;')
 	#write_line('fill({}, red + white);', export.asymptote_expression(stellation))

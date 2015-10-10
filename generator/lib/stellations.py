@@ -105,7 +105,7 @@ def teeth_length(polyview):
 
 	# Manual override
 	#hin = 0.05
-	hout *= 2.0
+	hout = 200
 
 	return hin, hout
 
@@ -169,23 +169,36 @@ def stellation_over_face(polyview):
 # 		(0.6, 0.3, -1),
 # 		(0.9, 0.1,  1)]
 
-def cantor_pair(k, l):
-	return l + (k+l)*(k+l+1)//2
 
-def bin_slots(n, w):
-	chi = sum([1 << i for i in range(0, w, 2)])
-	return numpy.array(list(map(int, numpy.binary_repr(n^chi, width=w))))
 
-def antisymmetrize(f):
-	return numpy.hstack([f, -f[::-1]])
+# def cantor_pair(k, l):
+# 	return l + (k+l)*(k+l+1)//2
+
+# def bin_slots(n, w):
+# 	chi = sum([1 << i for i in range(0, w, 2)])
+# 	return numpy.array(list(map(int, numpy.binary_repr(n^chi, width=w))))
+
+# def antisymmetrize(f):
+# 	return numpy.hstack([f, -f[::-1]])
+
+# def generate_pulses(polyview):
+# 	E = polyview._codata["edgenr"]
+# 	N = polyview._codata["K"]
+# 	N = int(numpy.ceil(numpy.log2(N)))
+# 	X = antisymmetrize(bin_slots(E, N))
+# 	P = [(i*1/N/2, 1/N/2, x) for i, x in enumerate(X)]
+# 	return P
+
 
 def generate_pulses(polyview):
-	E = polyview._codata["edgenr"]
-	N = polyview._codata["K"]
-	N = int(numpy.ceil(numpy.log2(N)))
-	X = antisymmetrize(bin_slots(E, N))
-	P = [(i*1/N/2, 1/N/2, x) for i, x in enumerate(X)]
-	return P
+	return [(0.0, 0.125, 1),
+		(0.125, 0.125, -1),
+		(0.25, 0.125, 1),
+		(0.375, 0.125, -1),
+		(0.5, 0.125, 1),
+		(0.625, 0.125, -1),
+		(0.75, 0.125, 1),
+		(0.875, 0.125, -1)]
 
 def thickness():
 	return 4
