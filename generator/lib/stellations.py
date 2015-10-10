@@ -189,16 +189,22 @@ def stellation_over_face(polyview):
 # 	P = [(i*1/N/2, 1/N/2, x) for i, x in enumerate(X)]
 # 	return P
 
+# def generate_pulses(polyview):
+# 	return [(0.0, 0.125, 1),
+# 		(0.125, 0.125, -1),
+# 		(0.25, 0.125, 1),
+# 		(0.375, 0.125, -1),
+# 		(0.5, 0.125, 1),
+# 		(0.625, 0.125, -1),
+# 		(0.75, 0.125, 1),
+# 		(0.875, 0.125, -1)]
+
+def equidistant(N):
+    dx = 1.0/N
+    return [(i*dx, dx, (-1)**i) for i in range(N)]
 
 def generate_pulses(polyview):
-	return [(0.0, 0.125, 1),
-		(0.125, 0.125, -1),
-		(0.25, 0.125, 1),
-		(0.375, 0.125, -1),
-		(0.5, 0.125, 1),
-		(0.625, 0.125, -1),
-		(0.75, 0.125, 1),
-		(0.875, 0.125, -1)]
+	return equidistant(8)
 
 def thickness():
 	return 4
