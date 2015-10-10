@@ -93,8 +93,7 @@ def make_teeth(polyview):
 
 
 def teeth_length(polyview):
-	d = 0.1
-
+	d = thickness()
 	theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
 
 	if theta <= numpy.pi/2.0:
@@ -187,3 +186,6 @@ def generate_pulses(polyview):
 	X = antisymmetrize(bin_slots(E, N))
 	P = [(i*1/N/2, 1/N/2, x) for i, x in enumerate(X)]
 	return P
+
+def thickness():
+	return 0.4
