@@ -17,7 +17,7 @@ def arrange_shapes(shapes, size = 5*50, gap = 0.1):
 
 @util.main
 def main(src_path):
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=50)
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=30)
 
 	def iter_stellations():
 		for face in polyhedron.faces:
