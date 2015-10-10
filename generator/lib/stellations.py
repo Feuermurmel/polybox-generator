@@ -72,12 +72,7 @@ def make_strip(t1, t2):
 
 
 def pulses(polyview):
-	return [(0.0, 0.1, -1),
-		(0.1, 0.3,  1),
-		(0.4, 0.1, -1),
-		(0.5, 0.1,  1),
-		(0.6, 0.3, -1),
-		(0.9, 0.1,  1)]
+	return generate_pulses(polyview)
 
 
 def make_teeth(polyview):
@@ -165,3 +160,31 @@ def stellation_over_face(polyview):
 	R = functools.reduce(operator.__or__, Ri)
 
 	return A / R
+
+
+# def generate_pulses(polyview):
+# 	return [(0.0, 0.1, -1),
+# 		(0.1, 0.3,  1),
+# 		(0.4, 0.1, -1),
+# 		(0.5, 0.1,  1),
+# 		(0.6, 0.3, -1),
+# 		(0.9, 0.1,  1)]
+
+def cantor_pair(k, l):
+	return l + (k+l)*(k+l+1)//2
+
+def bin_slots(n, w):
+	chi = sum([1 << i for i in range(0, w, 2)])
+	return numpy.array(list(map(int, numpy.binary_repr(n^chi, width=w))))
+
+def antisymmetrize(f):
+	return numpy.hstack([f, -f[::-1]])
+
+def generate_pulses(polyview):
+	edge = sorted(polyview._codata["edge"])
+	N = polyview._codata["E"]
+	N = int(numpy.ceil(numpy.log2(2*N**2)))
+	C = cantor_pair(*edge)
+	X = antisymmetrize(bin_slots(C, N))
+	P = [(i*1/N/2, 1/N/2, x) for i, x in enumerate(X)]
+	return P
