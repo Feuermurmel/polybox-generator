@@ -248,11 +248,11 @@ class Polyhedron:
 		return self._vertices
 	
 	@classmethod
-	def load_from_json(cls, path):
+	def load_from_json(cls, path, scale=1):
 		with open(path, encoding = 'utf-8') as file:
 			data = json.load(file)
-		
-		vertices = [numpy.array(i) for i in data['vertices']]
+
+		vertices = [scale * numpy.array(i) for i in data['vertices']]
 		faces = data['faces']
 		
 		return cls(vertices, faces)
