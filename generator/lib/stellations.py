@@ -105,7 +105,7 @@ def teeth_length(polyview):
 
 	# Manual override
 	#hin = 0.05
-	#hout = 2.0
+	hout *= 2.0
 
 	return hin, hout
 
@@ -188,4 +188,4 @@ def generate_pulses(polyview):
 	return P
 
 def thickness():
-	return 0.4
+	return 4
