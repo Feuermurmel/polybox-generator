@@ -22,9 +22,11 @@ class PolyhedronView:
 	Represents the combination of a face, an adjacent edge and the vertex at the start of that edge when traversing the boundary of the face in positive order.
 	"""
 
-	def __init__(self, polyhedron, vertex_id):
+	def __init__(self, polyhedron, vertex_id, edge_id, face_id):
 		self._polyhedron = polyhedron
 		self._vertex_id = vertex_id
+		self._edge_id = edge_id
+		self._face_id = face_id
 
 		# These are filled by the Polyhedron.__init__()
 		self._next_view = None
@@ -40,10 +42,35 @@ class PolyhedronView:
 		return self._polyhedron
 
 	@property
+	def vertex_id(self):
+		"""
+		Return the vertex identifier (unique per polyhedron).
+		"""
+
+		return self._vertex_id
+
+	@property
+	def edge_id(self):
+		"""
+		Return the edge identifier (unique per polyhedron).
+		"""
+
+		return self._edge_id
+
+	@property
+	def face_id(self):
+		"""
+		Return the face identifier (unique per polyhedron).
+		"""
+
+		return self._face_id
+
+	@property
 	def vertex_coordinate(self):
 		"""
 		The coordinate of this view's vertex.
 		"""
+
 		return self.polyhedron._vertex_coordinates[self._vertex_id]
 
 	@property
@@ -212,7 +239,7 @@ class Polyhedron:
 		for fi, i in enumerate(faces):
 			facei = []
 			for j1, j2 in zip(i, i[1:] + i[:1]):
-				V = PolyhedronView(self, j1)
+				V = PolyhedronView(self, j1, (j1,j2), fi)
 				V._codata["face"] = fi
 				V._codata["vertex"] = j1
 				V._codata["edge"] = (j1,j2)
