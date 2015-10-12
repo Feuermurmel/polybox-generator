@@ -236,9 +236,9 @@ class Polyhedron:
 			e.opposite._codata["edgenr"] = i
 
 		# Global data
-		self._number_vertices = len(self._vertices)
-		self._number_edges = len(self._edges)
-		self._number_faces = len(self._faces)
+		self._vertex_count = len(self._vertices)
+		self._edge_count = len(self._edges)
+		self._face_count = len(self._faces)
 
 	@property
 	def all_views(self):
@@ -273,25 +273,25 @@ class Polyhedron:
 		return self._vertices
 
 	@property
-	def number_vertices(self):
+	def vertex_count(self):
 		"""
 		Returns the number of vertices of the polyhedron.
 		"""
-		return self._number_vertices
+		return self._vertex_count
 
 	@property
-	def number_edges(self):
+	def edge_count(self):
 		"""
 		Returns the number of edges of the polyhedron.
 		"""
-		return self._number_edges
+		return self._edge_count
 
 	@property
-	def number_faces(self):
+	def face_count(self):
 		"""
 		Returns the number of faces of the polyhedron.
 		"""
-		return self._number_faces
+		return self._face_count
 
 	@classmethod
 	def load_from_json(cls, path):
