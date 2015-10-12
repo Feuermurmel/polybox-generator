@@ -182,7 +182,7 @@ def antisymmetrize(f):
 
 def generate_pulses(polyview):
 	edge = sorted(polyview._codata["edge"])
-	N = polyview._codata["E"]
+	N = polyview.polyhedron.number_vertices
 	N = int(numpy.ceil(numpy.log2(2*N**2)))
 	C = cantor_pair(*edge)
 	X = antisymmetrize(bin_slots(C, N))
