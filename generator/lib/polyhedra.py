@@ -21,8 +21,9 @@ class PolyhedronView:
 	"""
 	Represents the combination of a face, an adjacent edge and the vertex at the start of that edge when traversing the boundary of the face in positive order.
 	"""
-	
-	def __init__(self, vertex_coordinate):
+
+	def __init__(self, polyhedron, vertex_coordinate):
+		self._polyhedron = polyhedron
 		self._vertex_coordinate = vertex_coordinate
 		
 		# These are filled by the Polyhedron.__init__()
@@ -30,6 +31,13 @@ class PolyhedronView:
 		self._opposite_view = None
 
 		self._codata = {}
+
+	@property
+	def polyhedron(self):
+		"""
+		Returns the underlying polyhedron.
+		"""
+		return self._polyhedron
 
 	@property
 	def vertex_coordinate(self):
@@ -183,7 +191,7 @@ class Polyhedron:
 		for fi, i in enumerate(faces):
 			facei = []
 			for j1, j2 in zip(i, i[1:] + i[:1]):
-				V = PolyhedronView(vertices[j1])
+				V = PolyhedronView(self, vertices[j1])
 				V._codata["face"] = fi
 				V._codata["vertex"] = j1
 				V._codata["edge"] = (j1,j2)
@@ -203,17 +211,14 @@ class Polyhedron:
 		self._edges = [e for i in views_by_face for (v1, v2), e in i if v1 < v2]
 		self._vertices = list({ v: f for i in views_by_face for (v, _), f in i }.values())
 
-		E = len(self._vertices)
-		K = len(self._edges)
-		F = len(self._faces)
-		for v in self._all_views:
-			v._codata["E"] = E
-			v._codata["F"] = F
-			v._codata["K"] = K
-
 		for i, e in enumerate(self._edges):
 			e._codata["edgenr"] = i
 			e.opposite._codata["edgenr"] = i
+
+		# Global data
+		self._number_vertices = len(self._vertices)
+		self._number_edges = len(self._edges)
+		self._number_faces = len(self._faces)
 
 	@property
 	def all_views(self):
@@ -246,7 +251,28 @@ class Polyhedron:
 		"""
 		
 		return self._vertices
-	
+
+	@property
+	def number_vertices(self):
+		"""
+		Returns the number of vertices of the polyhedron.
+		"""
+		return self._number_vertices
+
+	@property
+	def number_edges(self):
+		"""
+		Returns the number of edges of the polyhedron.
+		"""
+		return self._number_edges
+
+	@property
+	def number_faces(self):
+		"""
+		Returns the number of faces of the polyhedron.
+		"""
+		return self._number_faces
+
 	@classmethod
 	def load_from_json(cls, path):
 		with open(path, encoding = 'utf-8') as file:
