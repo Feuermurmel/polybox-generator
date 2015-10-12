@@ -181,7 +181,7 @@ def antisymmetrize(f):
 
 def generate_pulses(polyview):
 	E = polyview._codata["edgenr"]
-	N = polyview._codata["K"]
+	N = polyview.polyhedron.number_edges
 	N = int(numpy.ceil(numpy.log2(N)))
 	X = antisymmetrize(bin_slots(E, N))
 	P = [(i*1/N/2, 1/N/2, x) for i, x in enumerate(X)]
