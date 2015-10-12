@@ -22,7 +22,7 @@ class PolyhedronView:
 	Represents the combination of a face, an adjacent edge and the vertex at the start of that edge when traversing the boundary of the face in positive order.
 	"""
 
-	def __init__(self, polyhedron, vertex_id, edge_id, face_id):
+	def __init__(self, polyhedron : 'Polyhedron', vertex_id, edge_id, face_id):
 		self._polyhedron = polyhedron
 		self._vertex_id = vertex_id
 		self._edge_id = edge_id
@@ -230,8 +230,10 @@ class Polyhedron:
 		:param vertices: List of coordinate triples.
 		:param faces: List of lists of vertex indexes.
 		"""
+		# Store numerical geometry data
 		self._vertex_coordinates = vertices[:]
 
+		# Store topology
 		views_by_face = [[((j1, j2), PolyhedronView(self, j1, (j1,j2), fi))
 				  for j1, j2 in zip(i, i[1:] + i[:1])]
 				 for fi, i in enumerate(faces)]
@@ -248,7 +250,7 @@ class Polyhedron:
 		self._edges = [e for i in views_by_face for (v1, v2), e in i if v1 < v2]
 		self._vertices = list({ v: f for i in views_by_face for (v, _), f in i }.values())
 
-		# Global data
+		# Global characteristics
 		self._vertex_count = len(self._vertices)
 		self._edge_count = len(self._edges)
 		self._face_count = len(self._faces)
