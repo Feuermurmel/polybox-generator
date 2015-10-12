@@ -80,14 +80,34 @@ class PolyhedronView:
 		return _grab_view_cycle(self, lambda x: x.adjacent)
 
 
+def edge_vector(view : PolyhedronView):
+	"""
+	The vector pointing in the direction of the specified view's edge.
+	"""
+
+	a, b = [i.vertex_coordinate for i in [view, view.next]]
+
+	return b - a
+
+
 def edge_direction(view : PolyhedronView):
 	"""
 	The normalized vector pointing in the direction of the specified view's edge.
 	"""
-	
-	a, b = [i.vertex_coordinate for i in [view, view.next]]
 
-	return linalg.normalize(b - a)
+	v = edge_vector(view)
+
+	return linalg.normalize(v)
+
+
+def edge_length(view : PolyhedronView):
+	"""
+	The length of the specified view's edge.
+	"""
+
+	v = edge_vector(view)
+
+	return linalg.norm(v)
 
 
 def face_normal(view : PolyhedronView):
