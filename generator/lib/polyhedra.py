@@ -22,10 +22,10 @@ class PolyhedronView:
 	Represents the combination of a face, an adjacent edge and the vertex at the start of that edge when traversing the boundary of the face in positive order.
 	"""
 
-	def __init__(self, polyhedron, vertex_coordinate):
+	def __init__(self, polyhedron, vertex_id):
 		self._polyhedron = polyhedron
-		self._vertex_coordinate = vertex_coordinate
-		
+		self._vertex_id = vertex_id
+
 		# These are filled by the Polyhedron.__init__()
 		self._next_view = None
 		self._opposite_view = None
@@ -44,9 +44,8 @@ class PolyhedronView:
 		"""
 		The coordinate of this view's vertex.
 		"""
-		
-		return self._vertex_coordinate
-	
+		return self.polyhedron._vertex_coordinates[self._vertex_id]
+
 	@property
 	def next(self) -> 'PolyhedronView':
 		"""
@@ -206,12 +205,14 @@ class Polyhedron:
 		:param vertices: List of coordinate triples.
 		:param faces: List of lists of vertex indexes.
 		"""
+		self._vertex_coordinates = vertices[:]
+
 
 		views_by_face = []
 		for fi, i in enumerate(faces):
 			facei = []
 			for j1, j2 in zip(i, i[1:] + i[:1]):
-				V = PolyhedronView(self, vertices[j1])
+				V = PolyhedronView(self, j1)
 				V._codata["face"] = fi
 				V._codata["vertex"] = j1
 				V._codata["edge"] = (j1,j2)
