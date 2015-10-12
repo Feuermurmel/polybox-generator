@@ -232,15 +232,9 @@ class Polyhedron:
 		"""
 		self._vertex_coordinates = vertices[:]
 
-
-		views_by_face = []
-		for fi, i in enumerate(faces):
-			facei = []
-			for j1, j2 in zip(i, i[1:] + i[:1]):
-				V = PolyhedronView(self, j1, (j1,j2), fi)
-				facei.append( ((j1, j2), V) )
-			views_by_face.append(facei)
-
+		views_by_face = [[((j1, j2), PolyhedronView(self, j1, (j1,j2), fi))
+				  for j1, j2 in zip(i, i[1:] + i[:1])]
+				 for fi, i in enumerate(faces)]
 		views_by_edge = dict(j for i in views_by_face for j in i)
 		
 		# Setup face cycles and opposite views.
