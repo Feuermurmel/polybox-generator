@@ -32,8 +32,6 @@ class PolyhedronView:
 		self._next_view = None
 		self._opposite_view = None
 
-		self._codata = {}
-
 	@property
 	def polyhedron(self):
 		"""
@@ -240,9 +238,6 @@ class Polyhedron:
 			facei = []
 			for j1, j2 in zip(i, i[1:] + i[:1]):
 				V = PolyhedronView(self, j1, (j1,j2), fi)
-				V._codata["face"] = fi
-				V._codata["vertex"] = j1
-				V._codata["edge"] = (j1,j2)
 				facei.append( ((j1, j2), V) )
 			views_by_face.append(facei)
 
@@ -258,10 +253,6 @@ class Polyhedron:
 		self._faces = [i[0][1] for i in views_by_face]
 		self._edges = [e for i in views_by_face for (v1, v2), e in i if v1 < v2]
 		self._vertices = list({ v: f for i in views_by_face for (v, _), f in i }.values())
-
-		for i, e in enumerate(self._edges):
-			e._codata["edgenr"] = i
-			e.opposite._codata["edgenr"] = i
 
 		# Global data
 		self._vertex_count = len(self._vertices)
