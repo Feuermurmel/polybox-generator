@@ -39,11 +39,12 @@ def main(src_path):
 
 	stellation = paths.scale(20) * arrange_shapes(list(iter_stellations()))
 	faces = paths.scale(20) * arrange_shapes(list(iter_faces()))
-
-	write_line('import "../_laser_cutting" as _laser_cutting;')
-	write_line('fill({}, red + white);', export.asymptote_expression(stellation))
-	write_line('draw({}, black);', export.asymptote_expression(stellation))
-	write_line('draw({}, gray);', export.asymptote_expression(faces))
+	
+	file = export.AsymptoteFile(sys.stdout)
+	file.write('import "../_laser_cutting" as _laser_cutting;')
+	file.write('fill({}, red + white);', stellation)
+	file.write('draw({}, black);', stellation)
+	file.write('draw({}, gray);', faces)
 
 
 main(*sys.argv[1:])
