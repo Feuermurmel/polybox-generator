@@ -1,50 +1,24 @@
-import sys, functools, math, numpy
+import sys, math, numpy
 from lib import polyhedra, stellations, paths, export, util
-from generate._helpers import write_line
 
 
-def arrange_shapes(shapes, size = 5, gap = 0.1):
-	width = math.ceil(math.sqrt(len(shapes)))
-	clip = paths.scale(size / 2) * paths.circle()
+def arrange_grid(count):
+	width = math.ceil(math.sqrt(count))
 	
-	def iter_arranged_shapes():
-		for i, shape in enumerate(shapes):
-			y, x = divmod(i, width)
-			
-			yield paths.move((size + gap) * x, -(size + gap) * y) * (shape & clip)
-	
-	return functools.reduce(lambda x, y: x | y, iter_arranged_shapes())
+	return [divmod(i, width) for i in range(count)]
 
 
 @util.main
 def main(src_path):
+	file = export.AsymptoteFile(sys.stdout)
+	file.write('access "../_faces.asy" as faces;')
+	
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
 	
-	def iter_stellations():
-		for face in polyhedron.faces:
-			# TODO: Hack to get the offset of the view's vertex relative to the center of the view's face.
-			c = -numpy.mean(polyhedra.get_planar_polygon(face).paths[0].vertices, 0)
-
-			yield paths.move(*c) * stellations.stellation_over_face(face)
-
-
-
-	def iter_faces():
-		for face in polyhedron.faces:
-			# TODO: Hack to get the offset of the view's vertex relative to the center of the view's face.
-			c = -numpy.mean(polyhedra.get_planar_polygon(face).paths[0].vertices, 0)
-
-			yield paths.move(*c) * polyhedra.get_planar_polygon(face)
-
-
-	stellation = paths.scale(20) * arrange_shapes(list(iter_stellations()))
-	faces = paths.scale(20) * arrange_shapes(list(iter_faces()))
-	
-	file = export.AsymptoteFile(sys.stdout)
-	file.write('import "../_laser_cutting" as _laser_cutting;')
-	file.write('fill({}, red + white);', stellation)
-	file.write('draw({}, black);', stellation)
-	file.write('draw({}, gray);', faces)
-
-
-main(*sys.argv[1:])
+	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
+		center = -numpy.mean(polyhedra.get_planar_polygon(face).paths[0].vertices, 0)
+		
+		polygon = paths.move(*center) * polyhedra.get_planar_polygon(face)
+		cut = paths.move(*center) * stellations.stellation_over_face(face)
+		
+		file.write('faces.face({}, {}, {}, {});', polygon, cut, c, r)
