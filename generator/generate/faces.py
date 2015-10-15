@@ -41,6 +41,3 @@ def main(src_path):
 	#write_line('fill({}, red + white);', export.asymptote_expression(stellation))
 	write_line('cut({});', export.asymptote_expression(stellation))
 	#write_line('draw({}, gray);', export.asymptote_expression(faces))
-
-
-main(*sys.argv[1:])
