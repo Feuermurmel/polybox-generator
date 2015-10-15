@@ -105,7 +105,7 @@ def teeth_length(polyview):
 
 	# Manual override
 	#hin = 0.05
-	hout = 200
+	hout *= 2
 
 	return hin, hout
 
@@ -204,7 +204,7 @@ def equidistant(N):
     return [(i*dx, dx, (-1)**i) for i in range(N)]
 
 def generate_pulses(polyview):
-	return equidistant(8)
+	return equidistant(4)
 
 def thickness():
 	return 4
