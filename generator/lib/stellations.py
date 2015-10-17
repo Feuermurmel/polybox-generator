@@ -176,4 +176,4 @@ def teeth_adapt(hin, hout):
 
 
 def thickness():
-	return 0.4
+	return 0.08
