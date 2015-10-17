@@ -104,10 +104,7 @@ def teeth_length(polyview):
 	hout = d / numpy.sin(numpy.pi-theta)
 
 	# Manual override
-	#hin = 0.05
-	#hout = 2.0
-
-	return hin, hout
+	return teeth_adapt(hin, hout)
 
 
 def make_V(polyview):
@@ -161,32 +158,22 @@ def stellation_over_face(polyview):
 	return A / R
 
 
-# def generate_pulses(polyview):
-# 	return [(0.0, 0.1, -1),
-# 		(0.1, 0.3,  1),
-# 		(0.4, 0.1, -1),
-# 		(0.5, 0.1,  1),
-# 		(0.6, 0.3, -1),
-# 		(0.9, 0.1,  1)]
-
-def cantor_pair(k, l):
-	return l + (k+l)*(k+l+1)//2
-
-def bin_slots(n, w):
-	chi = sum([1 << i for i in range(0, w, 2)])
-	return numpy.array(list(map(int, numpy.binary_repr(n^chi, width=w))))
-
-def antisymmetrize(f):
-	return numpy.hstack([f, -f[::-1]])
+# User Mod
 
 def generate_pulses(polyview):
-	edge = sorted(polyview.edge_id)
-	N = polyview.polyhedron.vertex_count
-	N = int(numpy.ceil(numpy.log2(2*N**2)))
-	C = cantor_pair(*edge)
-	X = antisymmetrize(bin_slots(C, N))
-	P = [(i*1/N/2, 1/N/2, x) for i, x in enumerate(X)]
-	return P
+      return equidistant(8)
+
+
+def equidistant(N):
+    dx = 1.0/N
+    return [(i*dx, dx, (-1)**i) for i in range(N)]
+
+
+def teeth_adapt(hin, hout):
+	#hin = 0.05
+	hout *= 2.0
+	return hin, hout
+
 
 def thickness():
 	return 0.4
