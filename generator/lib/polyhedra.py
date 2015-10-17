@@ -21,22 +21,56 @@ class PolyhedronView:
 	"""
 	Represents the combination of a face, an adjacent edge and the vertex at the start of that edge when traversing the boundary of the face in positive order.
 	"""
-	
-	def __init__(self, vertex_coordinate):
-		self._vertex_coordinate = vertex_coordinate
-		
+
+	def __init__(self, polyhedron : 'Polyhedron', vertex_id, edge_id, face_id):
+		self._polyhedron = polyhedron
+		self._vertex_id = vertex_id
+		self._edge_id = edge_id
+		self._face_id = face_id
+
 		# These are filled by the Polyhedron.__init__()
 		self._next_view = None
 		self._opposite_view = None
-	
+
+	@property
+	def polyhedron(self):
+		"""
+		Returns the underlying polyhedron.
+		"""
+		return self._polyhedron
+
+	@property
+	def vertex_id(self):
+		"""
+		Return the vertex identifier (unique per polyhedron).
+		"""
+
+		return self._vertex_id
+
+	@property
+	def edge_id(self):
+		"""
+		Return the edge identifier (unique per polyhedron).
+		"""
+
+		return self._edge_id
+
+	@property
+	def face_id(self):
+		"""
+		Return the face identifier (unique per polyhedron).
+		"""
+
+		return self._face_id
+
 	@property
 	def vertex_coordinate(self):
 		"""
 		The coordinate of this view's vertex.
 		"""
-		
-		return self._vertex_coordinate
-	
+
+		return self.polyhedron._vertex_coordinates[self._vertex_id]
+
 	@property
 	def next(self) -> 'PolyhedronView':
 		"""
@@ -196,8 +230,13 @@ class Polyhedron:
 		:param vertices: List of coordinate triples.
 		:param faces: List of lists of vertex indexes.
 		"""
-		
-		views_by_face = [[((j1, j2), PolyhedronView(vertices[j1])) for j1, j2 in zip(i, i[1:] + i[:1])] for i in faces]
+		# Store numerical geometry data
+		self._vertex_coordinates = vertices[:]
+
+		# Store topology
+		views_by_face = [[((j1, j2), PolyhedronView(self, j1, (j1,j2), fi))
+				  for j1, j2 in zip(i, i[1:] + i[:1])]
+				 for fi, i in enumerate(faces)]
 		views_by_edge = dict(j for i in views_by_face for j in i)
 		
 		# Setup face cycles and opposite views.
@@ -210,7 +249,12 @@ class Polyhedron:
 		self._faces = [i[0][1] for i in views_by_face]
 		self._edges = [e for i in views_by_face for (v1, v2), e in i if v1 < v2]
 		self._vertices = list({ v: f for i in views_by_face for (v, _), f in i }.values())
-	
+
+		# Global characteristics
+		self._vertex_count = len(self._vertices)
+		self._edge_count = len(self._edges)
+		self._face_count = len(self._faces)
+
 	@property
 	def all_views(self):
 		"""
@@ -242,7 +286,28 @@ class Polyhedron:
 		"""
 		
 		return self._vertices
-	
+
+	@property
+	def vertex_count(self):
+		"""
+		Returns the number of vertices of the polyhedron.
+		"""
+		return self._vertex_count
+
+	@property
+	def edge_count(self):
+		"""
+		Returns the number of edges of the polyhedron.
+		"""
+		return self._edge_count
+
+	@property
+	def face_count(self):
+		"""
+		Returns the number of faces of the polyhedron.
+		"""
+		return self._face_count
+
 	@classmethod
 	def load_from_json(cls, path):
 		with open(path, encoding = 'utf-8') as file:
