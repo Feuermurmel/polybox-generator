@@ -152,32 +152,3 @@ def _group(iterable, count):
 	
 	if accu:
 		yield accu
-
-
-def openscad_polygon(polygon : paths.Polygon):
-	def _array(seq):
-		return '[{}]'.format(', '.join(seq))
-	
-	vertices = []
-	
-	def save_vertex(v):
-		index = len(vertices)
-		
-		vertices.append(v)
-		
-		return index
-	
-	paths = [[save_vertex(j) for j in i.vertices] for i in polygon.paths]
-	
-	return 'polygon({}, {});'.format(
-		_array(_array(map(str, i)) for i in vertices),
-		_array(_array(map(str, i)) for i in paths))
-
-
-def openscad_expression(expression):
-	if isinstance(expression, (int, float, numpy.number)):
-		return str(expression)
-	elif isinstance(expression, (tuple, list, numpy.ndarray)):
-		return '[{}]'.format(', '.join(map(openscad_expression, expression)))
-	else:
-		raise Exception('Unsupported expression type: {}'.format(type(expression)))
