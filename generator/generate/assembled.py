@@ -10,6 +10,8 @@ def arrange_grid(count):
 
 @util.main
 def main(src_path):
+	thickness = 0.08
+	gap = 0.005
 	file = export.OpenSCADFile(sys.stdout)
 	
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
@@ -20,6 +22,6 @@ def main(src_path):
 			t = polyhedra.face_coordinate_system(face)
 			
 			with file.group('multmatrix', t):
-				with file.group('linear_extrude', 0.09):
-					with file.group('offset', -0.002):
+				with file.group('linear_extrude', thickness - gap):
+					with file.group('offset', -gap / 2):
 						file.polygon(cut)
