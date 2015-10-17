@@ -186,8 +186,8 @@ def join_paths(*paths):
 	return Path(numpy.concatenate([_cast_path(i).m for i in paths], 1))
 
 
-# See http://www.angusj.com/delphi/clipper/documentation/Docs/Overview/Rounding.htm
-_clipper_range = (1 << 62) - 1
+# See http://www.angusj.com/delphi/clipper/documentation/Docs/Overview/Rounding.htm. We use half the available range because otherwise clipper may return coordinates outside the valid range of coordinates.
+_clipper_range = (1 << 61)
 
 # Chosen by fair dice roll.
 _clipper_scale = 1 << 31
