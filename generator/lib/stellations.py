@@ -161,12 +161,11 @@ def stellation_over_face(polyview):
 # User Mod
 
 def generate_pulses(polyview):
-      return equidistant(8)
-
+	return equidistant(8)
 
 def equidistant(N):
-    dx = 1.0/N
-    return [(i*dx, dx, (-1)**i) for i in range(N)]
+	dx = 1.0/N
+	return [(i*dx, dx, (-1)**i) for i in range(N)]
 
 
 def teeth_adapt(hin, hout):
