@@ -2,7 +2,6 @@ import numpy, abc, itertools, io, contextlib
 from . import paths, util
 
 
-# TODO: Create subclass for OpenSCAD.
 class File:
 	"""
 	Context manager which yields a File instance. The statements written to that instance are written to a file at the specified path.
@@ -17,9 +16,6 @@ class File:
 	
 	def get_variable_name(self):
 		return '_var_{}'.format(next(self.variable_id_iter))
-	
-	@abc.abstractmethod
-	def write(self, statement, *args): pass
 
 
 class AsymptoteFile(File):
@@ -81,10 +77,66 @@ class AsymptoteFile(File):
 		self._write_line(statement.format(*[self._serialize_value(i, False) for i in args]))
 
 
+class OpenSCADFile(File):
+	def __init__(self, *args):
+		super().__init__(*args)
+		
+		self._indentation_level = 0
+	
+	def line(self, line, *args):
+		self._write_line('\t' * self._indentation_level + line.format(*args))
+	
+	@contextlib.contextmanager
+	def group(self, module, *args, **kwargs):
+		self.line('{} {{', self._format_call(module, args, kwargs))
+		self._indentation_level += 1
+		
+		yield
+		
+		self._indentation_level -= 1
+		self.line('}}')
+	
+	def call(self, module, *args, **kwargs):
+		self.line('{};', self._format_call(module, args, kwargs))
+	
+	def polygon(self, polygon : paths.Polygon):
+		vertices = []
+		
+		def save_vertex(v):
+			index = len(vertices)
+			
+			vertices.append(v)
+			
+			return index
+		
+		paths = [[save_vertex(j) for j in i.vertices] for i in polygon.paths]
+		
+		self.call('polygon', vertices, paths)
+	
+	@classmethod
+	def _serialize_expression(cls, expression):
+		if isinstance(expression, (int, float, numpy.number)):
+			return str(expression)
+		elif isinstance(expression, (tuple, list, numpy.ndarray)):
+			return '[{}]'.format(', '.join(map(cls._serialize_expression, expression)))
+		else:
+			raise Exception('Unsupported expression type: {}'.format(type(expression)))
+	
+	@classmethod
+	def _format_call(cls, module, args, kwargs):
+		return '{}({})'.format(module, ', '.join([cls._serialize_expression(i) for i in args] + ['{} = {}'.format(k, cls._serialize_expression(v)) for k, v in kwargs.items()]))
+
+
 @contextlib.contextmanager
 def writing_asymptote_file(path):
 	with util.writing_text_file(path) as file:
 		yield AsymptoteFile(file)
+
+
+@contextlib.contextmanager
+def writing_open_scad_file(path):
+	with util.writing_text_file(path) as file:
+		yield OpenSCADFile(file)
 
 
 def _group(iterable, count):
