@@ -197,7 +197,8 @@ def get_planar_coordinates(view : PolyhedronView):
 	P = linalg.projector([k1, k2])
 	s = numpy.dot(P, vertex_coordinates[0])
 	p = numpy.dot(numpy.array(vertex_coordinates) - s, numpy.column_stack([k1, k2]))
-	return list(map(lambda v: v.reshape(-1), numpy.vsplit(p, len(vertex_coordinates))))
+	
+	return list(p)
 
 
 def get_planar_polygon(view : PolyhedronView):
@@ -249,12 +250,7 @@ class Polyhedron:
 		self._faces = [i[0][1] for i in views_by_face]
 		self._edges = [e for i in views_by_face for (v1, v2), e in i if v1 < v2]
 		self._vertices = list({ v: f for i in views_by_face for (v, _), f in i }.values())
-
-		# Global characteristics
-		self._vertex_count = len(self._vertices)
-		self._edge_count = len(self._edges)
-		self._face_count = len(self._faces)
-
+	
 	@property
 	def all_views(self):
 		"""
@@ -292,22 +288,22 @@ class Polyhedron:
 		"""
 		Returns the number of vertices of the polyhedron.
 		"""
-		return self._vertex_count
-
+		return len(self.vertices)
+	
 	@property
 	def edge_count(self):
 		"""
 		Returns the number of edges of the polyhedron.
 		"""
-		return self._edge_count
-
+		return len(self.edges)
+	
 	@property
 	def face_count(self):
 		"""
 		Returns the number of faces of the polyhedron.
 		"""
-		return self._face_count
-
+		return len(self.faces)
+	
 	@classmethod
 	def load_from_json(cls, path, scale=1):
 		with open(path, encoding = 'utf-8') as file:
