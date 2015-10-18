@@ -19,6 +19,11 @@ class File:
 
 
 class AsymptoteFile(File):
+	def __init__(self, *args):
+		super().__init__(*args)
+		
+		self._picture_stack_id_iter = itertools.count()
+	
 	def _serialize_path(self, path, closed):
 		def iter_pairs():
 			for x, y in path.vertices:
@@ -59,8 +64,26 @@ class AsymptoteFile(File):
 			# Let str.format() deal with it.
 			return value
 	
+	def _format_expression(self, expression, *args):
+		return expression.format(*[self._serialize_value(i, False) for i in args])
+	
 	def declare_array(self, type, elements, depth = 1):
 		return self._serialize_array(type, elements, depth, False)
+	
+	@contextlib.contextmanager
+	def transform(self, expression, *args):
+		id = next(self._picture_stack_id_iter)
+		saved_name = '_currentpicture_stack_{}'.format(id)
+		transform_name = '_currentpicture_transform_{}'.format(id)
+		
+		self.write('transform {} = {};', transform_name, self._format_expression(expression, *args))
+		self.write('picture {} = currentpicture;', saved_name)
+		self.write('currentpicture = new picture;')
+		
+		yield
+		
+		self.write('add({}, {} * currentpicture);', saved_name, transform_name)
+		self.write('currentpicture = {};', saved_name)
 	
 	def write(self, statement, *args):
 		"""
@@ -74,7 +97,7 @@ class AsymptoteFile(File):
 		Other types are serialized using the default behavior of str.format().
 		"""
 		
-		self._write_line(statement.format(*[self._serialize_value(i, False) for i in args]))
+		self._write_line(self._format_expression(statement, *args))
 
 
 class OpenSCADFile(File):
