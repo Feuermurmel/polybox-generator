@@ -12,10 +12,10 @@ void face_id(pair center, string index, transform t) {
 
 void edge_id(pair a, pair b, string index, transform t) {
 	pair edge_center = t * ((a + b) / 2.0);
-	dot(edge_center, gray + black + 1mm);
-	path p = edge_center + unit(edge_center) * 0.5;
-	Label L = scale(0.5) * Label(index, edge_center);
-	label(L, p);
+	path anchor = edge_center - unit(edge_center) * 0.3;
+	transform r = rotate(90 + degrees(atan2(edge_center.y, edge_center.x)), edge_center);
+	Label L = scale(0.5) * r * Label(index, edge_center);
+	label(L, anchor);
 }
 
 void vertex_id(pair vertex, string index, transform t) {
