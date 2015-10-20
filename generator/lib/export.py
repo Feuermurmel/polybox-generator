@@ -135,13 +135,20 @@ class OpenSCADFile(File):
 		paths = [[save_vertex(j) for j in i.vertices] for i in polygon.paths]
 		
 		self.call('polygon', vertices, paths)
-	
+
+	def text(self, string : str, size = 1.0, font = 'Liberation Sans', **kwargs):
+		self.call('text', string, font=font, size=size, **kwargs);
+
 	@classmethod
 	def _serialize_expression(cls, expression):
 		if isinstance(expression, (int, float, numpy.number)):
 			return str(expression)
 		elif isinstance(expression, (tuple, list, numpy.ndarray)):
 			return '[{}]'.format(', '.join(map(cls._serialize_expression, expression)))
+		elif isinstance(expression, str):
+			return '"{}"'.format(expression)
+		elif expression is None:
+			return ''
 		else:
 			raise Exception('Unsupported expression type: {}'.format(type(expression)))
 	
