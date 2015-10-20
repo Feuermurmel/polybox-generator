@@ -5,11 +5,11 @@ from lib import polyhedra
 def main(src_path):
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
 
-	for i, f1 in enumerate(polyhedron.edges):
+	for f1 in polyhedron.edges:
 		f2 = f1.opposite
 		theta = polyhedra.dihedral_angle(f1, f2)
 		theta = numpy.degrees(theta)
-		print("%d:\t%.4f" % (i, theta))
+		print("%s:\t%.4f°" % (str(f1.edge_id), theta))
 
 
 main(*sys.argv[1:])
