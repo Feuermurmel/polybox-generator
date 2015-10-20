@@ -1,5 +1,5 @@
 import sys, math, numpy
-from lib import polyhedra, stellations, paths, export, util
+from lib import polyhedra, stellations, export, util
 
 
 def arrange_grid(count):
