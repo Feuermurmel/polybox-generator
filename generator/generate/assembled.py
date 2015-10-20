@@ -18,8 +18,8 @@ def main(src_path):
 
 			polygon = polyhedra.get_planar_polygon(face)
 			vertices = polygon.paths[0].vertices
-			centerx, centery = -numpy.mean(vertices, 0)
-			maxr = numpy.amax([numpy.linalg.norm(v) for v in vertices])
+			center = -numpy.mean(vertices, 0)
+			minr = numpy.amin([numpy.linalg.norm(v - center) for v in vertices])
 
 			with file.group('multmatrix', t):
 				with file.group('difference', None):
@@ -27,6 +27,6 @@ def main(src_path):
 						with file.group('offset', -gap / 2):
 							file.polygon(cut)
 
-					with file.group('translate', [-centerx, -centery, 0.7 * thickness]):
+					with file.group('translate', [-center[0], -center[1], 0.7 * thickness]):
 						with file.group('linear_extrude', thickness):
-							file.text(str(face.face_id), size=0.2 * maxr, halign="center", valign="center")
+							file.text(str(face.face_id), size=0.5 * minr, halign="center", valign="center")
