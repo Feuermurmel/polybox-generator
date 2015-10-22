@@ -30,6 +30,6 @@ def main(src_path):
 					with file.group('translate', [-center[0], -center[1], 0.7 * thickness]):
 						with file.group('linear_extrude', thickness):
 							fid = str(face.face_id)
-							if fid in ("6", "9"):
-								fid += "."
-							file.text(fid, size=0.3 * minr, halign="center", valign="center")
+							if fid in ('6','9'):
+								fid += '.'
+							file.text(fid, size=0.3 * minr, halign='center', valign='center')
