@@ -146,7 +146,7 @@ class OpenSCADFile(File):
 		elif isinstance(expression, (tuple, list, numpy.ndarray)):
 			return '[{}]'.format(', '.join(map(cls._serialize_expression, expression)))
 		elif isinstance(expression, str):
-			return '{}'.format(json.dumps(expression))
+			return json.dumps(expression)
 		else:
 			raise Exception('Unsupported expression type: {}'.format(type(expression)))
 	
