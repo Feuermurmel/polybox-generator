@@ -147,8 +147,6 @@ class OpenSCADFile(File):
 			return '[{}]'.format(', '.join(map(cls._serialize_expression, expression)))
 		elif isinstance(expression, str):
 			return '"{}"'.format(expression)
-		elif expression is None:
-			return ''
 		else:
 			raise Exception('Unsupported expression type: {}'.format(type(expression)))
 	

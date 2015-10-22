@@ -22,7 +22,7 @@ def main(src_path):
 			minr = numpy.amin([numpy.linalg.norm(v - center) for v in vertices])
 
 			with file.group('multmatrix', t):
-				with file.group('difference', None):
+				with file.group('difference'):
 					with file.group('linear_extrude', thickness - gap):
 						with file.group('offset', -gap / 2):
 							file.polygon(cut)
