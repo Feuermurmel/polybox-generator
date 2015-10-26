@@ -12,19 +12,23 @@ def arrange_grid(count):
 def main(src_path):
 	file = export.AsymptoteFile(sys.stdout)
 	file.write('import "../_faces.asy" as _;')
-	
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
-	
+
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=1)
+
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		polygon = polyhedra.get_planar_polygon(face)
-		centerx, centery = -numpy.mean(polygon.paths[0].vertices, 0)
+		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
 		cut = stellations.stellation_over_face(face)
 		
 		with file.transform('shift(({}, {}) * 100mm) * scale(20)', c, r):
-			file.write('transform t = shift(({}, {}) * 1mm);', centerx, centery)
-			file.write('face({}, {}, t);', polygon, cut, c, r)
+			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)
+			file.write('cut_contour({}, t);', cut, c, r)
 
-			file.write('face_id(({}mm, {}mm), "{}", t);', -centerx, -centery, face.face_id)
+			file.write('face({}, t);', cut, c, r)
+			file.write('edges({}, t);', polygon, c, r)
+			file.write('vertices({}, t);', polygon, c, r)
+
+			file.write('face_id(({}mm, {}mm), "{}", t);', centerx, centery, face.face_id)
 
 			for i, (x, y) in zip(face.face_cycle, polygon.paths[0].vertices):
 				file.write('vertex_id(({}mm, {}mm), "{}", t);', x, y, i.vertex_id)
