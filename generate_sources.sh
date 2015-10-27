@@ -25,8 +25,8 @@ generate() {
 for i in src/polyhedra/*.json; do
 	name=${i#src/polyhedra/}
 	name=${name%.json}
-	
-	for j in tenons; do
+
+	for j in faces tenons; do
 		generate_file "src/$j/$name.asy" generate "$j" "$i"
 	done
 	

@@ -10,7 +10,7 @@ def stellation_over_edge(polyview):
 
 	opposite = polyview.opposite
 	l1, l2, m = polyhedra.view_local_onb(opposite)
-	#yield (u, k1, -m)
+	yield (u, k1, -m)
 
 	for face in opposite.face_cycle:
 		neighbour = face.opposite
@@ -59,120 +59,5 @@ def stellation_over_view(polyview):
 		lines = line_to_face_coordinates(polyview, lines)
 		cells.append(compute_halfplanes(lines))
 
-
-	#stellation = functools.reduce(operator.__xor__, cells)
-	stellation = cells
+	stellation = functools.reduce(operator.__xor__, cells)
 	return stellation
-
-
-def make_strip(t1, t2):
-	h1 = paths.half_plane((t1, 0), (0, -1))
-	h2 = paths.half_plane((t2, 0), (0,  1))
-	return h1 & h2
-
-
-def pulses(polyview):
-	return generate_pulses(polyview)
-
-
-def make_teeth(polyview):
-	Sm = []
-	Sh = []
-
-	for ti, dt, da in pulses(polyview):
-		if da > 0:
-			Sm.append(make_strip(ti, ti+dt))
-		elif da < 0:
-			Sh.append(make_strip(ti, ti+dt))
-
-	A = paths.plane()
-	Sm = functools.reduce(operator.__or__, Sm, ~A)
-	Sh = functools.reduce(operator.__or__, Sh, ~A)
-
-	return Sm, Sh
-
-
-def teeth_length(polyview):
-	d = thickness()
-	theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
-
-	if theta <= numpy.pi/2.0:
-		hin = 0.0
-	else:
-		hin = d / numpy.tan(numpy.pi - theta)
-
-	hout = d / numpy.sin(numpy.pi-theta)
-
-	# Manual override
-	return teeth_adapt(hin, hout)
-
-
-def make_V(polyview):
-	Sm, Sh = make_teeth(polyview)
-	hin, hout = teeth_length(polyview)
-
-	H = paths.half_plane((0,  0),    ( 1, 0))
-	I = paths.half_plane((0,  hin),  ( 1, 0))
-	O = paths.half_plane((0, -hout), (-1, 0))
-
-	To = Sm / O
-	Ti = Sh / I
-	V = (H / Ti) | To
-
-	return V, H
-
-
-def face_V(polyview):
-	v = polyhedra.get_planar_coordinates(polyview)
-	n = len(v)
-
-	V = []
-	H = []
-
-	for i, view in enumerate(polyview.face_cycle):
-		Vi, Hi = make_V(view)
-
-		# ugly linalg here
-		a = v[i]
-		b = v[(i+1)%n]
-		k1 = b - a
-		k2 = linalg.normalize(linalg.rot_ccw(k1))
-
-		# General affine transform
-		M = numpy.column_stack([k1, k2])
-		T = paths.transform(M[0,0], M[0,1], a[0], M[1,0], M[1,1], a[1])
-
-		V.append(T * Vi)
-		H.append(T * Hi)
-
-	return V, H
-
-
-def stellation_over_face(polyview):
-	A = paths.plane()
-	V, H = face_V(polyview)
-	S = stellation_over_view(polyview)
-	Ri = [~(Vi & (Hi | Si)) for Vi, Hi, Si in zip(V,H,S)]
-	R = functools.reduce(operator.__or__, Ri)
-
-	return A / R
-
-
-# User Mod
-
-def generate_pulses(polyview):
-	return equidistant(8)
-
-def equidistant(N):
-	dx = 1.0/N
-	return [(i*dx, dx, (-1)**i) for i in range(N)]
-
-
-def teeth_adapt(hin, hout):
-	#hin = 0.05
-	hout *= 2.0
-	return hin, hout
-
-
-def thickness():
-	return 0.08
