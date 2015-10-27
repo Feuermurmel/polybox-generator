@@ -1,5 +1,4 @@
-import sys
-import numpy, numpy.linalg
+import sys, numpy
 from lib import polyhedra, stellations, export, util
 
 
