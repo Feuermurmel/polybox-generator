@@ -6,7 +6,7 @@ class Stellation:
 	"""
 	"""
 
-	def __init__(self, polyhedron):
+	def __init__(self, polyhedron : polyhedra.PolyhedronView):
 		self._polyhedron = polyhedron
 
 	@property
@@ -17,7 +17,7 @@ class Stellation:
 		return self._polyhedron
 
 
-	def _line_to_face_coordinates(self, view, lines):
+	def _line_to_face_coordinates(self, view : polyhedra.PolyhedronView, lines):
 		"""
 		"""
 		# TODO: Factor out common face projection
@@ -43,20 +43,14 @@ class Stellation:
 		return functools.reduce(operator.__and__, halfplanes)
 
 
-
-	def cone_over_edge(self, polyview):
-		pass
-
-	def cell_over_edge(self, polyview):
-		"""
-		stellation_over_edge(polyview)
-		"""
+	def _compute_stellation(self, polyview :  polyhedra.PolyhedronView, closed : bool = True):
 		k1, k2, n = polyhedra.view_local_onb(polyview)
 		u = polyview.vertex_coordinate
 
 		opposite = polyview.opposite
 		l1, l2, m = polyhedra.view_local_onb(opposite)
-		yield (u, k1, -m)
+		if closed:
+			yield (u, k1, -m)
 
 		for face in opposite.face_cycle:
 			neighbour = face.opposite
@@ -69,15 +63,48 @@ class Stellation:
 				yield (s, r, m)
 
 
-	def stellation_over_view(self, polyview):
+	def _cone_over_edge(self, polyview : polyhedra.PolyhedronView):
+		"""
+		"""
+		return self._compute_stellation(polyview, closed=False)
+
+
+	def _cell_over_edge(self, polyview : polyhedra.PolyhedronView):
+		"""
+		stellation_over_edge(polyview)
+		"""
+		return self._compute_stellation(polyview, closed=True)
+
+
+	def cones(self, polyview : polyhedra.PolyhedronView):
+		"""
+		"""
+		cones = []
+
+		for view in polyview.face_cycle:
+			lines = self._cone_over_edge(view)
+			lines = self._line_to_face_coordinates(polyview, lines)
+			cones.append(self._compute_halfplanes(lines))
+
+		return cones
+
+
+	def cells(self, polyview : polyhedra.PolyhedronView):
 		"""
 		"""
 		cells = []
 
 		for view in polyview.face_cycle:
-			lines = self.cell_over_edge(view)
+			lines = self._cell_over_edge(view)
 			lines = self._line_to_face_coordinates(polyview, lines)
 			cells.append(self._compute_halfplanes(lines))
 
+		return cells
+
+
+	def stellation(self, polyview : polyhedra.PolyhedronView):
+		"""
+		"""
+		cells = self.cells(polyview)
 		stellation = functools.reduce(operator.__xor__, cells)
 		return stellation
