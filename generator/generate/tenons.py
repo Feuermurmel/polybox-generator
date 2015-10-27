@@ -1,5 +1,5 @@
 import sys, math, numpy
-from lib import polyhedra, stellations, export, util
+from lib import polyhedra, tenon, export, util
 
 
 def arrange_grid(count):
@@ -14,14 +14,15 @@ def main(src_path):
 	file.write('import "../_faces.asy" as _;')
 
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=1)
+	fingertenon = tenon.RegularFingerTenon(polyhedron, 0.08, 12)
 
 	debug_mode = True
 
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		polygon = polyhedra.get_planar_polygon(face)
 		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
-		cut = stellations.stellation_over_face(face)
-		
+		cut = fingertenon.tenon(face)
+
 		with file.transform('shift(({}, {}) * 100mm) * scale(20)', c, r):
 			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)
 
