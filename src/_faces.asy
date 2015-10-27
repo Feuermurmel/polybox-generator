@@ -1,7 +1,9 @@
-real offset = 100mm;
+// Pen whose stroke has correct properties
+// for cuts laser cutter in 'vector' mode.
+pen cut_pen = black + 0.01mm;
 
 void cut_contour(path[] cut, transform t) {
-	draw(t * cut, black + 0.01mm);
+	draw(t * cut, cut_pen);
 }
 
 
