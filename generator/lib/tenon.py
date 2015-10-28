@@ -116,14 +116,14 @@ class RegularFingerTenon(Tenon):
 	"""
 	"""
 
-	def __init__(self, polyhedron, D, N):
+	def __init__(self, polyhedron, thickness=0.08, number_teeth=8):
 		super().__init__(polyhedron)
-		self._thickness = D
-		self._N = N
+		self._thickness = thickness
+		self._number_teeth = number_teeth
 
 	def pulses(self, polyview):
-		dx = 1.0 / self._N
-		return [(i*dx, dx, (-1)**i) for i in range(self._N)]
+		dx = 1.0 / self._number_teeth
+		return [(i*dx, dx, (-1)**i) for i in range(self._number_teeth)]
 
 	def teeth_adapt(self, hin, hout):
 	        #hin = 0.05
