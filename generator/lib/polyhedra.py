@@ -218,6 +218,7 @@ def get_planar_polygon(view : PolyhedronView):
 
 def dihedral_angle(view1 : PolyhedronView, view2 : PolyhedronView):
 	"""
+	Compute the dihedral angle between two faces.
 	"""
 	n1 = face_normal(view1)
 	n2 = face_normal(view2)
