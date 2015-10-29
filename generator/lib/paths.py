@@ -1,5 +1,5 @@
 import math, abc, numpy, pyclipper, fractions
-from . import util
+from . import linalg, util
 
 
 class _Transformable(metaclass = abc.ABCMeta):
@@ -158,8 +158,8 @@ def path(*vertices):
 	Return a path using the specified coordinates.
 	
 	The arguments can either be `Vertex` instances or 2-tuples containing the arguments for `vertex()`.
-	
-	Please not that a path without any vertices, when used in a polygon, is interpreted as the area of the whole plane. The reasoning behind this is that a (convex) polygon ca be interpreted as the intersection of the set of half-spaces created by converting each edge into a half-space. The intersection of zero half-planes is the full plane. (And it was a convenient hack solving the problem of representing the whole plane.) 
+
+	Please not that a path without any vertices, when used in a polygon, is interpreted as the area of the whole plane. The reasoning behind this is that a (convex) polygon ca be interpreted as the intersection of the set of half-spaces created by converting each edge into a half-space. The intersection of zero half-planes is the full plane. (And it was a convenient hack solving the problem of representing the whole plane.)
 	"""
 	
 	def iter_vertices():
@@ -502,6 +502,16 @@ def square():
 	"""
 	
 	return polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
+
+
+def strip(anchor, normal):
+	"""
+	Return an infinitely long strip. The 'anchor' point lies one edge and the 'normal' runs perpendicular to the strip, defining its width.
+	"""
+	anchor2 = tuple([ai + ni for ai, ni in zip(anchor, normal)])
+	h1 = half_plane(anchor, linalg.rot_cw(normal))
+	h2 = half_plane(anchor2, linalg.rot_ccw(normal))
+	return h1 & h2
 
 
 def half_plane(anchor, direction):
