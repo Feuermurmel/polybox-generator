@@ -14,7 +14,7 @@ def main(src_path):
 	file.write('import "../_faces.asy" as _;')
 
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=1)
-	fingertenon = tenon.RegularFingerTenon(polyhedron, 0.08, 12)
+	fingertenon = tenon.RegularFingerTenon(polyhedron, 0.08)
 
 	debug_mode = True
 

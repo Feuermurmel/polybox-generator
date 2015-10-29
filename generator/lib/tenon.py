@@ -2,19 +2,19 @@ import functools, numpy, operator
 from lib import polyhedra, stellations, paths, linalg
 
 
-def make_strip(t1, t2):
-	h1 = paths.half_plane((t1, 0), (0, -1))
-	h2 = paths.half_plane((t2, 0), (0,  1))
-	return h1 & h2
-
-
 class Tenon:
 	"""
+	Implements the basic concept of a very general
+	tenon structure along an edge of a polyhedron.
 	"""
 
 	def __init__(self, polyhedron):
+		"""
+		:param polyhedron: The underlying polyhedron.
+		"""
 		self._polyhedron = polyhedron
 		self._stellation = stellations.Stellation(polyhedron)
+
 
 	@property
 	def polyhedron(self):
@@ -24,19 +24,19 @@ class Tenon:
 		return self._polyhedron
 
 
-	def _pulses(self, polyview):
-		return self.pulses(polyview)
+	def _fingers(self, polyview):
+		return self.fingers(polyview)
 
 
-	def _make_teeth(self, polyview):
+	def _make_fingers(self, polyview):
 		Sm = []
 		Sh = []
 
-		for ti, dt, da in self._pulses(polyview):
+		for ti, dt, da in self._fingers(polyview):
 			if da > 0:
-				Sm.append(make_strip(ti, ti+dt))
+				Sm.append(paths.strip((ti,0), (dt,0)))
 			elif da < 0:
-				Sh.append(make_strip(ti, ti+dt))
+				Sh.append(paths.strip((ti,0), (dt,0)))
 
 		A = paths.plane()
 		Sm = functools.reduce(operator.__or__, Sm, ~A)
@@ -45,31 +45,43 @@ class Tenon:
 		return Sm, Sh
 
 
-	def _teeth_length(self, polyview):
+	def _finger_length(self, polyview):
 		d = self.thickness(polyview)
 		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
 
-		if theta <= numpy.pi/2.0:
-			hin = 0.0
-		else:
-			hin = d / numpy.tan(numpy.pi - theta)
+		# Is the finger length given or do we have to compute it
+		hin, hout = self.finger_length(polyview)
 
-		hout = d / numpy.sin(numpy.pi-theta)
+		if hin is True:
+			if theta <= numpy.pi/2.0:
+				hin = 0.0
+			else:
+				hin = d / numpy.tan(numpy.pi - theta)
+		if hout is True:
+			hout = d / numpy.sin(numpy.pi-theta)
 
 		# Manual override
-		return self.teeth_adapt(hin, hout)
+		return self.finger_length_adapt(polyview, hin, hout)
 
 
 	def _make_V(self, polyview):
-		Sm, Sh = self._make_teeth(polyview)
-		hin, hout = self._teeth_length(polyview)
-
+		Sm, Sh = self._make_fingers(polyview)
 		H = paths.half_plane((0,  0),    ( 1, 0))
-		I = paths.half_plane((0,  hin),  ( 1, 0))
-		O = paths.half_plane((0, -hout), (-1, 0))
 
-		To = Sm / O
-		Ti = Sh / I
+		hin, hout = self._finger_length(polyview)
+
+		if hin is not None:
+			I = paths.half_plane((0,  hin),  ( 1, 0))
+			Ti = Sh / I
+		else:
+			Ti = Sh
+		if hout is not None:
+			O = paths.half_plane((0, -hout), (-1, 0))
+			To = Sm / O
+		else:
+			To = Sm
+
+		# Clip the fingers and slots to desired length
 		V = (H / Ti) | To
 
 		return V, H
@@ -101,7 +113,59 @@ class Tenon:
 		return V, H
 
 
+	def thickness(self, polyview):
+		"""
+		Return the thickness of the material. This is usually a
+		constant for the whole polyhedron but could in principle
+		also vary per face.
+		"""
+		raise NotImplementedError("Tenon: Material thickness not defined.")
+
+
+	def fingers(self, polyview):
+		"""
+		Define the finger positions and widths via 'pulses'.
+		Each pulse is a triple (x, dx, n) where 'x' is the
+		starting point (0 <= x <= 1), 'dx' is the fingers width
+		and 'n' the direction. Negative 'n' will give 'slots' while
+		positive 'n' will give fingers. Return a list of pulses.
+		"""
+		raise NotImplementedError("Tenon: No fingers defined.")
+
+
+	def finger_length(self, polyview):
+		"""
+		Set the initial finger length before any clipping takes place.
+		Return a pair 'slot depth' and 'finger length' in this order.
+		A number value is used literally, while 'True' means we compute
+		a sensible value and 'None' stands for infinitely long fingers.
+		"""
+		return (True, True)
+
+
+	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
+		"""
+		Adapt the computed 'slot depth' and 'finger length' if desired.
+		Return again a pair 'slot depth' and 'finger length'.
+		"""
+		return (slotdepth, fingerlength)
+
+
+	def finger_clip_contour(self, polyview):
+		"""
+		Additional polyline contour which is used for clipping the fingers
+		after they got clipped along the edges of the stellation facet.
+		NOTE: This feature is not yet implemented.
+		"""
+		pass
+
+
 	def tenon(self, polyview):
+		"""
+		Compute the final tenon structure.
+
+		:param polyview: The view defining the edge along which to compute the tenon.
+		"""
 		A = paths.plane()
 		V, H = self._face_V(polyview)
 		S = self._stellation.cones(polyview)
@@ -112,23 +176,30 @@ class Tenon:
 
 
 
+
 class RegularFingerTenon(Tenon):
 	"""
+	Computes a regular finger tenon joint.
+	The number of fingers per edge is globally constant.
 	"""
 
-	def __init__(self, polyhedron, thickness=0.08, number_teeth=8):
+	def __init__(self, polyhedron, thickness=0.08, finger_count=8):
+		"""
+		:param polyhedron: The underlying polyhedron.
+		:param thickness: The thickness of the material.
+		:param finger_count: The sum of fingers and slots.
+		"""
 		super().__init__(polyhedron)
 		self._thickness = thickness
-		self._number_teeth = number_teeth
+		self._finger_count = finger_count
 
-	def pulses(self, polyview):
-		dx = 1.0 / self._number_teeth
-		return [(i*dx, dx, (-1)**i) for i in range(self._number_teeth)]
-
-	def teeth_adapt(self, hin, hout):
-	        #hin = 0.05
-		hout *= 2.0
-		return hin, hout
+	def fingers(self, polyview):
+		dx = 1.0 / self._finger_count
+		return [(i*dx, dx, (-1)**i) for i in range(self._finger_count)]
 
 	def thickness(self, polyview):
 		return self._thickness
+
+	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
+		fingerlength *= 2.0
+		return slotdepth, fingerlength
