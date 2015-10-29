@@ -20,9 +20,9 @@ def main(src_path):
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		polygon = polyhedra.get_planar_polygon(face)
 		centerx, centery = -numpy.mean(polygon.paths[0].vertices, 0)
-		facet = stellation.stellation(face)
+		facets = stellation.stellation(face)
 
 		with file.transform('shift(({}, {}) * 100mm) * scale(20)', c, r):
 			file.write('transform t = shift(({}, {}) * 1mm);', centerx, centery)
-			file.write('face({}, t);', facet & (paths.move(-centerx, -centery) * boundary))
+			file.write('face({}, t);', facets & (paths.move(-centerx, -centery) * boundary))
 			file.write('face({}, t);', polygon)
