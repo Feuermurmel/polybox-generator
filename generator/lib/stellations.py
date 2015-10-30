@@ -46,7 +46,7 @@ class Stellation:
 		Project the lines from the last step into the plane (and local
 		coordinate system) of the center face.
 
-		:param polyview: Select the center face.
+		:param view: Select the center face.
 		:param lines: The lines defining the edges of the stellation facet.
 		"""
 		# TODO: Factor out common face projection
@@ -82,7 +82,7 @@ class Stellation:
 		of the given view. The cone lies in the same plane
 		as the face.
 
-		:param polview: A view on the polyhedron.
+		:param polyview: A view on the polyhedron.
 		"""
 		return self._compute_stellation(polyview, closed=False)
 
@@ -94,7 +94,7 @@ class Stellation:
 		as the face. Closing the cone with the edge yields
 		the cell.
 
-		:param polview: A view on the polyhedron.
+		:param polyview: A view on the polyhedron.
 		"""
 		return self._compute_stellation(polyview, closed=True)
 
@@ -105,7 +105,7 @@ class Stellation:
 		all edges of the given view. The cones lie in
 		the same plane as the face.
 
-		:param polview: A view on the polyhedron.
+		:param polyview: A view on the polyhedron.
 		"""
 		cones = []
 
@@ -123,7 +123,7 @@ class Stellation:
 		all edges of the given view. The cells lie in
 		the same plane as the face.
 
-		:param polview: A view on the polyhedron.
+		:param polyview: A view on the polyhedron.
 		"""
 		cells = []
 
@@ -141,7 +141,7 @@ class Stellation:
 		of the face. The figure is just the (disjoint)
 		union of all stellation facets.
 
-		:param polview: A view on the polyhedron.
+		:param polyview: A view on the polyhedron.
 		"""
 		cells = self.cells(polyview)
 		stellation = functools.reduce(operator.__xor__, cells)
