@@ -137,7 +137,7 @@ class OpenSCADFile(File):
 		self.call('polygon', vertices, paths)
 
 	def text(self, string : str, size = 1.0, font = 'Liberation Sans', **kwargs):
-		self.call('text', string, font=font, size=size, **kwargs);
+		self.call('text', string, font=font, size=size, **kwargs)
 
 	@classmethod
 	def _serialize_expression(cls, expression):
