@@ -1,8 +1,8 @@
-import functools, numpy, operator
+import functools, numpy, operator, abc
 from lib import polyhedra, stellations, paths, linalg
 
 
-class Tenon:
+class Tenon(metaclass = abc.ABCMeta):
 	"""
 	Implements the basic concept of a very general
 	tenon structure along an edge of a polyhedron.
@@ -112,16 +112,16 @@ class Tenon:
 
 		return V, H
 
-
+	@abc.abstractmethod
 	def thickness(self, polyview):
 		"""
 		Return the thickness of the material. This is usually a
 		constant for the whole polyhedron but could in principle
 		also vary per face.
 		"""
-		raise NotImplementedError("Tenon: Material thickness not defined.")
 
 
+	@abc.abstractmethod
 	def fingers(self, polyview):
 		"""
 		Define the finger positions and widths via 'pulses'.
@@ -130,7 +130,6 @@ class Tenon:
 		and 'n' the direction. Negative 'n' will give 'slots' while
 		positive 'n' will give fingers. Return a list of pulses.
 		"""
-		raise NotImplementedError("Tenon: No fingers defined.")
 
 
 	def finger_length(self, polyview):
