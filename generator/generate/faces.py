@@ -14,7 +14,7 @@ def main(src_path):
 	file.write('import "../_faces.asy" as _;')
 
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
-	stellation = stellations.Stellation(polyhedron)
+	stellation = stellations.Stellation()
 	boundary = paths.scale(2.5) * paths.circle()
 
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):

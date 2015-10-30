@@ -8,20 +8,8 @@ class Tenon(metaclass = abc.ABCMeta):
 	tenon structure along an edge of a polyhedron.
 	"""
 
-	def __init__(self, polyhedron):
-		"""
-		:param polyhedron: The underlying polyhedron.
-		"""
-		self._polyhedron = polyhedron
-		self._stellation = stellations.Stellation(polyhedron)
-
-
-	@property
-	def polyhedron(self):
-		"""
-		Returns the underlying polyhedron.
-		"""
-		return self._polyhedron
+	def __init__(self):
+		self._stellation = stellations.Stellation()
 
 
 	def _fingers(self, polyview):
@@ -182,13 +170,15 @@ class RegularFingerTenon(Tenon):
 	The number of fingers per edge is globally constant.
 	"""
 
-	def __init__(self, polyhedron, thickness=0.08, finger_count=8):
+	def __init__(self, thickness=0.08, finger_count=8):
 		"""
 		:param polyhedron: The underlying polyhedron.
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
 		"""
-		super().__init__(polyhedron)
+		
+		super().__init__()
+		
 		self._thickness = thickness
 		self._finger_count = finger_count
 

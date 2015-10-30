@@ -8,20 +8,6 @@ class Stellation:
 	over a given polyhedron.
 	"""
 
-	def __init__(self, polyhedron : polyhedra.PolyhedronView):
-		"""
-		:param polyhedron: The underlying polyhedron.
-		"""
-		self._polyhedron = polyhedron
-
-
-	@property
-	def polyhedron(self):
-		"""
-		Returns the underlying polyhedron.
-		"""
-		return self._polyhedron
-
 
 	def _compute_stellation(self, polyview : polyhedra.PolyhedronView, closed : bool = True):
 		"""
