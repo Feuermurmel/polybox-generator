@@ -1,5 +1,5 @@
 import sys, numpy
-from lib import polyhedra, stellations, export, util
+from lib import polyhedra, tenon, export, util
 
 
 @util.main
@@ -9,10 +9,11 @@ def main(src_path):
 	file = export.OpenSCADFile(sys.stdout)
 	
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
+	ten = tenon.RegularFingerTenon(0.08)
 	
 	with file.group('render'):
 		for face in polyhedron.faces:
-			cut = stellations.stellation_over_face(face)
+			cut = ten.tenon(face)
 			t = polyhedra.face_coordinate_system(face)
 
 			polygon = polyhedra.get_planar_polygon(face)
