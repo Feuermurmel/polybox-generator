@@ -192,3 +192,25 @@ class RegularFingerTenon(Tenon):
 	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
 		fingerlength *= 2.0
 		return slotdepth, fingerlength
+
+
+class NullTenon(Tenon):
+	"""
+	The null tenon represents a simple straight edge.
+	"""
+
+	def __init__(self, thickness=0.08):
+		"""
+		:param thickness: The thickness of the material.
+		"""
+		super().__init__()
+		self._thickness = thickness
+
+	def fingers(self, polyview):
+		return []
+
+	def thickness(self, polyview):
+		return self._thickness
+
+	def finger_length(self, polyview):
+		return (0, 0)
