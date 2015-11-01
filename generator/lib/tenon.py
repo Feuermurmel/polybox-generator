@@ -54,12 +54,12 @@ class Tenon(metaclass = abc.ABCMeta):
 
 	def _make_V(self, polyview):
 		Sm, Sh = self._make_fingers(polyview)
-		H = paths.half_plane((0,  0),    ( 1, 0))
+		H = paths.half_plane((0, 0), (1, 0))
 
 		hin, hout = self._finger_length(polyview)
 
 		if hin is not None:
-			I = paths.half_plane((0,  hin),  ( 1, 0))
+			I = paths.half_plane((0, hin), (1, 0))
 			Ti = Sh / I
 		else:
 			Ti = Sh
@@ -176,9 +176,9 @@ class RegularFingerTenon(Tenon):
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
 		"""
-		
+
 		super().__init__()
-		
+
 		self._thickness = thickness
 		self._finger_count = finger_count
 
