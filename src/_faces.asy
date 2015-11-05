@@ -27,9 +27,10 @@ void face_id(pair center, string index, transform t) {
 
 void edge_id(pair a, pair b, string index, transform t) {
 	pair edge_center = t * ((a + b) / 2.0);
+	pair edge_direction = b - a;
 	pair anchor = 0.8 * edge_center;
-	transform r = rotate(90 + degrees(atan2(edge_center.y, edge_center.x)));
-	Label L = scale(0.5) * r * Label(index, anchor);
+	transform r = rotate(degrees(atan2(edge_direction.y, edge_direction.x)));
+	Label L = scale(0.5) * r * Label(index);
 	label(L, anchor);
 }
 
