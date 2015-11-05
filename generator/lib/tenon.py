@@ -88,9 +88,8 @@ class Tenon(metaclass = abc.ABCMeta):
 			# ugly linalg here
 			a = v[i]
 			b = v[(i+1)%n]
-			k1 = b - a
+			k1 = linalg.normalize(b - a)
 			k2 = linalg.normalize(linalg.rot_ccw(k1))
-
 			# General affine transform
 			M = numpy.column_stack([k1, k2])
 			T = paths.transform(M[0,0], M[0,1], a[0], M[1,0], M[1,1], a[1])
@@ -114,9 +113,10 @@ class Tenon(metaclass = abc.ABCMeta):
 		"""
 		Define the finger positions and widths via 'pulses'.
 		Each pulse is a triple (x, dx, n) where 'x' is the
-		starting point (0 <= x <= 1), 'dx' is the fingers width
+		starting point (0 <= x <= l), 'dx' is the fingers width
 		and 'n' the direction. Negative 'n' will give 'slots' while
-		positive 'n' will give fingers. Return a list of pulses.
+		positive 'n' will give fingers. The value 'l' is the edge
+		length. Return a list of pulses.
 		"""
 
 
@@ -172,7 +172,6 @@ class RegularFingerTenon(Tenon):
 
 	def __init__(self, thickness=0.08, finger_count=8):
 		"""
-		:param polyhedron: The underlying polyhedron.
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
 		"""
@@ -183,7 +182,8 @@ class RegularFingerTenon(Tenon):
 		self._finger_count = finger_count
 
 	def fingers(self, polyview):
-		dx = 1.0 / self._finger_count
+		l = polyhedra.edge_length(polyview)
+		dx = l / self._finger_count
 		return [(i*dx, dx, (-1)**i) for i in range(self._finger_count)]
 
 	def thickness(self, polyview):
