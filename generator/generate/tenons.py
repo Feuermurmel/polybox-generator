@@ -7,6 +7,12 @@ def arrange_grid(count):
 	
 	return [divmod(i, width) for i in range(count)]
 
+class mocktenonsource:
+	def __init__(self):
+		self._ft = tenon.RegularFingerTenon(0.4)
+
+	def __getitem__(self, key):
+		return self._ft
 
 @util.main
 def main(src_path):
@@ -14,14 +20,15 @@ def main(src_path):
 	file.write('import "../_faces.asy" as _;')
 
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=1)
-	fingertenon = tenon.RegularFingerTenon(0.08)
+	TS = mocktenonsource()
+	WW = tenon.WoodWorker(TS)
 
 	debug_mode = True
 
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		polygon = polyhedra.get_planar_polygon(face)
 		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
-		cut = fingertenon.tenon(face)
+		cut = WW.piece(face)
 
 		with file.transform('shift(({}, {}) * 100mm) * scale(20)', c, r):
 			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)

@@ -2,25 +2,78 @@ import functools, numpy, operator, abc
 from lib import polyhedra, stellations, paths, linalg
 
 
+class WoodWorker():
+	"""Combine different tenons, one for each edge, into
+	the final piece structure for a given face.
+	"""
+
+	def __init__(self, tenonsource):
+		"""
+		:param tenonsource: Where the tenons for each edge are defined.
+		"""
+		self._stellation = stellations.Stellation()
+		self._tenonsource = tenonsource
+
+
+	def _edge_joints(self, polyview):
+		"""
+		:param polyview: A view on the polyhedron.
+		"""
+		v = polyhedra.get_planar_coordinates(polyview)
+		n = len(v)
+
+		V = []
+		H = []
+
+		for i, view in enumerate(polyview.face_cycle):
+			tenon = self._tenonsource[view.edge_id]
+			Vi, Hi = tenon.tenon(view)
+
+			# ugly linalg here
+			a = v[i]
+			b = v[(i+1)%n]
+			k1 = linalg.normalize(b - a)
+			k2 = linalg.normalize(linalg.rot_ccw(k1))
+
+			# General affine transform
+			M = numpy.column_stack([k1, k2])
+			T = paths.transform(M[0,0], M[0,1], a[0], M[1,0], M[1,1], a[1])
+
+			V.append(T * Vi)
+			H.append(T * Hi)
+
+		return V, H
+
+
+	def piece(self, polyview):
+		"""
+		Compute the final tenon structure of a piece.
+
+		:param polyview: The view defining the face.
+		"""
+		A = paths.plane()
+		V, H = self._edge_joints(polyview)
+		S = self._stellation.cones(polyview)
+		Ri = [~(Vi & (Hi | Si)) for Vi, Hi, Si in zip(V,H,S)]
+		R = functools.reduce(operator.__or__, Ri)
+
+		return A / R
+
+
 class Tenon(metaclass = abc.ABCMeta):
 	"""
 	Implements the basic concept of a very general
 	tenon structure along an edge of a polyhedron.
 	"""
 
-	def __init__(self):
-		self._stellation = stellations.Stellation()
-
-
-	def _fingers(self, polyview):
-		return self.fingers(polyview)
-
-
 	def _make_fingers(self, polyview):
+		"""
+		:param polyview: A view on the polyhedron.
+		"""
 		Sm = []
 		Sh = []
 
-		for ti, dt, da in self._fingers(polyview):
+		for ti, dt, da in self.fingers(polyview):
 			if da > 0:
 				Sm.append(paths.strip((ti,0), (dt,0)))
 			elif da < 0:
@@ -34,6 +87,9 @@ class Tenon(metaclass = abc.ABCMeta):
 
 
 	def _finger_length(self, polyview):
+		"""
+		:param polyview: A view on the polyhedron.
+		"""
 		d = self.thickness(polyview)
 		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
 
@@ -52,7 +108,12 @@ class Tenon(metaclass = abc.ABCMeta):
 		return self.finger_length_adapt(polyview, hin, hout)
 
 
-	def _make_V(self, polyview):
+	def tenon(self, polyview):
+		"""
+		Compute the tenon structure along a given edge.
+
+		:param polyview: A view on the polyhedron defining the edge.
+		"""
 		Sm, Sh = self._make_fingers(polyview)
 		H = paths.half_plane((0, 0), (1, 0))
 
@@ -74,30 +135,6 @@ class Tenon(metaclass = abc.ABCMeta):
 
 		return V, H
 
-
-	def _face_V(self, polyview):
-		v = polyhedra.get_planar_coordinates(polyview)
-		n = len(v)
-
-		V = []
-		H = []
-
-		for i, view in enumerate(polyview.face_cycle):
-			Vi, Hi = self._make_V(view)
-
-			# ugly linalg here
-			a = v[i]
-			b = v[(i+1)%n]
-			k1 = linalg.normalize(b - a)
-			k2 = linalg.normalize(linalg.rot_ccw(k1))
-			# General affine transform
-			M = numpy.column_stack([k1, k2])
-			T = paths.transform(M[0,0], M[0,1], a[0], M[1,0], M[1,1], a[1])
-
-			V.append(T * Vi)
-			H.append(T * Hi)
-
-		return V, H
 
 	@abc.abstractmethod
 	def thickness(self, polyview):
@@ -145,23 +182,6 @@ class Tenon(metaclass = abc.ABCMeta):
 		NOTE: This feature is not yet implemented.
 		"""
 		pass
-
-
-	def tenon(self, polyview):
-		"""
-		Compute the final tenon structure.
-
-		:param polyview: The view defining the edge along which to compute the tenon.
-		"""
-		A = paths.plane()
-		V, H = self._face_V(polyview)
-		S = self._stellation.cones(polyview)
-		Ri = [~(Vi & (Hi | Si)) for Vi, Hi, Si in zip(V,H,S)]
-		R = functools.reduce(operator.__or__, Ri)
-
-		return A / R
-
-
 
 
 class RegularFingerTenon(Tenon):
