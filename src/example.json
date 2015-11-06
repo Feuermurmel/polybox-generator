@@ -1,0 +1,74 @@
+{
+    "polybox" : {
+	// Default configuration for all objects
+        // What if we have two "defaults"?
+        "default" : {
+            "scale_factor" : 20,
+	    "foo" : "bar",
+            // more foo settings
+            "vertices" : {
+                // What to do for each vertex
+            },
+            "edges" : {
+                // What to do for each edge
+                // For example the tenon configuration
+                "tenon" : {
+                    "class" : "RegularFingerTenon",
+                    "args" : {
+                        "finger_count" : 15
+                    }
+                }
+            },
+            "faces" : {
+                // What to do for each face
+                // For example the default material settings
+		"material" : {
+                    "thickness" : 0.08
+		}
+            }
+        },
+        // Specific configurations for individual geometric entities
+        "vertices" : {
+            // A 'vertex_id' is usually just a number 0...K
+            "vertex_id" : {
+                // foo
+            },
+            "vertex_id" : {
+                // bar
+            }
+        },
+        "edges" : {
+            // An 'edge_id' is usually a number pair (v_i, v_j)
+            // The edge (v_i, v_j) and (v_j, v_i) can have different settings
+            // Automatically set both to same value if just one is given?
+            "edge_id" : {
+                // foo
+	    },
+            "(0, 1)" : {
+                "tenon" : {
+                    "class" : "RegularFingerTenon",
+                    "args" : {
+                        "finger_count" : 4
+                    }
+                }
+	    },
+            "(5, 4)" : {
+                "tenon" : {
+                    "class" : "NullTenon",
+                    "args" : {}
+                }
+	    }
+	},
+        "faces" : {
+            // A 'face_id' is usually just a number 0...F
+            "face_id" : {
+                // bar
+            },
+            "face_id" : {
+                "engrave_image" : {
+                    "filepath" : "/.../foo.eps"
+                }
+            }
+        }
+    }
+}

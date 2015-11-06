@@ -1,18 +1,12 @@
 import sys, math, numpy
-from lib import polyhedra, tenon, export, util
+from lib import polyhedra, tenon, export, util, configs
 
 
 def arrange_grid(count):
 	width = math.ceil(math.sqrt(count))
-	
+
 	return [divmod(i, width) for i in range(count)]
 
-class mocktenonsource:
-	def __init__(self):
-		self._ft = tenon.RegularFingerTenon(0.4)
-
-	def __getitem__(self, key):
-		return self._ft
 
 @util.main
 def main(src_path):
@@ -20,8 +14,8 @@ def main(src_path):
 	file.write('import "../_faces.asy" as _;')
 
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=1)
-	TS = mocktenonsource()
-	WW = tenon.WoodWorker(TS)
+	cfg = configs.load_from_json("src/example.json")
+	WW = tenon.WoodWorker(cfg)
 
 	debug_mode = True
 
