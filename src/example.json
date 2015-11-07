@@ -82,6 +82,9 @@
 		// - as normal edge data? (for specific cases)
 		// - default omitted edge tenon?
             },
+	    "3" : {
+		// foo
+	    },
             "face_id" : {
                 "engrave_image" : {
                     "filepath" : "/.../foo.eps"

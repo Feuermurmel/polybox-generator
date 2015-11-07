@@ -26,25 +26,25 @@ class PolyBoxConfig():
 
 
     def omitted(self, polyview):
-        fid = polyview.face_id
+        fid = str(polyview.face_id)
         F = self._c["polybox"]["faces"]
-        if str(fid) in F.keys() and F[str(fid)]["omitted"]:
-            return True
+
+        if fid in F.keys() and "omitted" in F[fid].keys():
+            return F[fid]["omitted"]
         else:
             return False
 
 
     def __getitem__(self, polyview):
-        eid = polyview.edge_id
-        eido = polyview.opposite.edge_id
-
+        eid = str(polyview.edge_id)
+        eido = str(polyview.opposite.edge_id)
         D = self._c["polybox"]["default"]["edges"]
         E = self._c["polybox"]["edges"]
 
-        if str(eid) in E.keys():
-            T = E[str(eid)]["tenon"]
-        elif str(eido) in E.keys():
-            T = E[str(eido)]["tenon"]
+        if eid in E.keys():
+            T = E[eid]["tenon"]
+        elif eido in E.keys():
+            T = E[eido]["tenon"]
         elif self.omitted(polyview.adjacent):
             if "tenon_omitted" in D:
                 T = D["tenon_omitted"]
