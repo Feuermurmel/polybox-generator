@@ -15,6 +15,9 @@ def main(src_path):
 
 	with file.group('render'):
 		for face in polyhedron.faces:
+			if cfg.omitted(face):
+				continue
+
 			cut = WW.piece(face)
 			t = polyhedra.face_coordinate_system(face)
 

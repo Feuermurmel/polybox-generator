@@ -72,6 +72,9 @@
             "face_id" : {
                 // bar
             },
+            "2" : {
+                "omitted" : true
+            },
             "face_id" : {
                 "engrave_image" : {
                     "filepath" : "/.../foo.eps"

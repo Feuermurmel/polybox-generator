@@ -20,6 +20,9 @@ def main(src_path):
 	debug_mode = True
 
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
+		if cfg.omitted(face):
+			continue
+
 		polygon = polyhedra.get_planar_polygon(face)
 		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
 		cut = WW.piece(face)
