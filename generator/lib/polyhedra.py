@@ -74,7 +74,7 @@ class PolyhedronView:
 	@property
 	def next(self) -> 'PolyhedronView':
 		"""
-		Returns the second element of self.face_cycle.
+		Returns the next element of self.face_cycle.
 		"""
 		
 		return self._next_view
@@ -100,7 +100,7 @@ class PolyhedronView:
 	@property
 	def face_cycle(self):
 		"""
-		A list of views for his view's face starting with this view and enumerating edges and vertices in positive order around this view's face.
+		A list of views for this view's face starting with this view and enumerating edges and vertices in positive order around this view's face.
 		"""
 		
 		return _grab_view_cycle(self, lambda x: x.next)
@@ -108,7 +108,7 @@ class PolyhedronView:
 	@property
 	def vertex_cycle(self):
 		"""
-		A list of views for his view's vertex starting with this view and enumerating edges and faces in positive order around this view's vertex.
+		A list of views for this view's vertex starting with this view and enumerating edges and faces in positive order around this view's vertex.
 		"""
 		
 		return _grab_view_cycle(self, lambda x: x.adjacent)
