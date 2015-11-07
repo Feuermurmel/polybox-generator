@@ -38,14 +38,20 @@ class PolyBoxConfig():
         eid = polyview.edge_id
         eido = polyview.opposite.edge_id
 
+        D = self._c["polybox"]["default"]["edges"]
         E = self._c["polybox"]["edges"]
 
         if str(eid) in E.keys():
             T = E[str(eid)]["tenon"]
         elif str(eido) in E.keys():
             T = E[str(eido)]["tenon"]
+        elif self.omitted(polyview.adjacent):
+            if "tenon_omitted" in D:
+                T = D["tenon_omitted"]
+            else:
+                T = D["tenon"]
         else:
-            T = self._c["polybox"]["default"]["edges"]["tenon"]
+            T = D["tenon"]
 
         C = T["class"]
         A = T["args"]

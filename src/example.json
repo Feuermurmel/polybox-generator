@@ -15,9 +15,13 @@
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 15
+                        "finger_count" : 16
                     }
-                }
+                },
+		"tenon_omitted" : {
+                    "class" : "NullTenon",
+                    "args" : {}
+		}
             },
             "faces" : {
                 // What to do for each face
@@ -74,6 +78,9 @@
             },
             "2" : {
                 "omitted" : true
+		// Where to store tenons along edges of omitted faces?
+		// - as normal edge data? (for specific cases)
+		// - default omitted edge tenon?
             },
             "face_id" : {
                 "engrave_image" : {
