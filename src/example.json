@@ -52,6 +52,14 @@
                     }
                 }
 	    },
+	    // "(1, 0)" : {
+            //     "tenon" : {
+            //         "class" : "RegularFingerTenon",
+            //         "args" : {
+            //             "finger_count" : 2
+            //         }
+            //     }
+	    // },
             "(5, 4)" : {
                 "tenon" : {
                     "class" : "NullTenon",

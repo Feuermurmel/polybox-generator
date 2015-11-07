@@ -27,11 +27,14 @@ class PolyBoxConfig():
 
     def __getitem__(self, polyview):
         eid = polyview.edge_id
+        eido = polyview.opposite.edge_id
 
         E = self._c["polybox"]["edges"]
 
         if str(eid) in E.keys():
             T = E[str(eid)]["tenon"]
+        elif str(eido) in E.keys():
+            T = E[str(eido)]["tenon"]
         else:
             T = self._c["polybox"]["default"]["edges"]["tenon"]
 
