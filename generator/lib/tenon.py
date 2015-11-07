@@ -26,7 +26,7 @@ class WoodWorker():
 		H = []
 
 		for i, view in enumerate(polyview.face_cycle):
-			tenon = self._tenonsource[view.edge_id]
+			tenon = self._tenonsource[view]
 			Vi, Hi = tenon.tenon(view)
 
 			# ugly linalg here
