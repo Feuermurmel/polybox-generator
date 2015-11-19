@@ -1,5 +1,5 @@
 import sys, math, numpy
-from lib import polyhedra, tenon, export, util, configs
+from lib import polyhedra, tenon, export, util, configs, engravings
 
 
 def arrange_grid(count):
@@ -17,6 +17,8 @@ def main(src_path):
 	cfg = configs.load_from_json("src/example.json")
 	WW = tenon.WoodWorker(cfg)
 
+	EG = engravings.CoordinateEngraving()
+
 	debug_mode = True
 
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
@@ -26,6 +28,7 @@ def main(src_path):
 		polygon = polyhedra.get_planar_polygon(face)
 		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
 		cut = WW.piece(face)
+		eg = EG.engrave(face)
 
 		with file.transform('shift(({}, {}) * 100mm) * scale(20)', c, r):
 			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)
@@ -47,3 +50,8 @@ def main(src_path):
 
 			# Contour for laser cut
 			file.write('cut_contour({}, t);', cut, c, r)
+
+			# Face engraving
+			with file.transform('t'):
+				file.write_code(eg)
+				file.write('engrave();')
