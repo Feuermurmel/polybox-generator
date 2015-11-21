@@ -18,6 +18,8 @@ def main(src_path):
 	WW = tenon.WoodWorker(cfg)
 
 	EG = engravings.CoordinateEngraving()
+	EG = engravings.FaceCutEngraving()
+	EG = engravings.TextureEngraving()
 
 	debug_mode = True
 
@@ -30,7 +32,7 @@ def main(src_path):
 		cut = WW.piece(face)
 		eg = EG.engrave(face)
 
-		with file.transform('shift(({}, {}) * 100mm) * scale(20)', c, r):
+		with file.transform('shift(({}, {}) * 100mm) * scale(4mm)', c, r):
 			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)
 
 			if debug_mode:
@@ -48,10 +50,11 @@ def main(src_path):
 									 polygon.paths[0].vertices[1:] + [polygon.paths[0].vertices[0]]):
 						file.write('edge_id(({}mm, {}mm), ({}mm, {}mm), "{}", t);', ax, ay, bx, by, i.edge_id)
 
-			# Contour for laser cut
-			file.write('cut_contour({}, t);', cut, c, r)
 
 			# Face engraving
 			with file.transform('t'):
 				file.write_code(eg)
 				file.write('engrave();')
+
+			# Contour for laser cut
+			file.write('cut_contour({}, t);', cut, c, r)
