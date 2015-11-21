@@ -38,3 +38,24 @@ class FaceCutEngraving(Engraving):
         }
         """
         return code
+
+
+class TextureEngraving(Engraving):
+
+    def engrave(self, faceview):
+        code = """
+        void engrave() {
+          picture engraving;
+          // Scale postscript point (1/72 inch) to millimeter
+          // Note: tex point (1 / 72.27) is wrong here
+          transform s = scale(72 / 25.4);
+          // Load graphcs file
+          Label L = Label(graphic("/data/CCC/repos/polybox-generator/generator/lib/texture.eps"), embed=Scale);
+          // Make a label of proper scale and alignment
+          label(engraving, s*L, (0mm,0mm), align=Align);
+          add(engraving);
+          // Ensure remaining things are drawn on top
+          layer();
+        }
+        """
+        return code
