@@ -16,9 +16,10 @@ class CoordinateEngraving(Engraving):
     def engrave(self, faceview):
         code = """
         void engrave() {
-            draw((0,0) -- (1,0), red, arrow=Arrow());
-            draw((0,0) -- (0,1), red, arrow=Arrow());
-            dot((0,0), red);
+            pen b = black + 0.1mm;
+            draw((0mm,0mm) -- (1mm,0mm), b, arrow=Arrow());
+            draw((0mm,0mm) -- (0mm,1mm), b, arrow=Arrow());
+            dot((0mm,0mm), red);
         }
         """
         return code
