@@ -53,8 +53,9 @@ def main(src_path):
 
 			# Face engraving
 			with file.transform('t'):
+				file.write_code('{')
 				file.write_code(eg)
-				file.write('engrave();')
+				file.write_code('}')
 
 			# Contour for laser cut
 			file.write('cut_contour({}, t);', cut, c, r)
