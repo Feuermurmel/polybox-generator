@@ -1,5 +1,5 @@
 import re, json
-from lib import tenon
+import importlib
 
 
 def load_from_json(path):
@@ -20,9 +20,10 @@ class PolyBoxConfig():
         self._c = configuration
 
 
-    def _construct_tenon_class(self, classname, arguments):
-        T = getattr(tenon, classname)
-        return T(**arguments)
+    def _construct_class(self, modulename, classname, arguments):
+        M = importlib.import_module("lib."+modulename)
+        C = getattr(M, classname)
+        return C(**arguments)
 
 
     def omitted(self, polyview):
@@ -55,4 +56,24 @@ class PolyBoxConfig():
 
         C = T["class"]
         A = T["args"]
-        return self._construct_tenon_class(C, A)
+        return self._construct_class("tenon", C, A)
+
+
+    def engraving(self, polyview):
+        fid = str(polyview.face_id)
+        D = self._c["polybox"]["default"]["faces"]
+        F = self._c["polybox"]["faces"]
+
+        def engraving(config):
+            if "engraving" in config:
+                if "image" in config["engraving"]:
+                    A = config["engraving"]["image"]
+                    C = "TextureEngraving"
+                    return self._construct_class("engravings", C, A)
+
+        if fid in F.keys():
+            return engraving(F[fid])
+        else:
+            return engraving(D)
+
+        return None

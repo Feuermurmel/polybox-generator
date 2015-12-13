@@ -28,6 +28,16 @@
                 // For example the default material settings
                 "material" : {
                     "thickness" : 0.08
+                },
+                "engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/texture.eps",
+			"transformation" : {
+			    "shift" : [7, 8],
+			    "scale" : 0.004,
+			    "rotate" : 0
+			}
+		    }
                 }
             }
         },
@@ -83,7 +93,47 @@
 		// - default omitted edge tenon?
             },
 	    "3" : {
-		// foo
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/texture2.eps",
+			"transformation" : {
+			    "scale" : 0.004,
+			    "rotate" : 72
+			}
+		    }
+                }
+	    },
+	    "5" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/texture3.eps",
+			"transformation" : {
+			    "scale" : 0.004
+			}
+		    }
+                }
+	    },
+	    "6" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/texture3.eps",
+			"transformation" : {
+			    "scale" : 0.004,
+			    "rotate" : 144
+			}
+
+		    }
+                }
+	    },
+	    "7" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/texture2.eps",
+			"transformation" : {
+			    "scale" : 0.004
+			}
+		    }
+                }
 	    },
             "face_id" : {
                 "engrave_image" : {

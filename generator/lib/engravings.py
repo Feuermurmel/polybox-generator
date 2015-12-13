@@ -38,18 +38,37 @@ class FaceCutEngraving(Engraving):
 
 class TextureEngraving(Engraving):
 
+    def __init__(self, filepath=None, transformation={}, **kwargs):
+        """
+        :param filepath: Path to the image file.
+        :param transformation: Dictionary of tranformation specifications.
+                               Possible keys are:
+                               - shift
+                               - scale
+                               - rotate
+        """
+        super().__init__()
+        self._filepath = filepath
+        self._shift = tuple(transformation.get("shift", (0,0)))
+        self._scale = transformation.get("scale", 1)
+        self._rotate = transformation.get("rotate", 0)
+
+
     def engrave(self, faceview):
         code = """
         picture engraving;
         // Scale postscript point (1/72 inch) to millimeter
         // Note: tex point (1 / 72.27) is wrong here
-        transform s = scale(72 / 25.4);
-        // Load graphcs file
-        Label L = Label(graphic("/data/CCC/repos/polybox-generator/generator/lib/texture.eps"), embed=Scale);
+        //transform s = scale(72 / 25.4);
+        transform tm = shift(%s);
+        transform ts = scale(%f);
+        transform tr = rotate(%f);
+        // Load graphics file
+        Label L = Label(graphic("%s"), embed=Scale);
         // Make a label of proper scale and alignment
-        label(engraving, s*L, (0mm,0mm), align=Align);
+        label(engraving, tm*ts*tr*L, (0mm,0mm), align=Align);
         add(engraving);
         // Ensure remaining things are drawn on top
         layer();
-        """
+        """ % (self._shift, self._scale, self._rotate, self._filepath)
         return code
