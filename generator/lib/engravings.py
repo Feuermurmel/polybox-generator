@@ -1,4 +1,5 @@
 import abc
+from lib import polyhedra
 
 
 class Engraving(metaclass = abc.ABCMeta):
@@ -38,7 +39,7 @@ class FaceCutEngraving(Engraving):
 
 class TextureEngraving(Engraving):
 
-    def __init__(self, filepath=None, transformation={}, **kwargs):
+    def __init__(self, filepath=None, transformation={}, align="Center", **kwargs):
         """
         :param filepath: Path to the image file.
         :param transformation: Dictionary of tranformation specifications.
@@ -49,26 +50,39 @@ class TextureEngraving(Engraving):
         """
         super().__init__()
         self._filepath = filepath
+        self._align = align
         self._shift = tuple(transformation.get("shift", (0,0)))
         self._scale = transformation.get("scale", 1)
         self._rotate = transformation.get("rotate", 0)
 
 
     def engrave(self, faceview):
+        center = tuple(polyhedra.polygon_center(faceview))
+
         code = """
         picture engraving;
         // Scale postscript point (1/72 inch) to millimeter
         // Note: tex point (1 / 72.27) is wrong here
         //transform s = scale(72 / 25.4);
+
+        // Center
+        pair center = %s * 1mm;
+
+        // Transformations
         transform tm = shift(%s);
         transform ts = scale(%f);
         transform tr = rotate(%f);
+
         // Load graphics file
         Label L = Label(graphic("%s"), embed=Scale);
+
         // Make a label of proper scale and alignment
-        label(engraving, tm*ts*tr*L, (0mm,0mm), align=Align);
+        //label(engraving, tm*ts*tr*L, (0,0)*1mm, align=Align);
+        //label(engraving, tm*ts*tr*L, E*1mm, align=Align);
+        label(engraving, tm*ts*tr*L, center, align=%s);
         add(engraving);
+
         // Ensure remaining things are drawn on top
         layer();
-        """ % (self._shift, self._scale, self._rotate, self._filepath)
+        """ % (center, self._shift, self._scale, self._rotate, self._filepath, self._align)
         return code
