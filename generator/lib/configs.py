@@ -67,8 +67,12 @@ class PolyBoxConfig():
         def engraving(config):
             if "engraving" in config:
                 if "image" in config["engraving"]:
-                    A = config["engraving"]["image"]
                     C = "TextureEngraving"
+                    A = config["engraving"]["image"]
+                    return self._construct_class("engravings", C, A)
+                elif "cutfile" in config["engraving"]:
+                    C = "FaceCutEngravingFile"
+                    A = config["engraving"]["cutfile"]
                     return self._construct_class("engravings", C, A)
 
         if fid in F.keys():
