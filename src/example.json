@@ -93,10 +93,18 @@
 		// - default omitted edge tenon?
             },
             "1" : {
-                "omitted" : true
+                "omitted" : false,
 		// Where to store tenons along edges of omitted faces?
 		// - as normal edge data? (for specific cases)
 		// - default omitted edge tenon?
+		"engraving" : {
+		    "cutfile" : {
+			// Either python class that returns some cutting code
+			// Or asymptote file path
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/circle.asy"
+			//"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/hole.asy"
+		    }
+		}
             },
 	    "2" : {
 		"engraving" : {
