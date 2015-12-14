@@ -37,6 +37,23 @@ class FaceCutEngraving(Engraving):
         return code
 
 
+class FaceCutEngravingFile(Engraving):
+
+    def __init__(self, filepath=None, **kwargs):
+        """
+        :param filepath: Path to the image file.
+        """
+        super().__init__()
+        self._filepath = filepath
+
+
+    def engrave(self, faceview):
+        code = """
+        import "%s" as cutfile;
+        """ % self._filepath
+        return code
+
+
 class TextureEngraving(Engraving):
 
     def __init__(self, filepath=None, transformation={}, align="Center", **kwargs):
