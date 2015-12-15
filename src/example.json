@@ -4,8 +4,6 @@
         // What if we have two "defaults"?
         "default" : {
             "scale_factor" : 20,
-            "foo" : "bar",
-            // more foo settings
             "vertices" : {
                 // What to do for each vertex
             },
@@ -15,7 +13,7 @@
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 16
+                        "finger_count" : 8
                     }
                 },
 		"tenon_omitted" : {
@@ -28,36 +26,17 @@
                 // For example the default material settings
                 "material" : {
                     "thickness" : 0.08
-                },
-                "engraving" : {
-		    //"image" : {
-		    //	"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/texture.eps",
-		    //	"transformation" : {
-		    //	    "shift" : [0, 0],
-		    //	    "scale" : 0.004,
-		    //	    "rotate" : 0
-		    //	}
-		    //}
                 }
             }
         },
         // Specific configurations for individual geometric entities
         "vertices" : {
             // A 'vertex_id' is usually just a number 0...K
-            "vertex_id" : {
-                // foo
-            },
-            "vertex_id" : {
-                // bar
-            }
         },
         "edges" : {
             // An 'edge_id' is usually a number pair (v_i, v_j)
             // The edge (v_i, v_j) and (v_j, v_i) can have different settings
             // Automatically set both to same value if just one is given?
-            "edge_id" : {
-                // foo
-            },
             "(0, 1)" : {
                 "tenon" : {
                     "class" : "RegularFingerTenon",
@@ -83,136 +62,146 @@
         },
         "faces" : {
             // A 'face_id' is usually just a number 0...F
-            "face_id" : {
-                // bar
-            },
             "0" : {
-                "omitted" : false
-		// Where to store tenons along edges of omitted faces?
-		// - as normal edge data? (for specific cases)
-		// - default omitted edge tenon?
-            },
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face1.ps",
+			"transformation" : {
+			    "scale" : 0.003,
+			    "rotate" : -12,
+			    "shift" : [0.2,0.5]
+			}
+		    }
+                }
+	    },
             "1" : {
-                "omitted" : false,
-		// Where to store tenons along edges of omitted faces?
-		// - as normal edge data? (for specific cases)
-		// - default omitted edge tenon?
-		"engraving" : {
-		    "cutfile" : {
-			// Either python class that returns some cutting code
-			// Or asymptote file path
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/circle.asy"
-			//"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/hole.asy"
-		    }
-		}
-            },
-	    "2" : {
 		"engraving" : {
 		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_bloom.ps",
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face2.ps",
 			"transformation" : {
 			    "scale" : 0.003,
-			    "rotate" : 180
+			    "rotate" : 19.5,
+			    "shift" : [0.1,0.6]
 			}
 		    }
                 }
 	    },
-	    "3" : {
+            "2" : {
 		"engraving" : {
 		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_lemonhearts.ps",
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face3.ps",
 			"transformation" : {
 			    "scale" : 0.003,
-			    "rotate" : 180
+			    "rotate" : -13.2,
+			    "shift" : [-0.4,1.6]
 			}
 		    }
                 }
 	    },
-	    "4" : {
+            "3" : {
 		"engraving" : {
 		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_rose.ps",
-			"transformation" : {
-			    "scale" : 0.0035,
-			    "rotate" : 180
-			}
-		    }
-                }
-	    },
-	    "5" : {
-		"engraving" : {
-		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_twilight.ps",
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face4.ps",
 			"transformation" : {
 			    "scale" : 0.003,
-			    "rotate" : 180
+			    "rotate" : 37,
+			    "shift" : [0,-0.2]
 			}
 		    }
                 }
 	    },
-	    "6" : {
+            "4" : {
 		"engraving" : {
 		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_fatherdashie.ps",
-			"transformation" : {
-			    "scale" : 0.0028,
-			    "rotate" : 180
-			}
-		    }
-                }
-	    },
-	    //
-	    "7" : {
-		"engraving" : {
-		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_fluttershy.ps",
-			"transformation" : {
-			    "scale" : 0.004,
-			    "rotate" : 216
-			}
-		    }
-                }
-	    },
-	    "8" : {
-		"engraving" : {
-		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_maude.ps",
-			"transformation" : {
-			    "scale" : 0.0034,
-			    "rotate" : 216
-			}
-		    }
-                }
-	    },
-	    "9" : {
-		"engraving" : {
-		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_zecora.ps",
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face5.ps",
 			"transformation" : {
 			    "scale" : 0.003,
-			    "rotate" : 216
+			    "rotate" : -18.5,
+			    "shift" : [-0.2,-0.3]
 			}
 		    }
                 }
 	    },
-	    "10" : {
+            "5" : {
 		"engraving" : {
 		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_derpy.ps",
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face6.ps",
 			"transformation" : {
 			    "scale" : 0.003,
-			    "rotate" : 216
+			    "rotate" : -11.5,
+			    "shift" : [-0.8,0]
 			}
 		    }
                 }
 	    },
-	    "11" : {
+            "6" : {
 		"engraving" : {
 		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_fluffle.ps",
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face7.ps",
 			"transformation" : {
-			    "scale" : 0.0035,
-			    "rotate" : 216
+			    "scale" : 0.003,
+			    "rotate" : -19.5,
+			    "shift" : [-0.3,0.8]
+			}
+		    }
+                }
+	    },
+            "7" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face8.ps",
+			"transformation" : {
+			    "scale" : 0.003,
+			    "rotate" : 6,
+			    "shift" : [-1.2,0]
+			}
+		    }
+                }
+	    },
+            "8" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face9.ps",
+			"transformation" : {
+			    "scale" : 0.003,
+			    "rotate" : -7.5,
+			    "shift" : [-1.2,-0.2]
+			}
+		    }
+                }
+	    },
+            "9" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face10.ps",
+			"transformation" : {
+			    "scale" : 0.003,
+			    "rotate" : 35.5,
+			    "shift" : [-0.3,-0.1]
+			}
+		    }
+                }
+	    },
+            "10" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face11.ps",
+			"transformation" : {
+			    "scale" : 0.003,
+			    "rotate" : -20.5,
+			    "shift" : [-1,0.1]
+			}
+		    }
+                }
+	    },
+            "11" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/face12.ps",
+			"transformation" : {
+			    "scale" : 0.003,
+			    "rotate" : -13,
+			    "shift" : [-0.3,0.5]
 			}
 		    }
                 }
