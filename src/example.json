@@ -83,14 +83,19 @@
         },
         "faces" : {
             // A 'face_id' is usually just a number 0...F
-            "face_id" : {
-                // bar
-            },
             "0" : {
-                "omitted" : false
+                "omitted" : false,
 		// Where to store tenons along edges of omitted faces?
 		// - as normal edge data? (for specific cases)
 		// - default omitted edge tenon?
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/awc.ps",
+			"transformation" : {
+			    "scale" : 0.02
+			}
+		    }
+		}
             },
             "1" : {
                 "omitted" : false,
@@ -101,8 +106,8 @@
 		    "cutfile" : {
 			// Either python class that returns some cutting code
 			// Or asymptote file path
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/circle.asy"
-			//"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/hole.asy"
+			//"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/circle.asy"
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/hole.asy"
 		    }
 		}
             },
