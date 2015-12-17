@@ -49,7 +49,7 @@ class FaceCutEngravingFile(Engraving):
 
     def engrave(self, faceview):
         code = """
-        import "%s" as cutfile;
+        access "%s" as cutfile;
         """ % self._filepath
         return code
 
