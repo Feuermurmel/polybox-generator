@@ -31,6 +31,6 @@ setup_venv() {
 	
 	setup_venv venv "$PYTHON_COMMAND"
 	pip install cython
-	pip install 'https://github.com/Feuermurmel/pyclipper/archive/master.zip'
+	pip install pyclipper
 	pip install numpy
 )
