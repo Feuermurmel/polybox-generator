@@ -27,7 +27,7 @@ def main(src_path):
 		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
 		cut = WW.piece(face)
 
-		with file.transform('shift(({}, {}) * 100mm) * scale(25mm)', c, r):
+		with file.transform('shift(({}, {}) * 140mm) * scale(25mm)', c, r):
 			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)
 
 			if debug_mode:

@@ -11,13 +11,13 @@
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 16
+                        "finger_count" : 8
                     }
                 },
 		"tenon_omitted" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 16
+                        "finger_count" : 8
                     }
 		}
             },
@@ -62,7 +62,7 @@
 			}
 		    }
 		}
-            },
+	    },
 	    "0" : {
 		"engraving" : {
 		    "image" : {
@@ -86,7 +86,7 @@
 			}
 		    }
 		}
-            },
+	    },
 	    "2" : {
 		"engraving" : {
 		    "image" : {
@@ -98,7 +98,7 @@
 			}
 		    }
 		}
-            },
+	    },
 	    "3" : {
 		"engraving" : {
 		    "image" : {
