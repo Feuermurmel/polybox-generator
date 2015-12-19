@@ -27,7 +27,8 @@
                 // What to do for each face
                 // For example the default material settings
                 "material" : {
-                    "thickness" : 0.08
+                    "thickness" : 4
+		    //0.08
                 },
                 "engraving" : {
 		    //"image" : {
@@ -92,7 +93,8 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/awc.ps",
 			"transformation" : {
-			    "scale" : 0.02
+			    "scale" : 0.15,
+			    "shift": [6,0]
 			}
 		    }
 		}
@@ -116,7 +118,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_bloom.ps",
 			"transformation" : {
-			    "scale" : 0.003,
+			    "scale" : 0.03,
 			    "rotate" : 180
 			}
 		    }
@@ -127,7 +129,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_lemonhearts.ps",
 			"transformation" : {
-			    "scale" : 0.003,
+			    "scale" : 0.03,
 			    "rotate" : 180
 			}
 		    }
@@ -138,7 +140,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_rose.ps",
 			"transformation" : {
-			    "scale" : 0.0035,
+			    "scale" : 0.035,
 			    "rotate" : 180
 			}
 		    }
@@ -149,7 +151,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_twilight.ps",
 			"transformation" : {
-			    "scale" : 0.003,
+			    "scale" : 0.03,
 			    "rotate" : 180
 			}
 		    }
@@ -160,7 +162,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_fatherdashie.ps",
 			"transformation" : {
-			    "scale" : 0.0028,
+			    "scale" : 0.028,
 			    "rotate" : 180
 			}
 		    }
@@ -172,7 +174,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_fluttershy.ps",
 			"transformation" : {
-			    "scale" : 0.004,
+			    "scale" : 0.04,
 			    "rotate" : 216
 			}
 		    }
@@ -183,7 +185,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_maude.ps",
 			"transformation" : {
-			    "scale" : 0.0034,
+			    "scale" : 0.034,
 			    "rotate" : 216
 			}
 		    }
@@ -194,7 +196,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_zecora.ps",
 			"transformation" : {
-			    "scale" : 0.003,
+			    "scale" : 0.03,
 			    "rotate" : 216
 			}
 		    }
@@ -205,7 +207,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_derpy.ps",
 			"transformation" : {
-			    "scale" : 0.003,
+			    "scale" : 0.03,
 			    "rotate" : 216
 			}
 		    }
@@ -216,7 +218,7 @@
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/pony_test_fluffle.ps",
 			"transformation" : {
-			    "scale" : 0.0035,
+			    "scale" : 0.035,
 			    "rotate" : 216
 			}
 		    }

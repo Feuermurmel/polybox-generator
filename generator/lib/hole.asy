@@ -61,7 +61,7 @@ path hypotrochoid(int R, int r, real d, int samples=200) {
 pen cut_pen = black + 0.01mm;
 
 int n = 5;
-real a = 1mm;
+real a = 10mm;
 real R = a / (2*sin(pi/n));
 
 real x = 0.5 * a;
@@ -70,8 +70,8 @@ real y = sqrt(R^2 - x^2);
 pair center = (x,y);
 real radius = 0.6 * R;
 
-int r = 1;
-int R = 5;
+int r = 10;
+int R = 50;
 real d = 0.6*r;
 
-draw(shift(center)*scale(0.3)*rotate(18)*hypotrochoid(R, r, d), cut_pen);
+draw(shift(center)*scale(0.35)*rotate(18)*hypotrochoid(R, r, d), cut_pen);

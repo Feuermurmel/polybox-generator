@@ -13,7 +13,7 @@ def main(src_path):
 	file = export.AsymptoteFile(sys.stdout)
 	file.write('import "../_faces.asy" as _;')
 
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=1)
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=10)
 	cfg = configs.load_from_json("src/example.json")
 	WW = tenon.WoodWorker(cfg)
 
@@ -27,7 +27,7 @@ def main(src_path):
 		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
 		cut = WW.piece(face)
 
-		with file.transform('shift(({}, {}) * 100mm) * scale(4mm)', c, r):
+		with file.transform('shift(({}, {}) * 100mm) * scale(1mm)', c, r):
 			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)
 
 			if debug_mode:

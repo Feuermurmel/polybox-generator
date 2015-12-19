@@ -24,17 +24,24 @@ class CoordinateEngraving(Engraving):
         return code
 
 
-class FaceCutEngraving(Engraving):
+class FaceCutEngravingCode(Engraving):
+
+    def __init__(self, code="", **kwargs):
+        """
+        """
+        super().__init__()
+        self._code = code
 
     def engrave(self, faceview):
-        code = """
-        draw(circle((0.5mm, 0.5mm), 0.2mm), cut_pen);
-        draw(circle((0.2mm, 0.2mm), 0.1mm), cut_pen);
-        draw(circle((0.8mm, 0.2mm), 0.1mm), cut_pen);
-        draw(circle((0.2mm, 0.8mm), 0.1mm), cut_pen);
-        draw(circle((0.8mm, 0.8mm), 0.1mm), cut_pen);
-        """
-        return code
+        # center = tuple(polyhedra.polygon_center(faceview))
+        # code = """
+        # draw(circle((0.5mm, 0.5mm), 0.2mm), cut_pen);
+        # draw(circle((0.2mm, 0.2mm), 0.1mm), cut_pen);
+        # draw(circle((0.8mm, 0.2mm), 0.1mm), cut_pen);
+        # draw(circle((0.2mm, 0.8mm), 0.1mm), cut_pen);
+        # draw(circle((0.8mm, 0.8mm), 0.1mm), cut_pen);
+        # """
+        return self._code
 
 
 class FaceCutEngravingFile(Engraving):
