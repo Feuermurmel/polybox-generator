@@ -13,11 +13,11 @@ def main(src_path):
 	file = export.AsymptoteFile(sys.stdout)
 	file.write('import "../_faces.asy" as _;')
 
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=10)
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=5)
 	cfg = configs.load_from_json("src/example.json")
 	WW = tenon.WoodWorker(cfg)
 
-	debug_mode = False
+	debug_mode = True
 
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		if cfg.omitted(face):
