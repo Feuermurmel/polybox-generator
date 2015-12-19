@@ -210,7 +210,7 @@ class RegularFingerTenon(Tenon):
 		return self._thickness
 
 	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
-		fingerlength *= 2.0
+		fingerlength *= 1.0
 		return slotdepth, fingerlength
 
 

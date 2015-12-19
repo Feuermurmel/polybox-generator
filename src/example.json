@@ -3,7 +3,7 @@
         // Default configuration for all objects
         // What if we have two "defaults"?
         "default" : {
-            "scale_factor" : 5,
+            //"scale_factor" : 5,
             // more foo settings
             "edges" : {
                 // What to do for each edge
@@ -25,7 +25,7 @@
                 // What to do for each face
                 // For example the default material settings
                 "material" : {
-                    "thickness" : 0.62
+                    "thickness" : 0.08
 		    //0.08
                 }
             }
@@ -51,27 +51,86 @@
             // A 'face_id' is usually just a number 0...F
             "0" : {
                 "omitted" : false
-		// Where to store tenons along edges of omitted faces?
-		// - as normal edge data? (for specific cases)
-		// - default omitted edge tenon?
-		//"engraving" : {
-		//    "image" : {
-		//	"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/awc.ps",
-		//	"transformation" : {
-		//	    "scale" : 0.15,
-		//	    "shift": [6,0]
-		//	}
-		//    }
-		//}
             },
 	    "6" : {
-                "omitted" : false
 		"engraving" : {
 		    "image" : {
-			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/awc.ps",
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/cmc_top.ps",
 			"transformation" : {
-			    "scale" : 0.15,
-			    "shift": [6,0]
+			    "scale" : 0.007,
+			    "shift": [0,0]
+			}
+		    }
+		}
+            },
+	    "0" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/cmc1.ps",
+			"transformation" : {
+			    "scale" : 0.004,
+			    "rotate" : -90,
+			    "shift": [0,0]
+			}
+		    }
+		}
+            },
+	    "1" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/cmc2.ps",
+			"transformation" : {
+			    "scale" : 0.004,
+			    "rotate" : -90,
+			    "shift": [0,0]
+			}
+		    }
+		}
+            },
+	    "2" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/cmc3.ps",
+			"transformation" : {
+			    "scale" : 0.004,
+			    "rotate" : -90,
+			    "shift": [0,0]
+			}
+		    }
+		}
+            },
+	    "3" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/cmc1.ps",
+			"transformation" : {
+			    "scale" : 0.004,
+			    "rotate" : -90,
+			    "shift": [0,0]
+			}
+		    }
+		}
+            },
+	    "4" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/cmc2.ps",
+			"transformation" : {
+			    "scale" : 0.004,
+			    "rotate" : -90,
+			    "shift": [0,0]
+			}
+		    }
+		}
+            },
+	    "5" : {
+		"engraving" : {
+		    "image" : {
+			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/cmc3.ps",
+			"transformation" : {
+			    "scale" : 0.004,
+			    "rotate" : -90,
+			    "shift": [0,0]
 			}
 		    }
 		}
