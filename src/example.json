@@ -1,95 +1,40 @@
 {
     "polybox" : {
         // Default configuration for all objects
-        // What if we have two "defaults"?
         "default" : {
             "scale_factor" : 1,
-            "foo" : "bar",
-            // more foo settings
             "vertices" : {
                 // What to do for each vertex
             },
             "edges" : {
                 // What to do for each edge
-                // For example the tenon configuration
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 16
+                        "finger_count" : 6
                     }
-                },
-		"tenon_omitted" : {
-                    "class" : "NullTenon",
-                    "args" : {}
-		}
+                }
             },
             "faces" : {
                 // What to do for each face
-                // For example the default material settings
                 "material" : {
                     "thickness" : 0.08
-		    //0.062
-		    //0.08
                 },
                 "engraving" : {
-		    //"image" : {
-		    //	"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/texture.eps",
-		    //	"transformation" : {
-		    //	    "shift" : [0, 0],
-		    //	    "scale" : 0.004,
-		    //	    "rotate" : 0
-		    //	}
-		    //}
-                }
+		}
             }
         },
         // Specific configurations for individual geometric entities
         "vertices" : {
             // A 'vertex_id' is usually just a number 0...K
-            "vertex_id" : {
-                // foo
-            },
-            "vertex_id" : {
-                // bar
-            }
         },
         "edges" : {
             // An 'edge_id' is usually a number pair (v_i, v_j)
-            // The edge (v_i, v_j) and (v_j, v_i) can have different settings
-            // Automatically set both to same value if just one is given?
-            "edge_id" : {
-                // foo
-            },
-            "(0, 1)" : {
-                "tenon" : {
-                    "class" : "RegularFingerTenon",
-                    "args" : {
-                        "finger_count" : 4
-                    }
-                }
-            },
-            // "(1, 0)" : {
-            //     "tenon" : {
-            //         "class" : "RegularFingerTenon",
-            //         "args" : {
-            //             "finger_count" : 2
-            //         }
-            //     }
-            // },
-            "(5, 4)" : {
-                "tenon" : {
-                    "class" : "NullTenon",
-                    "args" : {}
-                }
-            }
         },
         "faces" : {
             // A 'face_id' is usually just a number 0...F
             "0" : {
                 "omitted" : false,
-		// Where to store tenons along edges of omitted faces?
-		// - as normal edge data? (for specific cases)
-		// - default omitted edge tenon?
 		"engraving" : {
 		    "image" : {
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/awc.ps",
@@ -102,14 +47,8 @@
             },
             "1" : {
                 "omitted" : false,
-		// Where to store tenons along edges of omitted faces?
-		// - as normal edge data? (for specific cases)
-		// - default omitted edge tenon?
 		"engraving" : {
 		    "cutfile" : {
-			// Either python class that returns some cutting code
-			// Or asymptote file path
-			//"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/circle.asy"
 			"filepath" : "/data/CCC/repos/polybox-generator/generator/lib/hole.asy"
 		    }
 		}
@@ -169,7 +108,6 @@
 		    }
                 }
 	    },
-	    //
 	    "7" : {
 		"engraving" : {
 		    "image" : {
