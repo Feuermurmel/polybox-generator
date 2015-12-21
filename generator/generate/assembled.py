@@ -42,6 +42,6 @@ def main(src_path):
 							FILE.text(fid, size=0.3 * minr, halign='center', valign='center')
 
 					with FILE.group('translate', [-center[0], -center[1], 0]):
-						with FILE.group('translate', [-107.8,-139.5,0]):
+						with FILE.group('translate', [-0.56,-0.5,0]):
 							with FILE.group('linear_extrude', thickness):
 								FILE.call('import', file='/data/CCC/repos/polybox-generator/generator/lib/hole.dxf')
