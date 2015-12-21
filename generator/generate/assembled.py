@@ -7,13 +7,13 @@ from lib import polyhedra, tenon, export, util, configs
 def main(src_path):
 	thickness = 0.08
 	gap = 0.005
-	file = export.OpenSCADFile(sys.stdout)
-	
+	FILE = export.OpenSCADFile(sys.stdout)
+
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
 	cfg = configs.load_from_json("src/example.json")
 	WW = tenon.WoodWorker(cfg)
 
-	with file.group('render'):
+	with FILE.group('render'):
 		for face in polyhedron.faces:
 			if cfg.omitted(face):
 				continue
@@ -26,17 +26,22 @@ def main(src_path):
 			center = -numpy.mean(vertices, 0)
 			minr = numpy.amin([numpy.linalg.norm(v - center) for v in vertices])
 
-			with file.group('multmatrix', t):
-				with file.group('difference'):
-					with file.group('linear_extrude', thickness - gap):
-						with file.group('offset', -gap / 2):
-							file.polygon(cut)
+			with FILE.group('multmatrix', t):
+				with FILE.group('difference'):
+					with FILE.group('linear_extrude', thickness - gap):
+						with FILE.group('offset', -gap / 2):
+							FILE.polygon(cut)
 
-					with file.group('translate', [-center[0], -center[1], 0.7 * thickness]):
-						with file.group('linear_extrude', thickness):
+					with FILE.group('translate', [-center[0], -center[1], 0.7 * thickness]):
+						with FILE.group('linear_extrude', thickness):
 							fid = str(face.face_id)
-							
+
 							if all(i in '0689' for i in fid):
 								fid += '.'
-							
-							file.text(fid, size=0.3 * minr, halign='center', valign='center')
+
+							FILE.text(fid, size=0.3 * minr, halign='center', valign='center')
+
+					with FILE.group('translate', [-center[0], -center[1], 0]):
+						with FILE.group('translate', [-107.8,-139.5,0]):
+							with FILE.group('linear_extrude', thickness):
+								FILE.call('import', file='/data/CCC/repos/polybox-generator/generator/lib/hole.dxf')
