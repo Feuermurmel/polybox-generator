@@ -113,6 +113,96 @@ class PolyhedronView:
 		return _grab_view_cycle(self, lambda x: x.adjacent)
 
 
+class Polyhedron:
+	def __init__(self, vertices, faces):
+		"""
+		:param vertices: List of coordinate triples.
+		:param faces: List of lists of vertex indexes.
+		"""
+		# Store numerical geometry data
+		self._vertex_coordinates = vertices[:]
+
+		# Store topology
+		views_by_face = [[((j1, j2), PolyhedronView(self, j1, fi))
+				  for j1, j2 in zip(i, i[1:] + i[:1])]
+				 for fi, i in enumerate(faces)]
+		views_by_edge = dict(j for i in views_by_face for j in i)
+		
+		# Setup face cycles and opposite views.
+		for i in views_by_face:
+			for ((v1, v2), f1), (_, f2) in zip(i, i[1:] + i[:1]):
+				f1._next_view = f2
+				f1._opposite_view = views_by_edge[(v2, v1)]
+		
+		self._all_views = [v for i in views_by_face for _, v in i]
+		self._faces = [i[0][1] for i in views_by_face]
+		self._edges = [e for i in views_by_face for (v1, v2), e in i if v1 < v2]
+		self._vertices = list({ v: f for i in views_by_face for (v, _), f in i }.values())
+	
+	@property
+	def all_views(self):
+		"""
+		The set of all views, one for each edge of each face (thus counting each edge twice).
+		"""
+		
+		return self._all_views
+	
+	@property
+	def faces(self):
+		"""
+		A set of views with one view chosen arbitrarily for each face of the polyhedron.
+		"""
+		
+		return self._faces
+	
+	@property
+	def edges(self):
+		"""
+		A set of views with one view chosen arbitrarily for each edge of the polyhedron.
+		"""
+		
+		return self._edges
+	
+	@property
+	def vertices(self):
+		"""
+		A set of views with one view chosen arbitrarily for each vertex of the polyhedron.
+		"""
+		
+		return self._vertices
+
+	@property
+	def vertex_count(self):
+		"""
+		Returns the number of vertices of the polyhedron.
+		"""
+		return len(self.vertices)
+	
+	@property
+	def edge_count(self):
+		"""
+		Returns the number of edges of the polyhedron.
+		"""
+		return len(self.edges)
+	
+	@property
+	def face_count(self):
+		"""
+		Returns the number of faces of the polyhedron.
+		"""
+		return len(self.faces)
+	
+	@classmethod
+	def load_from_json(cls, path, scale=1):
+		with open(path, encoding = 'utf-8') as file:
+			data = json.load(file)
+
+		vertices = [scale * numpy.array(i) for i in data['vertices']]
+		faces = data['faces']
+		
+		return cls(vertices, faces)
+
+
 def edge_vector(view : PolyhedronView):
 	"""
 	The vector pointing in the direction of the specified view's edge.
@@ -223,93 +313,3 @@ def dihedral_angle(view1 : PolyhedronView, view2 : PolyhedronView):
 	n2 = face_normal(view2)
 	theta = numpy.pi - numpy.arccos(numpy.dot(n1, n2))
 	return theta
-
-
-class Polyhedron:
-	def __init__(self, vertices, faces):
-		"""
-		:param vertices: List of coordinate triples.
-		:param faces: List of lists of vertex indexes.
-		"""
-		# Store numerical geometry data
-		self._vertex_coordinates = vertices[:]
-
-		# Store topology
-		views_by_face = [[((j1, j2), PolyhedronView(self, j1, fi))
-				  for j1, j2 in zip(i, i[1:] + i[:1])]
-				 for fi, i in enumerate(faces)]
-		views_by_edge = dict(j for i in views_by_face for j in i)
-		
-		# Setup face cycles and opposite views.
-		for i in views_by_face:
-			for ((v1, v2), f1), (_, f2) in zip(i, i[1:] + i[:1]):
-				f1._next_view = f2
-				f1._opposite_view = views_by_edge[(v2, v1)]
-		
-		self._all_views = [v for i in views_by_face for _, v in i]
-		self._faces = [i[0][1] for i in views_by_face]
-		self._edges = [e for i in views_by_face for (v1, v2), e in i if v1 < v2]
-		self._vertices = list({ v: f for i in views_by_face for (v, _), f in i }.values())
-	
-	@property
-	def all_views(self):
-		"""
-		The set of all views, one for each edge of each face (thus counting each edge twice).
-		"""
-		
-		return self._all_views
-	
-	@property
-	def faces(self):
-		"""
-		A set of views with one view chosen arbitrarily for each face of the polyhedron.
-		"""
-		
-		return self._faces
-	
-	@property
-	def edges(self):
-		"""
-		A set of views with one view chosen arbitrarily for each edge of the polyhedron.
-		"""
-		
-		return self._edges
-	
-	@property
-	def vertices(self):
-		"""
-		A set of views with one view chosen arbitrarily for each vertex of the polyhedron.
-		"""
-		
-		return self._vertices
-
-	@property
-	def vertex_count(self):
-		"""
-		Returns the number of vertices of the polyhedron.
-		"""
-		return len(self.vertices)
-	
-	@property
-	def edge_count(self):
-		"""
-		Returns the number of edges of the polyhedron.
-		"""
-		return len(self.edges)
-	
-	@property
-	def face_count(self):
-		"""
-		Returns the number of faces of the polyhedron.
-		"""
-		return len(self.faces)
-	
-	@classmethod
-	def load_from_json(cls, path, scale=1):
-		with open(path, encoding = 'utf-8') as file:
-			data = json.load(file)
-
-		vertices = [scale * numpy.array(i) for i in data['vertices']]
-		faces = data['faces']
-		
-		return cls(vertices, faces)
