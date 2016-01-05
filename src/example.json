@@ -12,10 +12,10 @@
                         "finger_count" : 7
                     }
                 },
-		"tenon_omitted" : {
+                "tenon_omitted" : {
                     "class" : "NullTenon",
                     "args" : {}
-		}
+                }
             },
             "faces" : {
                 "material" : {
@@ -39,26 +39,35 @@
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 5
+                        "finger_count" : 5,
+                        "parity_flip" : true
                     }
                 }
             },
-	    "(5, 7)" : {
+            "(5, 7)" : {
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 3
+                        "finger_count" : 3,
+                        "parity_flip" : true
                     }
                 }
             },
-	    "(4, 5)" : {
+            "(4, 5)" : {
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
                         "finger_count" : 1
                     }
                 }
-	    }
+            }
+            // "(4, 5)" : {
+            //     "tenon" : {
+            //         "class" : "NullTenon",
+            //         "args" : {
+            //         }
+            //     }
+            // }
         },
         "faces" : {
         }
