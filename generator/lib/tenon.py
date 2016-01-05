@@ -230,6 +230,10 @@ class KerfCompensatedRegularFingerTenon(RegularFingerTenon):
 		l = polyhedra.edge_length(polyview)
 		k = self._kerf
 		dx = l / self._finger_count
+
+		if k >= dx:
+			raise ValueError("Kerf is larger than finger slot width.")
+
 		fingers = []
 		for i in range(self._finger_count):
 			direction = (-1)**i
