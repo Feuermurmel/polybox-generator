@@ -26,8 +26,13 @@ class WoodWorker():
 		H = []
 
 		for i, view in enumerate(polyview.face_cycle):
+			# Decide which part to use for this edge
+			ei = view.edge_id
+			parity = ei[0] > ei[1]
+
+			# Get the tenon
 			tenon = self._tenonsource[view]
-			Vi, Hi = tenon.tenon(view)
+			Vi, Hi = tenon.tenon(view, parity)
 
 			# ugly linalg here
 			a = v[i]
@@ -108,13 +113,31 @@ class Tenon(metaclass = abc.ABCMeta):
 		return self.finger_length_adapt(polyview, hin, hout)
 
 
-	def tenon(self, polyview):
+	def tenon(self, polyview, parity=True):
+		if parity is True:
+			return self._tenon_a(polyview)
+		elif parity is False:
+			return self._tenon_b(polyview)
+		else:
+			raise ValueError("Invalid parity")
+
+
+	def _tenon_a(self, polyview):
+		Sm, Sh = self._make_fingers(polyview)
+		return self._tenon_common(polyview, Sm, Sh)
+
+
+	def _tenon_b(self, polyview):
+		Sh, Sm = self._make_fingers(polyview)
+		return self._tenon_common(polyview, Sm, Sh)
+
+
+	def _tenon_common(self, polyview, Sm, Sh):
 		"""
 		Compute the tenon structure along a given edge.
 
 		:param polyview: A view on the polyhedron defining the edge.
 		"""
-		Sm, Sh = self._make_fingers(polyview)
 		H = paths.half_plane((0, 0), (1, 0))
 
 		hin, hout = self._finger_length(polyview)
