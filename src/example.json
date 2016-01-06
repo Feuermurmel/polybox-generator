@@ -9,13 +9,13 @@
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 7
+                        "finger_count" : 5
                     }
-                },
-                "tenon_omitted" : {
-                    "class" : "NullTenon",
-                    "args" : {}
                 }
+                // "tenon" : {
+                //     "class" : "NullTenon",
+                //     "args" : {}
+                // }
             },
             "faces" : {
                 "material" : {
@@ -27,47 +27,38 @@
         "vertices" : {
         },
         "edges" : {
-            "(4, 6)" : {
+            "(4, 5)" : {
                 "tenon" : {
-                    "class" : "RegularFingerTenon",
+                    "class" : "HingeTenon",
                     "args" : {
-                        "finger_count" : 3
+			"parity_flip" : true
                     }
                 }
             },
             "(6, 7)" : {
                 "tenon" : {
-                    "class" : "RegularFingerTenon",
+                    "class" : "HingeTenon",
                     "args" : {
-                        "finger_count" : 5,
-                        "parity_flip" : true
+			"edge_flip" : true
                     }
                 }
             },
-            "(5, 7)" : {
+	    "(4, 6)" : {
                 "tenon" : {
-                    "class" : "RegularFingerTenon",
+                    "class" : "NullTenon",
                     "args" : {
-                        "finger_count" : 3,
-                        "parity_flip" : true
                     }
                 }
             },
-            "(4, 5)" : {
+	    "(5, 7)" : {
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 1
+			"finger_count" : 1,
+			"finger_length" : 1.5
                     }
                 }
             }
-            // "(4, 5)" : {
-            //     "tenon" : {
-            //         "class" : "NullTenon",
-            //         "args" : {
-            //         }
-            //     }
-            // }
         },
         "faces" : {
         }
