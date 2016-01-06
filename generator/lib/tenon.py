@@ -313,7 +313,7 @@ class HingeTenon(Tenon):
 		Co = t * paths.scale(self._ro) * paths.circle()
 		Ci = t * paths.scale(self._ri) * paths.circle()
 
-		V = H | (Co / Ci)
+		V = (H | Co) / Ci
 
 		return V, H / Ci
 
