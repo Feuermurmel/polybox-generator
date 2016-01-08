@@ -190,7 +190,13 @@ class RegularFingerTenon(Tenon):
 	The number of fingers per edge is globally constant.
 	"""
 
-	def __init__(self, thickness=0.08, finger_count=8):
+	def __init__(self,
+		     thickness = 0.08,
+		     finger_count = 8,
+		     finger_length_factor = 1.0,
+		     finger_length_add = 0.0,
+		     slot_length_factor = 1.0,
+		     slot_length_add = 0.0):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
@@ -200,6 +206,10 @@ class RegularFingerTenon(Tenon):
 
 		self._thickness = thickness
 		self._finger_count = finger_count
+		self._finger_length_factor = finger_length_factor
+		self._finger_length_add = finger_length_add
+		self._slot_length_factor = slot_length_factor
+		self._slot_length_add = slot_length_add
 
 	def fingers(self, polyview):
 		l = polyhedra.edge_length(polyview)
@@ -209,9 +219,12 @@ class RegularFingerTenon(Tenon):
 	def thickness(self, polyview):
 		return self._thickness
 
-	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
-		fingerlength *= 2.0
-		return slotdepth, fingerlength
+	def finger_length_adapt(self, polyview, slotlength, fingerlength):
+		fingerlength *= self._finger_length_factor
+		fingerlength += self._finger_length_add
+		slotlength *= self._slot_length_factor
+		slotlength += self._slot_length_add
+		return slotlength, fingerlength
 
 
 class NullTenon(Tenon):
