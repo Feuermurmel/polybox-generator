@@ -96,13 +96,15 @@ class Tenon(metaclass = abc.ABCMeta):
 		# Is the finger length given or do we have to compute it
 		hin, hout = self.finger_length(polyview)
 
+		if hout is True:
+			#hout = d / numpy.sin(numpy.pi - theta)
+			hout = d / numpy.tan(theta / 2.0)
 		if hin is True:
 			if theta <= numpy.pi/2.0:
 				hin = 0.0
 			else:
-				hin = d / numpy.tan(numpy.pi - theta)
-		if hout is True:
-			hout = d / numpy.sin(numpy.pi-theta)
+				#hin = d / numpy.tan(numpy.pi - theta)
+				hin = hout * numpy.cos(numpy.pi - theta)
 
 		# Manual override
 		return self.finger_length_adapt(polyview, hin, hout)
