@@ -1,5 +1,5 @@
 import sys, math, numpy
-from lib import polyhedra, tenon, export, util, configs
+from lib import polyhedra, tenon, export, util, configs, engravings
 
 
 def arrange_grid(count):
@@ -17,7 +17,7 @@ def main(src_path):
 	cfg = configs.load_from_json("src/example.json")
 	WW = tenon.WoodWorker(cfg)
 
-	debug_mode = True
+	debug_mode = False
 
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		if cfg.omitted(face):
@@ -27,7 +27,7 @@ def main(src_path):
 		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
 		cut = WW.piece(face)
 
-		with file.transform('shift(({}, {}) * 100mm) * scale(20)', c, r):
+		with file.transform('shift(({}, {}) * 100mm) * scale(4mm)', c, r):
 			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)
 
 			if debug_mode:
@@ -35,6 +35,19 @@ def main(src_path):
 				file.write('edges({}, t);', polygon, c, r)
 				file.write('vertices({}, t);', polygon, c, r)
 
+			# Face engraving
+			EG = cfg.engraving(face)
+			if EG is not None:
+				eg = EG.engrave(face)
+				with file.transform('t'):
+					file.write_code('{')
+					file.write_code(eg)
+					file.write_code('}')
+
+			# Contour for laser cut
+			file.write('cut_contour({}, t);', cut, c, r)
+
+			if debug_mode:
 				file.write('face_id(({}mm, {}mm), "{}", t);', centerx, centery, face.face_id)
 
 				for i, (x, y) in zip(face.face_cycle, polygon.paths[0].vertices):
@@ -44,6 +57,3 @@ def main(src_path):
 									 polygon.paths[0].vertices,
 									 polygon.paths[0].vertices[1:] + [polygon.paths[0].vertices[0]]):
 						file.write('edge_id(({}mm, {}mm), ({}mm, {}mm), "{}", t);', ax, ay, bx, by, i.edge_id)
-
-			# Contour for laser cut
-			file.write('cut_contour({}, t);', cut, c, r)

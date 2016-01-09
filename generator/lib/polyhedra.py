@@ -216,6 +216,13 @@ def get_planar_polygon(view : PolyhedronView):
 	return paths.polygon(p)
 
 
+def polygon_center(view : PolyhedronView):
+	"""
+	"""
+	pc = get_planar_coordinates(view)
+	return numpy.mean(pc, axis=0)
+
+
 def dihedral_angle(view1 : PolyhedronView, view2 : PolyhedronView):
 	"""
 	Compute the dihedral angle between two faces.
