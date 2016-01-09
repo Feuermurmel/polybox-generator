@@ -32,6 +32,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : false
                     }
                 }
@@ -41,6 +42,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : false
                     }
                 }
@@ -50,6 +52,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : false
                     }
                 }
@@ -59,6 +62,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : false
                     }
                 }
@@ -68,6 +72,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : false
                     }
                 }
@@ -77,6 +82,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : true
                     }
                 }
@@ -87,6 +93,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : true
                     }
                 }
@@ -96,6 +103,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : true
                     }
                 }
@@ -105,6 +113,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : true
                     }
                 }
@@ -114,6 +123,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : true
                     }
                 }
@@ -123,6 +133,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : true
                     }
                 }
@@ -132,6 +143,7 @@
                     "class" : "HoleTenon",
                     "args" : {
                         "finger_count" : 5,
+			"flip_fingers" : true,
 			"parity_flip" : false
                     }
                 }

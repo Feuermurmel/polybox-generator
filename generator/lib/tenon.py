@@ -263,7 +263,7 @@ class HoleTenon(Tenon):
 	The number of fingers per edge is globally constant.
 	"""
 
-	def __init__(self, thickness=0.08, finger_count=8, parity_flip=False):
+	def __init__(self, thickness=0.08, finger_count=8, flip_fingers=False, parity_flip=False):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
@@ -272,13 +272,14 @@ class HoleTenon(Tenon):
 		super().__init__()
 		self._thickness = thickness
 		self._finger_count = int(finger_count)
+		self._flip_fingers = bool(flip_fingers)
 		self._parity_flip = bool(parity_flip)
 
-
 	def fingers(self, polyview):
+		o = 0 if not self._flip_fingers else 1
 		l = polyhedra.edge_length(polyview)
 		dx = l / self._finger_count
-		return [(i*dx, dx, (-1)**i) for i in range(self._finger_count)]
+		return [(i*dx, dx, (-1)**(i+o)) for i in range(self._finger_count)]
 
 	def thickness(self, polyview):
 		return self._thickness
