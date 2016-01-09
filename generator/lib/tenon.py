@@ -253,8 +253,95 @@ class RegularFingerTenon(Tenon):
 		return self._thickness
 
 	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
-		fingerlength *= 2.0
+		fingerlength *= 1.0
 		return slotdepth, fingerlength
+
+
+class HoleTenon(Tenon):
+	"""
+	Computes a regular finger tenon joint.
+	The number of fingers per edge is globally constant.
+	"""
+
+	def __init__(self, thickness=0.08, finger_count=8, parity_flip=False):
+		"""
+		:param thickness: The thickness of the material.
+		:param finger_count: The sum of fingers and slots.
+		:param parity_flip: Flip the two twin parts of the tenon.
+		"""
+		super().__init__()
+		self._thickness = thickness
+		self._finger_count = int(finger_count)
+		self._parity_flip = bool(parity_flip)
+
+
+	def fingers(self, polyview):
+		l = polyhedra.edge_length(polyview)
+		dx = l / self._finger_count
+		return [(i*dx, dx, (-1)**i) for i in range(self._finger_count)]
+
+	def thickness(self, polyview):
+		return self._thickness
+
+	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
+		fingerlength *= 1.0
+		return slotdepth, fingerlength
+
+
+	def _tenon_a(self, polyview):
+		"""
+		Compute the tenon structure along a given edge, twin A part.
+
+		:param polyview: A view on the polyhedron defining the edge.
+		"""
+		Sm, Sh = self._make_fingers(polyview)
+		H = paths.half_plane((0, 0), (1, 0))
+
+		hin, hout = self._finger_length(polyview)
+
+		if hin is not None:
+			I = paths.half_plane((0, hin), (1, 0))
+			Ti = Sh / I
+		else:
+			Ti = Sh
+		if hout is not None:
+			O = paths.half_plane((0, -hout), (-1, 0))
+			To = Sm / O
+		else:
+			To = Sm
+
+		# Clip the fingers and slots to desired length
+		V = (H / Ti) | To
+
+		return V, H
+
+
+	def _tenon_b(self, polyview):
+		"""
+		Compute the tenon structure along a given edge, twin B part.
+
+		:param polyview: A view on the polyhedron defining the edge.
+		"""
+		d = self._thickness
+		S = paths.square()
+		H = paths.half_plane((0, 0), (1, 0))
+
+		Sis = []
+		for ti, dt, da in self.fingers(polyview):
+			if da > 0:
+				s = paths.scale(x=dt, y=-d)
+				m = paths.move(x=ti, y=0)
+				Si = m * s * S
+				Sis.append(Si)
+
+		A = paths.plane()
+		Sis = functools.reduce(operator.__or__, Sis, ~A)
+
+		Hs = paths.half_plane((0, -2*d), (1, 0))
+
+		V = Hs / Sis
+
+		return V, H
 
 
 class NullTenon(Tenon):
