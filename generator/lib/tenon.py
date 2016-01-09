@@ -190,7 +190,7 @@ class RegularFingerTenon(Tenon):
 	The number of fingers per edge is globally constant.
 	"""
 
-	def __init__(self, thickness=0.08, finger_count=8):
+	def __init__(self, thickness=4, finger_count=8):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
@@ -210,14 +210,14 @@ class RegularFingerTenon(Tenon):
 		return self._thickness
 
 	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
-		fingerlength *= 2.0
+		fingerlength *= 1.0
 		return slotdepth, fingerlength
 
 
 class KerfCompensatedRegularFingerTenon(RegularFingerTenon):
 	"""
 	"""
-	def __init__(self, thickness=0.08, finger_count=8, kerf=0.0):
+	def __init__(self, thickness=4, finger_count=8, kerf=0.0):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
@@ -255,7 +255,7 @@ class KerfCompensatedRegularFingerTenon(RegularFingerTenon):
 
 
 	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
-		fingerlength *= 2.0
+		fingerlength *= 1.0
 		return self.finger_length_adapt_kerf(slotdepth, fingerlength)
 
 
@@ -264,7 +264,7 @@ class NullTenon(Tenon):
 	The null tenon represents a simple straight edge.
 	"""
 
-	def __init__(self, thickness=0.08):
+	def __init__(self, thickness=4):
 		"""
 		:param thickness: The thickness of the material.
 		"""

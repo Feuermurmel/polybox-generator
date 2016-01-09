@@ -2,19 +2,22 @@
     "polybox" : {
         // Default configuration for all geometric entities
         "default" : {
-            "scale_factor" : 20,
             "vertices" : {
             },
             "edges" : {
                 "tenon" : {
                     "class" : "NullTenon",
                     "args" : {}
+                },
+		"tenon_omitted" : {
+                    "class" : "NullTenon",
+                    "args" : {}
                 }
             },
             "faces" : {
-                "material" : {
-                    "thickness" : 0.08
-                }
+                // "material" : {
+                //     "thickness" : 4
+                // }
             }
         },
         // Specific configurations for individual geometric entities
@@ -26,20 +29,32 @@
                     "class" : "KerfCompensatedRegularFingerTenon",
                     "args" : {
                         "finger_count" : 4,
-			"kerf" : 0.02
-                    }
-                }
-            },
-	    "(0, 2)" : {
-                "tenon" : {
-                    "class" : "RegularFingerTenon",
-                    "args" : {
-                        "finger_count" : 4
+			"kerf" : 0.0001
                     }
                 }
             }
+	    // "(0, 2)" : {
+            //     "tenon" : {
+            //         "class" : "RegularFingerTenon",
+            //         "args" : {
+            //             "finger_count" : 4
+            //         }
+            //     }
+            // }
         },
         "faces" : {
-        }
+	    "0" : {
+		"omitted" : true
+	    },
+	    "1" : {
+	    	"omitted" : true
+	    },
+	    "2" : {
+	    	"omitted" : true
+	    },
+	    "4" : {
+	    	"omitted" : true
+	    }
+	}
     }
 }
