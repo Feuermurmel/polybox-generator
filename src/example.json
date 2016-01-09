@@ -2,7 +2,7 @@
     "polybox" : {
         // Default configuration for all geometric entities
         "default" : {
-            "scale_factor" : 20,
+            //"scale_factor" : 20,
             "vertices" : {
             },
             "edges" : {
@@ -138,6 +138,13 @@
             }
 	},
         "faces" : {
+	    "6" : {
+		"engraving" : {
+                    "cutfile" : {
+                        "filepath" : "/data/CCC/repos/polybox-generator/generator/lib/hole.asy"
+                    }
+                }
+	    }
         }
     }
 }
