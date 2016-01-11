@@ -323,24 +323,32 @@ class HoleTenon(Tenon):
 
 		:param polyview: A view on the polyhedron defining the edge.
 		"""
-		d = self._thickness
+		d = self.thickness(polyview.adjacent)
+		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
+		_, l = self._finger_length(polyview.adjacent)
+
+		if theta >= numpy.pi / 2:
+			ca = l * numpy.cos(numpy.pi - theta)
+			cb = d / numpy.cos(theta - numpy.pi / 2)
+		elif theta < numpy.pi / 2:
+			ca = 0
+			cb = (l + d * numpy.tan(theta)) * numpy.cos(theta)
+		cl = ca + cb
+
 		S = paths.square()
 		H = paths.half_plane((0, 0), (1, 0))
 
-		Sis = []
+		Si = []
 		for ti, dt, da in self.fingers(polyview):
 			if da > 0:
-				s = paths.scale(x=dt, y=-d)
-				m = paths.move(x=ti, y=0)
-				Si = m * s * S
-				Sis.append(Si)
+				s = paths.scale(x=dt, y=-cl)
+				m = paths.move(x=ti, y=ca)
+				Si.append(m * s * S)
 
 		A = paths.plane()
-		Sis = functools.reduce(operator.__or__, Sis, ~A)
-
-		Hs = paths.half_plane((0, -2*d), (1, 0))
-
-		V = Hs / Sis
+		Si = functools.reduce(operator.__or__, Si, ~A)
+		Hs = paths.half_plane((0, -2*cb), (1, 0))
+		V = Hs / Si
 
 		return V, H
 
