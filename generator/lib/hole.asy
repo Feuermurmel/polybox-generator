@@ -74,4 +74,4 @@ int q = 1;
 real r = q*R/p;
 real d = 0.5*r;
 
-draw(shift(center)*scale(2.4)*hypotrochoid(R, p, q, d), cut_pen);
+draw(scale(1,1.52752523165195)*shift(center)*scale(2.4)*hypotrochoid(R, p, q, d), cut_pen);
