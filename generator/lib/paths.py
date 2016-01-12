@@ -237,7 +237,9 @@ class Polygon(_Transformable):
 	
 	@abc.abstractmethod
 	def _get_pyclipper_paths(self, tm : numpy.ndarray) -> list:
-		pass
+		"""
+		Return a list of tuples of ints representing the path in the representation used for clipper.
+		"""
 	
 	@property
 	@abc.abstractmethod
@@ -250,18 +252,30 @@ class Polygon(_Transformable):
 	
 	@classmethod
 	def _transform_coordinate(cls, tm : numpy.ndarray, v : numpy.ndarray):
+		"""
+		Transform a coordinate with a transformation matrix and return the result as a pair of fractions.
+		"""
+		
 		x, y, _ = numpy.dot(tm, v)
 		
 		return fractions.Fraction.from_float(x), fractions.Fraction.from_float(y)
 	
 	@classmethod
 	def _scale_point(cls, tm : numpy.ndarray, p : numpy.ndarray):
+		"""
+		Transform a coordinate with a transformation matrix and convert the values to the rance used for clipper.
+		"""
+		
 		x, y = cls._transform_coordinate(tm, p)
 		
 		return cls._scale(x), cls._scale(y)
 	
 	@classmethod
 	def _scale(cls, x):
+		"""
+		Convert a coordinate value to the numeric range used for clipper and return the result as an int.
+		"""
+		
 		res = round(_clipper_scale * x)
 		
 		if not (-_clipper_range < res < _clipper_range):
@@ -400,12 +414,17 @@ class _HalfPlane(_CompositePolygon):
 		self._direction = direction
 	
 	def _get_pyclipper_paths(self, tm : numpy.ndarray):
+		# Anchor in the representation used for clipper.
 		px, py = self._scale_point(tm, self._anchor)
+		
+		# Transformed direction as fractions.
 		dx, dy = self._transform_coordinate(tm, self._direction)
 		
+		# Endpoints of the line segment inside the range supported by clipper.
 		e1x, e1y = self._project_infinity(px, py, dx, dy)
 		e2x, e2y = self._project_infinity(px, py, -dx, -dy)
 		
+		# Information about which clipper range edges the line segment's endpoints touch.
 		r1 = self._get_clipper_range_edges(e1x, e1y)
 		r2 = self._get_clipper_range_edges(e2x, e2y)
 		
@@ -431,14 +450,11 @@ class _HalfPlane(_CompositePolygon):
 		return [list(iter_points())]
 	
 	@classmethod
-	def _project_to_edge(cls, p1, p2, d1, d2):
-		if d1:
-			return min(round(p2 + (_clipper_range - p1) * d2 / d1), _clipper_range)
-		else:
-			return _clipper_range
-	
-	@classmethod
 	def _project_infinity(cls, px, py, dx, dy):
+		"""
+		Project a point along a direction onto the border of the range supported by clipper.
+		"""
+		
 		sx = -1 if dx < 0 else 1
 		sy = -1 if dy < 0 else 1
 		
@@ -453,7 +469,18 @@ class _HalfPlane(_CompositePolygon):
 		return ex * sx, ey * sy
 	
 	@classmethod
+	def _project_to_edge(cls, p1, p2, d1, d2):
+		if d1:
+			return min(round(p2 + (_clipper_range - p1) * d2 / d1), _clipper_range)
+		else:
+			return _clipper_range
+	
+	@classmethod
 	def _get_clipper_range_edges(cls, x, y):
+		"""
+		Calculate on which edges of the border of the range supported by clipper a point lies.
+		"""
+		
 		return [
 			x == _clipper_range,
 			y == _clipper_range,
