@@ -414,11 +414,16 @@ class _HalfPlane(_CompositePolygon):
 		self._direction = direction
 	
 	def _get_pyclipper_paths(self, tm : numpy.ndarray):
+		# Used to correct inversion of the direction for mirroring transformations. 
+		det = numpy.linalg.det(tm[:2, :2])
+		
+		assert det
+		
 		# Anchor in the representation used for clipper.
 		px, py = self._scale_point(tm, self._anchor)
 		
 		# Transformed direction as fractions.
-		dx, dy = self._transform_coordinate(tm, self._direction)
+		dx, dy = self._transform_coordinate(tm, self._direction / numpy.array([det, det, 1]))
 		
 		# Endpoints of the line segment inside the range supported by clipper.
 		e1x, e1y = self._project_infinity(px, py, dx, dy)
