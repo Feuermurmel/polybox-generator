@@ -516,7 +516,7 @@ def strip(anchor, normal):
 
 def half_plane(anchor, direction):
 	"""
-	Return a Polygon instance representing the half-plane which is delimited by the line through the specified anchor and running orthogonal to the specified direction. The specified direction points outward of the half-plane.
+	Return a Polygon instance representing a half-plane delimited by a line. The delimiting line runs through the specified anchor and along the specified direction. The half-plane is to the left of the line when traveling along the line in the specified direction.
 	"""
 	
 	return _HalfPlane(_cast_vertex(anchor), _cast_vertex(direction, True))
