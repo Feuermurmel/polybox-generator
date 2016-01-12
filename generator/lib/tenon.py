@@ -278,14 +278,10 @@ class HingeTenon(Tenon):
 		self._edge_flip = edge_flip
 
 		# Hinge parameters
-		self._dl = 0.2
-		self._d = self._thickness
-		self._w = 0.1
-		self._eps = 0.005
+		self._dl = 0.15
+		self._w = 0.04
 		self._dr = 0.08
-		self._ri = math.sqrt(self._w**2 / 4 + self._d**2 / 4) + self._eps
-		self._ro = self._ri + self._dr
-		self._t = self._thickness + self._eps
+		self._eps = 0.002
 
 	def tenon(self, polyview, parity=True):
 		"""
@@ -300,48 +296,56 @@ class HingeTenon(Tenon):
 			raise ValueError("Invalid parity")
 
 	def _tenon_a(self, polyview):
-		if self._edge_flip:
-			l = polyhedra.edge_length(polyview)
-			dl = l - self._dl
-		else:
-			dl = self._dl
+		d = self.thickness(polyview.adjacent)
+		ri = math.sqrt(self._w**2 / 4 + d**2 / 4) + self._eps
+		ro = ri + self._dr
 
 		H = paths.half_plane((0, 0), (1, 0))
 
-		t = paths.move(dl, -self._d/2.0)
-
-		Co = t * paths.scale(self._ro) * paths.circle()
-		Ci = t * paths.scale(self._ri) * paths.circle()
+		s = paths.move(self._dl, -d/2.0)
+		Co = s * paths.scale(ro) * paths.circle()
+		Ci = s * paths.scale(ri) * paths.circle()
 
 		V = (H | Co) / Ci
 
-		return V, H / Ci
+		if self._edge_flip:
+			l = polyhedra.edge_length(polyview)
+			m = paths.scale(x=-1)
+			s = paths.move(x=l)
+			V = s*m*V
+
+		return V, H
 
 	def _tenon_b(self, polyview):
+		d = self.thickness(polyview) # sic
+		ri = math.sqrt(self._w**2 / 4 + d**2 / 4) + self._eps
+		ro = ri + self._dr
+
+		d = self.thickness(polyview.adjacent)
 		l = polyhedra.edge_length(polyview)
-		b = l - (self._dl + self._ro + self._eps)
-		if self._edge_flip:
-			dl = self._dl
-			tx = l - b
-		else:
-			dl = l - self._dl
-			tx = 0
+		t = d + self._eps
+		b = l - (self._dl + ro + self._eps)
 
 		H = paths.half_plane((0, 0), (1, 0))
 
 		# Hinge axis
 		A = paths.strip((0, 0), (self._w, 0))
 		A /= (~H)
-		t = paths.move(dl - self._w/2, -self._t)
+		t = paths.move(self._dl - self._w/2, -t)
 		A = t * A
 
 		# Rest
 		B = paths.strip((0, 0), (b, 0))
 		B /= (~H)
-		t = paths.move(tx, -self._d)
+		t = paths.move(l-b, -d)
 		B = t * B
 
 		V = H | A | B
+
+		if not self._edge_flip:
+			m = paths.scale(x=-1)
+			s = paths.move(x=l)
+			V = s*m*V
 
 		return V, H
 
