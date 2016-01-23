@@ -1,4 +1,4 @@
-import numpy, abc, itertools, io, contextlib, json
+import numpy, itertools, io, contextlib, json, svgwrite.path
 from . import paths, util
 
 
@@ -185,3 +185,18 @@ def _group(iterable, count):
 	
 	if accu:
 		yield accu
+
+
+def polygon_to_svg_path(polygon : paths.Polygon) -> svgwrite.path.Path:
+	p = svgwrite.path.Path()
+	
+	for i in polygon.paths:
+		command = 'M'
+		
+		for x, y in i.vertices:
+			p.push(command, x, y)
+			command = 'L'
+		
+		p.push('Z')
+	
+	return p
