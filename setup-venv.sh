@@ -33,4 +33,5 @@ setup_venv() {
 	pip install cython
 	pip install pyclipper
 	pip install numpy
+	pip install svgwrite
 )
