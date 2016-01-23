@@ -1,5 +1,8 @@
 *.asy
 !_*.asy
 
+*.svg
+!_*.svg
+
 *.scad
 !_*.scad

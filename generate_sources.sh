@@ -25,9 +25,13 @@ generate() {
 for i in src/polyhedra/*.json; do
 	name=${i#src/polyhedra/}
 	name=${name%.json}
-
+	
 	for j in faces tenons; do
 		generate_file "src/$j/$name.asy" generate "$j" "$i"
+	done
+	
+	for j in tenons_svg; do
+		generate_file "src/$j/$name.svg" generate "$j" "$i"
 	done
 	
 	for j in models stellations assembled; do
