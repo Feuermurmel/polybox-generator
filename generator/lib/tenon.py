@@ -378,7 +378,7 @@ class HingeTenonGeneral(Tenon):
 		self._edge_flip = edge_flip
 
 		# Hinge parameters
-		self._gamma = numpy.pi / 4
+		self._gamma = numpy.pi / 3
 		self._dl = 0.15
 		self._w = 0.08
 		self._dr = 0.08
@@ -404,49 +404,48 @@ class HingeTenonGeneral(Tenon):
 		gamma = self._gamma
 
 		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
-		theta = 3*numpy.pi / 4
-		beta = theta
-
-		# Incident angle
-		#alpha = numpy.arcsin(numpy.sin(gamma)*numpy.sin(beta))
+		# theta = 2*numpy.pi / 4
 
 		# Shift
 		sx = d * numpy.cos(gamma) / numpy.sin(gamma)
 		sy = d * numpy.tan(theta - numpy.pi/2)
 		S = paths.move(sx, sy)
 
-		# Ellipse distortion
-		ai = ri / numpy.sin(gamma)
-		bi = ri / numpy.sin(numpy.pi - beta)
-		ao = ro / numpy.sin(gamma)
-		bo = ro / numpy.sin(numpy.pi - beta)
-		Di = paths.scale(ai, bi)
-		Do = paths.scale(ao, bo)
+		# Main figure o=o
+		EIi = paths.circle()
+		EOi = paths.circle()
 
-		eta = numpy.arctan2(-sy, -sx)
-		u = numpy.sqrt((bi*numpy.sin(eta))**2 + (ai*numpy.cos(eta))**2)
-		v = numpy.sqrt((bo*numpy.sin(eta))**2 + (ao*numpy.cos(eta))**2)
+		EIo = S * paths.circle()
+		EOo = S * paths.circle()
 
+		eta = numpy.arctan2(sy, sx)
 		Ti = paths.move(0, -0.5) * paths.square()
-		Ti = paths.scale(numpy.sqrt(sx**2 + sy**2), 2*u) * Ti
+		Ti = paths.scale(numpy.sqrt(sx**2 + sy**2), 2) * Ti
 		Ti = paths.rotate(eta) * Ti
 
 		To = paths.move(0, -0.5) * paths.square()
-		To = paths.scale(numpy.sqrt(sx**2 + sy**2), 2*v) * To
+		To = paths.scale(numpy.sqrt(sx**2 + sy**2), 2) * To
 		To = paths.rotate(eta) * To
 
-		EIi = paths.circle()
-		EOi = paths.circle()
-		EIo = S * paths.circle()
-		EOo = S * paths.circle()
-		Ti = S * Ti
-		To = S * To
-		EI = EIi | EIo | Ti
-		EO = EOi | EOo | To
+		EI = EIi | Ti | EIo
+		EO = EOi | To | EOo
 
+		# Ellipse distortion
+		ai = ri / numpy.sin(gamma)
+		bi = ri / numpy.sin(numpy.pi - theta)
+		ao = ro / numpy.sin(gamma)
+		bo = ro / numpy.sin(numpy.pi - theta)
+		Di = paths.scale(ai, bi)
+		Do = paths.scale(ao, bo)
+
+		# Skew the figure
+		EI = Di * EI
+		EO = Do * EO
+
+		# Move
 		s = paths.move(self._dl, -d/2.0)
-		EI = s * Di * EI
-		EO = s * Do * EO
+		EI = s * EI
+		EO = s * EO
 
 		H = paths.half_plane((0, 0), (1, 0))
 
