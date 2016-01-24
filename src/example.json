@@ -29,7 +29,7 @@
         "edges" : {
             "(4, 5)" : {
                 "tenon" : {
-                    "class" : "HingeTenon",
+                    "class" : "HingeTenonGeneral",
                     "args" : {
 			"parity_flip" : true
                     }
@@ -37,7 +37,7 @@
             },
             "(6, 7)" : {
                 "tenon" : {
-                    "class" : "HingeTenon",
+                    "class" : "HingeTenonGeneral",
                     "args" : {
 			"edge_flip" : true
                     }

@@ -1,5 +1,5 @@
 import functools, numpy, operator, abc, math
-from lib import polyhedra, stellations, paths, linalg
+from lib import polyhedra, stellations, paths, linalg, util
 
 
 class WoodWorker():
@@ -307,6 +307,150 @@ class HingeTenon(Tenon):
 		Ci = s * paths.scale(ri) * paths.circle()
 
 		V = (H | Co) / Ci
+
+		if self._edge_flip:
+			l = polyhedra.edge_length(polyview)
+			m = paths.scale(x=-1)
+			s = paths.move(x=l)
+			V = s*m*V
+
+		return V, H
+
+	def _tenon_b(self, polyview):
+		d = self.thickness(polyview) # sic
+		ri = math.sqrt(self._w**2 / 4 + d**2 / 4) + self._eps
+		ro = ri + self._dr
+
+		d = self.thickness(polyview.adjacent)
+		l = polyhedra.edge_length(polyview)
+		t = d + self._eps
+		b = l - (self._dl + ro + self._eps)
+
+		H = paths.half_plane((0, 0), (1, 0))
+
+		# Hinge axis
+		A = paths.strip((0, 0), (self._w, 0))
+		A /= (~H)
+		t = paths.move(self._dl - self._w/2, -t)
+		A = t * A
+
+		# Rest
+		B = paths.strip((0, 0), (b, 0))
+		B /= (~H)
+		t = paths.move(l-b, -d)
+		B = t * B
+
+		V = H | A | B
+
+		if not self._edge_flip:
+			m = paths.scale(x=-1)
+			s = paths.move(x=l)
+			V = s*m*V
+
+		return V, H
+
+	def fingers(self, polyview):
+		# Unused abstract method :-/
+		return None
+
+	def thickness(self, polyview):
+		# Unused abstract method :-/
+		return self._thickness
+
+
+class HingeTenonGeneral(Tenon):
+	"""
+	Computes a regular finger tenon joint.
+	The number of fingers per edge is globally constant.
+	"""
+
+	def __init__(self, thickness=0.08, edge_flip=False, parity_flip=False):
+		"""
+		:param thickness: The thickness of the material.
+		:param finger_count: The sum of fingers and slots.
+		:param parity_flip: Flip the two twin parts of the tenon.
+		"""
+		super().__init__()
+		self._thickness = thickness
+		self._parity_flip = bool(parity_flip)
+
+		# Flip along edge
+		self._edge_flip = edge_flip
+
+		# Hinge parameters
+		self._gamma = numpy.pi / 2
+		self._dl = 0.15
+		self._w = 0.08
+		self._dr = 0.08
+		self._eps = 0.00002
+
+	def tenon(self, polyview, parity=True):
+		"""
+		:param polyview: A view on the polyhedron.
+		:param parity: Which of the two twin parts to take for the tenon.
+		"""
+		if parity != self._parity_flip:
+			return self._tenon_a(polyview)
+		elif parity == self._parity_flip:
+			return self._tenon_b(polyview)
+		else:
+			raise ValueError("Invalid parity")
+
+	def _tenon_a(self, polyview):
+		d = self.thickness(polyview.adjacent)
+		ri = math.sqrt(self._w**2 / 4 + d**2 / 4) + self._eps
+		ro = ri + self._dr
+
+		gamma = self._gamma
+
+		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
+		#theta = 2*numpy.pi / 4
+		beta = theta
+
+		# Incident angle
+		alpha = numpy.arcsin(numpy.sin(gamma)*numpy.sin(beta))
+
+		# Shift
+		sx = d * numpy.cos(gamma) / numpy.sin(gamma)
+		sy = d * numpy.tan(theta - numpy.pi/2)
+		S = paths.move(sx, sy)
+
+		# Ellipse distortion
+		ai = ri / numpy.sin(alpha)
+		bi = ri
+		ao = ro / numpy.sin(alpha)
+		bo = ro
+		Di = paths.scale(ai, bi)
+		Do = paths.scale(ao, bo)
+
+		eta = numpy.arctan2(-sy, -sx)
+		u = numpy.sqrt((bi*numpy.sin(eta))**2 + (ai*numpy.cos(eta))**2)
+		v = numpy.sqrt((bo*numpy.sin(eta))**2 + (ao*numpy.cos(eta))**2)
+
+		Ti = paths.move(0, -0.5) * paths.square()
+		Ti = paths.scale(numpy.sqrt(sx**2 + sy**2), 2*u) * Ti
+		Ti = paths.rotate(eta) * Ti
+
+		To = paths.move(0, -0.5) * paths.square()
+		To = paths.scale(numpy.sqrt(sx**2 + sy**2), 2*v) * To
+		To = paths.rotate(eta) * To
+
+		EIi = paths.circle()
+		EOi = paths.circle()
+		EIo = S * paths.circle()
+		EOo = S * paths.circle()
+		Ti = S * Ti
+		To = S * To
+		EI = EIi | EIo | Ti
+		EO = EOi | EOo | To
+
+		s = paths.move(self._dl, -d/2.0)
+		EI = s * Di * EI
+		EO = s * Do * EO
+
+		H = paths.half_plane((0, 0), (1, 0))
+
+		V = (H | EO) / EI
 
 		if self._edge_flip:
 			l = polyhedra.edge_length(polyview)
