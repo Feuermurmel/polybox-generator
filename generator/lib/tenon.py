@@ -378,7 +378,7 @@ class HingeTenonGeneral(Tenon):
 		self._edge_flip = edge_flip
 
 		# Hinge parameters
-		self._gamma = numpy.pi / 2
+		self._gamma = numpy.pi / 4
 		self._dl = 0.15
 		self._w = 0.08
 		self._dr = 0.08
@@ -404,11 +404,11 @@ class HingeTenonGeneral(Tenon):
 		gamma = self._gamma
 
 		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
-		#theta = 2*numpy.pi / 4
+		theta = 3*numpy.pi / 4
 		beta = theta
 
 		# Incident angle
-		alpha = numpy.arcsin(numpy.sin(gamma)*numpy.sin(beta))
+		#alpha = numpy.arcsin(numpy.sin(gamma)*numpy.sin(beta))
 
 		# Shift
 		sx = d * numpy.cos(gamma) / numpy.sin(gamma)
@@ -416,10 +416,10 @@ class HingeTenonGeneral(Tenon):
 		S = paths.move(sx, sy)
 
 		# Ellipse distortion
-		ai = ri / numpy.sin(alpha)
-		bi = ri
-		ao = ro / numpy.sin(alpha)
-		bo = ro
+		ai = ri / numpy.sin(gamma)
+		bi = ri / numpy.sin(numpy.pi - beta)
+		ao = ro / numpy.sin(gamma)
+		bo = ro / numpy.sin(numpy.pi - beta)
 		Di = paths.scale(ai, bi)
 		Do = paths.scale(ao, bo)
 
