@@ -454,13 +454,11 @@ class HingeTenonGeneral(Tenon):
 		EOo = S * R * Do * paths.circle()
 
 		Ti = paths.move(-0.5, -0.5) * paths.square()
-		Ti = paths.scale(2, 2) * Ti
-		Ti = paths.scale(x/2, ri) * Ti
+		Ti = paths.scale(x, 2*ri) * Ti
 		Ti = S2 * R * Ti
 
 		To = paths.move(-0.5, -0.5) * paths.square()
-		To = paths.scale(2, 2) * To
-		To = paths.scale(x/2, ro) * To
+		To = paths.scale(x, 2*ro) * To
 		To = S2 * R * To
 
 		EI = EIi | Ti | EOi
