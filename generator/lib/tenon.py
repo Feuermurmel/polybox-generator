@@ -378,10 +378,10 @@ class HingeTenonGeneral(Tenon):
 		self._edge_flip = edge_flip
 
 		# Hinge parameters
-		self._gamma = numpy.pi / 3
+		self._gamma = numpy.pi / 2
 		self._dl = 0.15
 		self._w = 0.08
-		self._dr = 0.08
+		self._dr = 0.04
 		self._eps = 0.00002
 
 	def tenon(self, polyview, parity=True):
@@ -402,45 +402,69 @@ class HingeTenonGeneral(Tenon):
 		ro = ri + self._dr
 
 		gamma = self._gamma
+		#gamma = 4*numpy.pi / 12
 
 		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
-		# theta = 2*numpy.pi / 4
+		#theta = 4*numpy.pi / 12
 
-		# Shift
-		sx = d * numpy.cos(gamma) / numpy.sin(gamma)
-		sy = d * numpy.tan(theta - numpy.pi/2)
-		S = paths.move(sx, sy)
+		# Lin. alg. or sph. trigo. to compute angles
+		den = numpy.cos(gamma)**2 + numpy.cos(theta)**2 * numpy.sin(gamma)**2
+		alpha = numpy.arccos(numpy.sqrt(den))
+		if numpy.abs(den) < 0.0001:
+                        #delta = numpy.arccos(0)
+			delta = 0
+		else:
+			delta = numpy.arccos(-numpy.cos(gamma) / numpy.sqrt(den))
 
-		# Main figure o=o
-		EIi = paths.circle()
-		EOi = paths.circle()
-
-		EIo = S * paths.circle()
-		EOo = S * paths.circle()
-
-		eta = numpy.arctan2(sy, sx)
-		Ti = paths.move(0, -0.5) * paths.square()
-		Ti = paths.scale(numpy.sqrt(sx**2 + sy**2), 2) * Ti
-		Ti = paths.rotate(eta) * Ti
-
-		To = paths.move(0, -0.5) * paths.square()
-		To = paths.scale(numpy.sqrt(sx**2 + sy**2), 2) * To
-		To = paths.rotate(eta) * To
-
-		EI = EIi | Ti | EIo
-		EO = EOi | To | EOo
+		util.log('-------------------')
+		util.log(str(numpy.rad2deg(theta)))
+		util.log(str(numpy.rad2deg(gamma)))
+		util.log(str(numpy.rad2deg(alpha)))
+		util.log(str(numpy.rad2deg(delta)))
 
 		# Ellipse distortion
-		ai = ri / numpy.sin(gamma)
-		bi = ri / numpy.sin(numpy.pi - theta)
-		ao = ro / numpy.sin(gamma)
-		bo = ro / numpy.sin(numpy.pi - theta)
+		ai = ri / numpy.sin(alpha)
+		bi = ri
+		ao = ro / numpy.sin(alpha)
+		bo = ro
 		Di = paths.scale(ai, bi)
 		Do = paths.scale(ao, bo)
 
-		# Skew the figure
-		EI = Di * EI
-		EO = Do * EO
+		# Ellipse rotation
+		R = paths.rotate(-(numpy.pi - delta))
+
+		# Ellipse shift
+		cot = lambda x: numpy.cos(x) / numpy.sin(x)
+		x = d * cot(alpha)
+		sx =  x * numpy.cos(numpy.pi - delta)
+		sy = -x * numpy.sin(numpy.pi - delta)
+		S = paths.move(sx, sy)
+		S2 = paths.move(sx/2, sy/2)
+
+		util.log('.....')
+		util.log(str(x))
+		util.log(str(sx))
+		util.log(str(sy))
+
+		# Main figure o=o
+		EIi = R * Di * paths.circle()
+		EIo = R * Do * paths.circle()
+
+		EOi = S * R * Di * paths.circle()
+		EOo = S * R * Do * paths.circle()
+
+		Ti = paths.move(-0.5, -0.5) * paths.square()
+		Ti = paths.scale(2, 2) * Ti
+		Ti = paths.scale(x/2, ri) * Ti
+		Ti = S2 * R * Ti
+
+		To = paths.move(-0.5, -0.5) * paths.square()
+		To = paths.scale(2, 2) * To
+		To = paths.scale(x/2, ro) * To
+		To = S2 * R * To
+
+		EI = EIi | Ti | EOi
+		EO = EIo | To | EOo
 
 		# Move
 		s = paths.move(self._dl, -d/2.0)
