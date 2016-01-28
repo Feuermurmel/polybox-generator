@@ -1,5 +1,5 @@
 import functools, numpy, operator, abc, math
-from lib import polyhedra, stellations, paths, linalg, util
+from lib import polyhedra, stellations, paths, linalg
 
 
 class WoodWorker():
@@ -401,64 +401,38 @@ class HingeTenonGeneral(Tenon):
 		ri = math.sqrt(self._w**2 / 4 + d**2 / 4) + self._eps
 		ro = ri + self._dr
 
-		gamma = self._gamma
-		#gamma = 8*numpy.pi / 12
-
 		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
-		#theta = 4*numpy.pi / 12
+		gamma = self._gamma
 
-		# Lin. alg. or sph. trigo. to compute angles
-		cot = lambda x: 1.0 / numpy.tan(x)
-		csc = lambda x: 1.0 / numpy.sin(x)
-
-		den = numpy.cos(gamma)**2 + numpy.cos(theta)**2 * numpy.sin(gamma)**2
-		alpha = numpy.arccos(numpy.sqrt(den))
-		if numpy.abs(den) < 0.0001:
-                        delta = numpy.arccos(0)
-		else:
-			delta = numpy.arccos(-numpy.cos(gamma) / numpy.sqrt(den))
-		# delta = -2*numpy.arctan(
-		# 	cot((numpy.pi+2*theta)/4)*
-		# 	numpy.tan((numpy.arcsin(numpy.sin(gamma)*numpy.sin(theta))+gamma)/2)
-		# 	)
-
-		# Ellipse distortion
-		ai = ri / numpy.sin(alpha)
-		bi = ri
-		ao = ro / numpy.sin(alpha)
-		bo = ro
+		# Incidence angle
+		alpha = numpy.arccos(numpy.sqrt(numpy.cos(gamma)**2 + numpy.cos(theta)**2 * numpy.sin(gamma)**2))
 
 		# Ellipse shift
-		x = d * cot(alpha)
-		sx = d * cot(gamma) * csc(theta)
-		sy = d * cot(theta)
-		r = numpy.arctan2(-sy, sx)
-
-		util.log('-------------------')
-		util.log(str(numpy.rad2deg(theta)))
-		util.log(str(numpy.rad2deg(gamma)))
-		util.log(str(numpy.rad2deg(alpha)))
-		util.log(str(numpy.rad2deg(delta)))
-		util.log(str(x))
-
-		# Main figure o=o
+		x = d / numpy.tan(alpha)
 		S = paths.move(x, 0)
 		S2 = paths.move(x/2, 0)
-		DCi = paths.scale(ai, ri)
-		DCo = paths.scale(ao, ro)
+
+		# Ellipse distortion
+		DCi = paths.scale(ri/numpy.sin(alpha), ri)
+		DCo = paths.scale(ro/numpy.sin(alpha), ro)
 		DMi = paths.scale(x, ri)
 		DMo = paths.scale(x, ro)
+
 		# Ellipse rotation
-		#R = paths.rotate(-(numpy.pi-delta))
+		sx = d / numpy.tan(gamma) / numpy.sin(theta)
+		sy = d / numpy.tan(theta)
+		r = numpy.arctan2(sy, sx)
 		R = paths.rotate(r)
 
-		# Inner part
+		# Main figure o=o
+
+		# Inner contour
 		C1i  =      DCi * paths.scale(0.5) * paths.circle()
 		C2i  = S  * DCi * paths.scale(0.5) * paths.circle()
 		M12i = S2 * DMi * paths.move(-0.5, -0.5) * paths.square()
 		EI = R * (C1i | M12i | C2i )
 
-		# Outer part
+		# Outer contour
 		C1o  =      DCo * paths.scale(0.5) * paths.circle()
 		C2o  = S  * DCo * paths.scale(0.5) * paths.circle()
 		M12o = S2 * DMo * paths.move(-0.5, -0.5) * paths.square()
