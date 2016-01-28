@@ -364,7 +364,7 @@ class HingeTenonGeneral(Tenon):
 	The number of fingers per edge is globally constant.
 	"""
 
-	def __init__(self, thickness=0.08, edge_flip=False, parity_flip=False):
+	def __init__(self, thickness=0.08, gamma=numpy.pi/2, edge_flip=False, parity_flip=False):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
@@ -378,7 +378,7 @@ class HingeTenonGeneral(Tenon):
 		self._edge_flip = edge_flip
 
 		# Hinge parameters
-		self._gamma = numpy.pi / 2
+		self._gamma = gamma
 		self._dl = 0.15
 		self._w = 0.08
 		self._dr = 0.04
@@ -421,7 +421,7 @@ class HingeTenonGeneral(Tenon):
 		# Ellipse rotation
 		sx = d / numpy.tan(gamma) / numpy.sin(theta)
 		sy = d / numpy.tan(theta)
-		r = numpy.arctan2(sy, sx)
+		r = numpy.arctan2(-sy, sx)
 		R = paths.rotate(r)
 
 		# Main figure o=o
@@ -470,7 +470,6 @@ class HingeTenonGeneral(Tenon):
 		R = paths.rotate(numpy.pi/2 - self._gamma)
 
 		l = polyhedra.edge_length(polyview)
-		#b = l - (self._dl + ro + self._eps)
 		t = d / numpy.sin(self._gamma) + d/2 * numpy.abs(numpy.tan(numpy.pi/2 - self._gamma)) + self._eps
 
 		H = paths.half_plane((0, 0), (1, 0))
