@@ -413,10 +413,10 @@ class HingeTenonGeneral(Tenon):
 		S2 = paths.move(x/2, 0)
 
 		# Ellipse distortion
-		DCi = paths.scale(ri/numpy.sin(alpha), ri)
-		DCo = paths.scale(ro/numpy.sin(alpha), ro)
-		DMi = paths.scale(x, ri)
-		DMo = paths.scale(x, ro)
+		DCi = paths.scale(2*ri/numpy.sin(alpha), 2*ri)
+		DCo = paths.scale(2*ro/numpy.sin(alpha), 2*ro)
+		DMi = paths.scale(x, 2*ri)
+		DMo = paths.scale(x, 2*ro)
 
 		# Ellipse rotation
 		sx = d / numpy.tan(gamma) / numpy.sin(theta)
@@ -459,27 +459,28 @@ class HingeTenonGeneral(Tenon):
 		d = self.thickness(polyview) # sic
 		ri = math.sqrt(self._w**2 / 4 + d**2 / 4) + self._eps
 		ro = ri + self._dr
+		d = self.thickness(polyview.adjacent) # sic
 
-		d = self.thickness(polyview.adjacent)
+		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
+		gamma = self._gamma
+
+		# Incidence angle
+		alpha = numpy.arccos(numpy.sqrt(numpy.cos(gamma)**2 + numpy.cos(theta)**2 * numpy.sin(gamma)**2))
+
+		R = paths.rotate(numpy.pi/2 - self._gamma)
+
 		l = polyhedra.edge_length(polyview)
-		t = d + self._eps
-		b = l - (self._dl + ro + self._eps)
+		#b = l - (self._dl + ro + self._eps)
+		t = d / numpy.sin(self._gamma) + d/2 * numpy.abs(numpy.tan(numpy.pi/2 - self._gamma)) + self._eps
 
 		H = paths.half_plane((0, 0), (1, 0))
 
 		# Hinge axis
-		A = paths.strip((0, 0), (self._w, 0))
-		A /= (~H)
-		t = paths.move(self._dl - self._w/2, -t)
-		A = t * A
+		A = paths.strip((-self._w/2, 0), (self._w, 0))
+		A /= ~(paths.move(0, -t) * H)
+		A = paths.move(self._dl, 0) * R * A
 
-		# Rest
-		B = paths.strip((0, 0), (b, 0))
-		B /= (~H)
-		t = paths.move(l-b, -d)
-		B = t * B
-
-		V = H | A | B
+		V = H | A
 
 		if not self._edge_flip:
 			m = paths.scale(x=-1)
