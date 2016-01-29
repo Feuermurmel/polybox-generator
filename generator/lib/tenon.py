@@ -479,7 +479,14 @@ class HingeTenonGeneral(Tenon):
 		A /= ~(paths.move(0, -t) * H)
 		A = paths.move(self._dl, 0) * R * A
 
-		V = H | A
+		x = d / numpy.tan(alpha)
+		u = (d/2 + ro + self._eps) * numpy.cos(alpha)
+
+		Q = paths.move(-0.5, -0.5) * paths.square()
+		Q = paths.scale(2*ro/numpy.sin(alpha) + x + self._eps, 2*u) * Q
+		Q = paths.move(self._dl, 0) * R * Q
+
+		V = (H / Q) | A
 
 		if not self._edge_flip:
 			m = paths.scale(x=-1)
