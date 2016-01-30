@@ -251,13 +251,13 @@ class RegularFingerTenon(Tenon):
 	"""
 
 	def __init__(self,
-		     thickness = 0.08,
-		     finger_count = 8,
+		     thickness = 1.0,
+		     finger_count = 5,
 		     finger_length_factor = 1.0,
 		     finger_length_add = 0.0,
 		     slot_length_factor = 1.0,
 		     slot_length_add = 0.0,
-		     parity_flip=False):
+		     parity_flip = False):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
@@ -294,14 +294,16 @@ class RegularFingerTenon(Tenon):
 class KerfCompensatedRegularFingerTenon(RegularFingerTenon):
 	"""
 	"""
-	def __init__(self, thickness=0.08, finger_count=8, kerf=0.0):
+	def __init__(self,
+		     thickness = 1.0,
+		     finger_count = 5,
+		     kerf = 0.0):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
 		"""
 		super().__init__(thickness, finger_count)
 		self._kerf = kerf
-
 
 	def fingers(self, polyview):
 		l = polyhedra.edge_length(polyview)
@@ -325,7 +327,6 @@ class KerfCompensatedRegularFingerTenon(RegularFingerTenon):
 			fingers.append((position, width, direction))
 		return fingers
 
-
 	def finger_length_adapt_kerf(self, slotdepth, fingerlength):
 		k = self._kerf
 		return slotdepth - k/2.0, fingerlength + k/2.0
@@ -337,7 +338,11 @@ class HoleTenon(Tenon):
 	The number of fingers per edge is globally constant.
 	"""
 
-	def __init__(self, thickness=0.08, finger_count=8, flip_fingers=False, parity_flip=False):
+	def __init__(self,
+		     thickness = 1.0,
+		     finger_count = 5,
+		     flip_fingers = False,
+		     parity_flip = False):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
@@ -361,7 +366,6 @@ class HoleTenon(Tenon):
 	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
 		fingerlength *= 1.0
 		return slotdepth, fingerlength
-
 
 	def _tenon_a(self, polyview):
 		"""
@@ -389,7 +393,6 @@ class HoleTenon(Tenon):
 		V = (H / Ti) | To
 
 		return V, H
-
 
 	def _tenon_b(self, polyview):
 		"""
@@ -433,7 +436,14 @@ class HingeTenon(Tenon):
 	The number of fingers per edge is globally constant.
 	"""
 
-	def __init__(self, thickness=0.08, edge_flip=False, parity_flip=False):
+	def __init__(self,
+		     thickness = 1.0,
+		     dl = 3,
+		     w = 2,
+		     dr = 1,
+		     eps = 0.0,
+		     edge_flip = False,
+		     parity_flip = False):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
@@ -443,14 +453,15 @@ class HingeTenon(Tenon):
 		self._thickness = thickness
 		self._parity_flip = bool(parity_flip)
 
+		# Hinge parameters
+		self._dl = dl
+		self._w = w
+		self._dr = dr
+		self._eps = eps
+
 		# Flip along edge
 		self._edge_flip = edge_flip
 
-		# Hinge parameters
-		self._dl = 0.15
-		self._w = 0.04
-		self._dr = 0.08
-		self._eps = 0.002
 
 	def tenon(self, polyview, parity=True):
 		"""
@@ -533,7 +544,15 @@ class HingeTenonGeneral(Tenon):
 	The number of fingers per edge is globally constant.
 	"""
 
-	def __init__(self, thickness=0.08, gamma=numpy.pi/2, edge_flip=False, parity_flip=False):
+	def __init__(self,
+		     thickness = 1.0,
+		     dl = 3,
+		     w = 2,
+		     dr = 1,
+		     eps = 0.1,
+		     gamma = numpy.pi/2,
+		     edge_flip = False,
+		     parity_flip = False):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
@@ -543,15 +562,16 @@ class HingeTenonGeneral(Tenon):
 		self._thickness = thickness
 		self._parity_flip = bool(parity_flip)
 
+		# Hinge parameters
+		self._gamma = gamma
+		self._dl = dl
+		self._w = w
+		self._dr = dr
+		self._eps = eps
+
 		# Flip along edge
 		self._edge_flip = edge_flip
 
-		# Hinge parameters
-		self._gamma = gamma
-		self._dl = 0.2
-		self._w = 0.08
-		self._dr = 0.08
-		self._eps = 0.0
 
 	def tenon(self, polyview, parity=True):
 		"""
@@ -678,7 +698,8 @@ class NullTenon(Tenon):
 	The null tenon represents a simple straight edge.
 	"""
 
-	def __init__(self, thickness=0.08):
+	def __init__(self,
+		     thickness = 1.0):
 		"""
 		:param thickness: The thickness of the material.
 		"""

@@ -18,7 +18,7 @@
             },
             "faces" : {
                 "material" : {
-                    "thickness" : 0.08
+                    "thickness" : 1.0
                 }
             }
         },
