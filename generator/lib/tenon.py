@@ -26,8 +26,13 @@ class WoodWorker():
 		H = []
 
 		for i, view in enumerate(polyview.face_cycle):
+			# Decide which part to use for this edge
+			ei = view.edge_id
+			parity = ei[0] > ei[1]
+
+			# Get the tenon
 			tenon = self._tenonsource[view]
-			Vi, Hi = tenon.tenon(view)
+			Vi, Hi = tenon.tenon(view, parity)
 
 			# ugly linalg here
 			a = v[i]
@@ -65,6 +70,10 @@ class Tenon(metaclass = abc.ABCMeta):
 	Implements the basic concept of a very general
 	tenon structure along an edge of a polyhedron.
 	"""
+
+	def __init__(self):
+		self._parity_flip = False
+
 
 	def _make_fingers(self, polyview):
 		"""
@@ -110,13 +119,47 @@ class Tenon(metaclass = abc.ABCMeta):
 		return self.finger_length_adapt(polyview, hin, hout)
 
 
-	def tenon(self, polyview):
+	def tenon(self, polyview, parity=True):
 		"""
-		Compute the tenon structure along a given edge.
+		:param polyview: A view on the polyhedron.
+		:param parity: Which of the two twin parts to take for the tenon.
+		"""
+		if parity != self._parity_flip:
+			return self._tenon_a(polyview)
+		elif parity == self._parity_flip:
+			return self._tenon_b(polyview)
+		else:
+			raise ValueError("Invalid parity")
+
+
+	def _tenon_a(self, polyview):
+		"""
+		Compute the tenon structure along a given edge, twin A part.
 
 		:param polyview: A view on the polyhedron defining the edge.
 		"""
 		Sm, Sh = self._make_fingers(polyview)
+		return self._tenon_common(polyview, Sm, Sh)
+
+
+	def _tenon_b(self, polyview):
+		"""
+		Compute the tenon structure along a given edge, twin B part.
+
+		:param polyview: A view on the polyhedron defining the edge.
+		"""
+		Sh, Sm = self._make_fingers(polyview)
+		return self._tenon_common(polyview, Sm, Sh)
+
+
+	def _tenon_common(self, polyview, Sm, Sh):
+		"""
+		Compute the tenon structure along a given edge.
+
+		:param polyview: A view on the polyhedron defining the edge.
+		:param Sm: Finger parts.
+		:param Sh: Finger holes.
+		"""
 		H = paths.half_plane((0, 0), (1, 0))
 
 		hin, hout = self._finger_length(polyview)
@@ -213,20 +256,23 @@ class RegularFingerTenon(Tenon):
 		     finger_length_factor = 1.0,
 		     finger_length_add = 0.0,
 		     slot_length_factor = 1.0,
-		     slot_length_add = 0.0):
+		     slot_length_add = 0.0,
+		     parity_flip=False):
 		"""
 		:param thickness: The thickness of the material.
 		:param finger_count: The sum of fingers and slots.
+		:param parity_flip: Flip the two twin parts of the tenon.
 		"""
-
 		super().__init__()
-
 		self._thickness = thickness
-		self._finger_count = finger_count
+
+		self._finger_count = int(finger_count)
 		self._finger_length_factor = finger_length_factor
 		self._finger_length_add = finger_length_add
 		self._slot_length_factor = slot_length_factor
 		self._slot_length_add = slot_length_add
+
+		self._parity_flip = bool(parity_flip)
 
 	def fingers(self, polyview):
 		l = polyhedra.edge_length(polyview)
