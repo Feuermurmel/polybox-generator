@@ -43,9 +43,9 @@ def main(src_path):
 					file.write('vertex_id({}, "{}");', pos, i.vertex_id)
 					
 					for j, a, b in zip(face.face_cycle,
-									 polygon.paths[0].vertices,
-									 polygon.paths[0].vertices[1:] + [polygon.paths[0].vertices[0]]):
-						file.write('edge_id({}, {}, "{}");', a, b, j.edge_id)
-			
+							   polygon.paths[0].vertices,
+							   polygon.paths[0].vertices[1:] + [polygon.paths[0].vertices[0]]):
+						file.write('edge_id({}, {}, "{}");', a, b, str(j.edge_id))
+
 			# Contour for laser cut
 			file.write('cut_contour({});', cut)
