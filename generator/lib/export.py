@@ -99,6 +99,12 @@ class AsymptoteFile(File):
 		
 		self._write_line(self._format_expression(statement, *args))
 
+	def write_code(self, code):
+		"""
+		Directly write asymptote code to the file without further processing.
+		"""
+		self._write_line(code)
+
 
 class OpenSCADFile(File):
 	def __init__(self, *args):

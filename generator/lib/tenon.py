@@ -335,6 +335,102 @@ class KerfCompensatedRegularFingerTenon(RegularFingerTenon):
 		return self.finger_length_adapt_kerf(slotdepth, fingerlength)
 
 
+class HoleTenon(Tenon):
+	"""
+	Computes a regular finger tenon joint.
+	The number of fingers per edge is globally constant.
+	"""
+
+	def __init__(self, thickness=0.08, finger_count=8, flip_fingers=False, parity_flip=False):
+		"""
+		:param thickness: The thickness of the material.
+		:param finger_count: The sum of fingers and slots.
+		:param parity_flip: Flip the two twin parts of the tenon.
+		"""
+		super().__init__()
+		self._thickness = thickness
+		self._finger_count = int(finger_count)
+		self._flip_fingers = bool(flip_fingers)
+		self._parity_flip = bool(parity_flip)
+
+	def fingers(self, polyview):
+		o = 0 if not self._flip_fingers else 1
+		l = polyhedra.edge_length(polyview)
+		dx = l / self._finger_count
+		return [(i*dx, dx, (-1)**(i+o)) for i in range(self._finger_count)]
+
+	def thickness(self, polyview):
+		return self._thickness
+
+	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
+		fingerlength *= 1.0
+		return slotdepth, fingerlength
+
+
+	def _tenon_a(self, polyview):
+		"""
+		Compute the tenon structure along a given edge, twin A part.
+
+		:param polyview: A view on the polyhedron defining the edge.
+		"""
+		Sm, Sh = self._make_fingers(polyview)
+		H = paths.half_plane((0, 0), (1, 0))
+
+		hin, hout = self._finger_length(polyview)
+
+		if hin is not None:
+			I = paths.half_plane((0, hin), (1, 0))
+			Ti = Sh / I
+		else:
+			Ti = Sh
+		if hout is not None:
+			O = paths.half_plane((0, -hout), (-1, 0))
+			To = Sm / O
+		else:
+			To = Sm
+
+		# Clip the fingers and slots to desired length
+		V = (H / Ti) | To
+
+		return V, H
+
+
+	def _tenon_b(self, polyview):
+		"""
+		Compute the tenon structure along a given edge, twin B part.
+
+		:param polyview: A view on the polyhedron defining the edge.
+		"""
+		d = self.thickness(polyview.adjacent)
+		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
+		_, l = self._finger_length(polyview.adjacent)
+
+		if theta >= numpy.pi / 2:
+			ca = l * numpy.cos(numpy.pi - theta)
+			cb = d / numpy.cos(theta - numpy.pi / 2)
+		elif theta < numpy.pi / 2:
+			ca = 0
+			cb = (l + d * numpy.tan(theta)) * numpy.cos(theta)
+		cl = ca + cb
+
+		S = paths.square()
+		H = paths.half_plane((0, 0), (1, 0))
+
+		Si = []
+		for ti, dt, da in self.fingers(polyview):
+			if da > 0:
+				s = paths.scale(x=dt, y=-cl)
+				m = paths.move(x=ti, y=ca)
+				Si.append(m * s * S)
+
+		A = paths.plane()
+		Si = functools.reduce(operator.__or__, Si, ~A)
+		Hs = paths.half_plane((0, -2*cb), (1, 0))
+		V = Hs / Si
+
+		return V, H
+
+
 class NullTenon(Tenon):
 	"""
 	The null tenon represents a simple straight edge.
