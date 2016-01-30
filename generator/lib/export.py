@@ -27,7 +27,7 @@ class AsymptoteFile(File):
 	def _serialize_path(self, path, closed):
 		def iter_pairs():
 			for x, y in path.vertices:
-				yield '({}mm, {}mm)'.format(x, y)
+				yield self._serialize_value((x, y), False)
 			
 			if closed:
 				yield 'cycle'
@@ -55,11 +55,16 @@ class AsymptoteFile(File):
 		else:
 			return self._serialize_value(value, close_paths)
 	
+	def _serialize_length(self, value):
+		return '{}mm'.format(self._serialize_value(value, False))
+	
 	def _serialize_value(self, value, close_paths):
 		if isinstance(value, paths.Path):
 			return self._serialize_path(value, closed = close_paths)
 		elif isinstance(value, paths.Polygon):
 			return self._serialize_array('path', value.paths, 1, True)
+		elif isinstance(value, tuple):
+			return '({})'.format(', '.join(map(self._serialize_length, value)))
 		else:
 			# Let str.format() deal with it.
 			return value

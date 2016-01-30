@@ -1,5 +1,5 @@
 import sys, math, numpy
-from lib import polyhedra, tenon, export, util, configs
+from lib import polyhedra, tenon, export, util, paths, configs
 
 
 def arrange_grid(count):
@@ -12,38 +12,44 @@ def arrange_grid(count):
 def main(src_path):
 	file = export.AsymptoteFile(sys.stdout)
 	file.write('import "../_faces.asy" as _;')
+	file.write('unitsize(mm);')
 
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale=10)
+	# Both are in mm.
+	scale = 20
+	spacing = 100
+
+	debug_mode = True
+
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale = scale)
 	cfg = configs.load_from_json("src/example.json")
 	WW = tenon.WoodWorker(cfg)
 
-	debug_mode = False
-
-	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
+	for face, grid_pos in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		if cfg.omitted(face):
 			continue
 
 		polygon = polyhedra.get_planar_polygon(face)
-		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
+		offset = -numpy.mean(polygon.paths[0].vertices, 0)
 		cut = WW.piece(face)
 
-		with file.transform('shift(({}, {}) * 9.5mm) * scale(1)', c, r):
-			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)
+		polygon = paths.move(*offset) * polygon
+		cut = paths.move(*offset) * cut
 
+		with file.transform('shift({} * {})', grid_pos, spacing):
 			if debug_mode:
-				file.write('face({}, t);', cut, c, r)
-				file.write('edges({}, t);', polygon, c, r)
-				file.write('vertices({}, t);', polygon, c, r)
+				file.write('face({});', cut)
+				file.write('edges({});', polygon)
+				file.write('vertices({});', polygon)
 
-				file.write('face_id(({}mm, {}mm), "{}", t);', centerx, centery, face.face_id)
+				file.write('face_id((0, 0), "{}");', face.face_id)
 
-				for i, (x, y) in zip(face.face_cycle, polygon.paths[0].vertices):
-					file.write('vertex_id(({}mm, {}mm), "{}", t);', x, y, i.vertex_id)
+				for i, pos in zip(face.face_cycle, polygon.paths[0].vertices):
+					file.write('vertex_id({}, "{}");', pos, i.vertex_id)
 
-					for i, (ax, ay), (bx, by) in zip(face.face_cycle,
-									 polygon.paths[0].vertices,
-									 polygon.paths[0].vertices[1:] + [polygon.paths[0].vertices[0]]):
-						file.write('edge_id(({}mm, {}mm), ({}mm, {}mm), "{}", t);', ax, ay, bx, by, i.edge_id)
+					for j, a, b in zip(face.face_cycle,
+							   polygon.paths[0].vertices,
+							   polygon.paths[0].vertices[1:] + [polygon.paths[0].vertices[0]]):
+						file.write('edge_id({}, {}, "{}");', a, b, str(j.edge_id))
 
 			# Contour for laser cut
-			file.write('cut_contour({}, t);', cut, c, r)
+			file.write('cut_contour({});', cut)

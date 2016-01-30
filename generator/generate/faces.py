@@ -12,17 +12,23 @@ def arrange_grid(count):
 def main(src_path):
 	file = export.AsymptoteFile(sys.stdout)
 	file.write('import "../_faces.asy" as _;')
+	
+	# Both are in mm.
+	scale = 20
+	spacing = 100
 
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale)
 	stellation = stellations.Stellation()
-	boundary = paths.scale(2.5) * paths.circle()
+	boundary = paths.scale(spacing / 2) * paths.circle()
 
-	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
+	for face, grid_pos in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		polygon = polyhedra.get_planar_polygon(face)
-		centerx, centery = -numpy.mean(polygon.paths[0].vertices, 0)
+		offset = -numpy.mean(polygon.paths[0].vertices, 0)
 		facets = stellation.stellation(face)
-
-		with file.transform('shift(({}, {}) * 100mm) * scale(20)', c, r):
-			file.write('transform t = shift(({}, {}) * 1mm);', centerx, centery)
-			file.write('face({}, t);', facets & (paths.move(-centerx, -centery) * boundary))
-			file.write('face({}, t);', polygon)
+		
+		polygon = paths.move(*offset) * polygon
+		facets = paths.move(*offset) * facets
+		
+		with file.transform('shift({} * {})', grid_pos, spacing):
+			file.write('face({});', facets & boundary)
+			file.write('face({});', polygon)
