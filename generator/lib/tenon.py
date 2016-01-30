@@ -1,5 +1,5 @@
 import functools, numpy, operator, abc, math
-from lib import polyhedra, stellations, paths, linalg
+from lib import polyhedra, stellations, paths, linalg, util
 
 
 class WoodWorker():
@@ -510,6 +510,152 @@ class HingeTenon(Tenon):
 		B = t * B
 
 		V = H | A | B
+
+		if not self._edge_flip:
+			m = paths.scale(x=-1)
+			s = paths.move(x=l)
+			V = s*m*V
+
+		return V, H
+
+	def fingers(self, polyview):
+		# Unused abstract method :-/
+		return None
+
+	def thickness(self, polyview):
+		# Unused abstract method :-/
+		return self._thickness
+
+
+class HingeTenonGeneral(Tenon):
+	"""
+	Computes a regular finger tenon joint.
+	The number of fingers per edge is globally constant.
+	"""
+
+	def __init__(self, thickness=0.08, gamma=numpy.pi/2, edge_flip=False, parity_flip=False):
+		"""
+		:param thickness: The thickness of the material.
+		:param finger_count: The sum of fingers and slots.
+		:param parity_flip: Flip the two twin parts of the tenon.
+		"""
+		super().__init__()
+		self._thickness = thickness
+		self._parity_flip = bool(parity_flip)
+
+		# Flip along edge
+		self._edge_flip = edge_flip
+
+		# Hinge parameters
+		self._gamma = gamma
+		self._dl = 0.2
+		self._w = 0.08
+		self._dr = 0.08
+		self._eps = 0.0
+
+	def tenon(self, polyview, parity=True):
+		"""
+		:param polyview: A view on the polyhedron.
+		:param parity: Which of the two twin parts to take for the tenon.
+		"""
+		if parity != self._parity_flip:
+			return self._tenon_a(polyview)
+		elif parity == self._parity_flip:
+			return self._tenon_b(polyview)
+		else:
+			raise ValueError("Invalid parity")
+
+	def _tenon_a(self, polyview):
+		d = self.thickness(polyview.adjacent)
+		ri = math.sqrt(self._w**2 / 4 + d**2 / 4) + self._eps
+		ro = ri + self._dr
+
+		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
+		gamma = self._gamma
+
+		# Incidence angle
+		alpha = numpy.arccos(numpy.sqrt(numpy.cos(gamma)**2 + numpy.cos(theta)**2 * numpy.sin(gamma)**2))
+
+		# Ellipse shift
+		x = d / numpy.tan(alpha)
+		S = paths.move(x, 0)
+		S2 = paths.move(x/2, 0)
+
+		# Ellipse distortion
+		DCi = paths.scale(2*ri/numpy.sin(alpha), 2*ri)
+		DCo = paths.scale(2*ro/numpy.sin(alpha), 2*ro)
+		DMi = paths.scale(x, 2*ri)
+		DMo = paths.scale(x, 2*ro)
+
+		# Ellipse rotation
+		sx = d / numpy.tan(gamma) / numpy.sin(theta)
+		sy = d / numpy.tan(theta)
+		r = numpy.arctan2(-sy, sx)
+		R = paths.rotate(r)
+
+		# Main figure o=o
+
+		# Inner contour
+		C1i  =      DCi * paths.scale(0.5) * paths.circle()
+		C2i  = S  * DCi * paths.scale(0.5) * paths.circle()
+		M12i = S2 * DMi * paths.move(-0.5, -0.5) * paths.square()
+		EI = R * (C1i | M12i | C2i )
+
+		# Outer contour
+		C1o  =      DCo * paths.scale(0.5) * paths.circle()
+		C2o  = S  * DCo * paths.scale(0.5) * paths.circle()
+		M12o = S2 * DMo * paths.move(-0.5, -0.5) * paths.square()
+		EO = R * (C1o | M12o | C2o )
+
+		# Move
+		s = paths.move(self._dl, -d/2.0)
+		EI = s * EI
+		EO = s * EO
+
+		H = paths.half_plane((0, 0), (1, 0))
+
+		V = (H | EO) / EI
+
+		if self._edge_flip:
+			l = polyhedra.edge_length(polyview)
+			m = paths.scale(x=-1)
+			s = paths.move(x=l)
+			V = s*m*V
+
+		return V, H
+
+	def _tenon_b(self, polyview):
+		d = self.thickness(polyview) # sic
+		ri = math.sqrt(self._w**2 / 4 + d**2 / 4) + self._eps
+		ro = ri + self._dr
+		d = self.thickness(polyview.adjacent) # sic
+
+		theta = polyhedra.dihedral_angle(polyview, polyview.adjacent)
+		gamma = self._gamma
+
+		# Incidence angle
+		alpha = numpy.arccos(numpy.sqrt(numpy.cos(gamma)**2 + numpy.cos(theta)**2 * numpy.sin(gamma)**2))
+
+		R = paths.rotate(numpy.pi/2 - self._gamma)
+
+		l = polyhedra.edge_length(polyview)
+		t = d / numpy.sin(self._gamma) + d/2 * numpy.abs(numpy.tan(numpy.pi/2 - self._gamma)) + self._eps
+
+		H = paths.half_plane((0, 0), (1, 0))
+
+		# Hinge axis
+		A = paths.strip((-self._w/2, 0), (self._w, 0))
+		A /= ~(paths.move(0, -t) * H)
+		A = paths.move(self._dl, 0) * R * A
+
+		x = d / numpy.tan(alpha)
+		u = (d/2 + ro + self._eps) * numpy.cos(alpha)
+
+		Q = paths.move(-0.5, -0.5) * paths.square()
+		Q = paths.scale(2*ro/numpy.sin(alpha) + x + self._eps, 2*u) * Q
+		Q = paths.move(self._dl, 0) * R * Q
+
+		V = (H / Q) | A
 
 		if not self._edge_flip:
 			m = paths.scale(x=-1)

@@ -1,7 +1,6 @@
 {
     "polybox" : {
-        // Default configuration for all objects
-        // What if we have two "defaults"?
+        // Default configuration for all geometric entities
         "default" : {
             "scale_factor" : 20,
             "vertices" : {
@@ -10,11 +9,14 @@
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 6,
-			"finger_length_factor" : 2,
-			"slot_length_add" : 0.1
+                        "finger_count" : 5,
+			"finger_length" : 1.5
                     }
                 }
+                // "tenon" : {
+                //     "class" : "NullTenon",
+                //     "args" : {}
+                // }
             },
             "faces" : {
                 "material" : {
@@ -26,8 +28,101 @@
         "vertices" : {
         },
         "edges" : {
+	    // Dodecahedron
+            "(1, 5)" : {
+                "tenon" : {
+                    "class" : "HingeTenonGeneral",
+                    "args" : {
+	    		"parity_flip" : true,
+			"gamma" : 1.2566370614359172
+                    }
+                }
+            },
+	    "(17, 12)" : {
+                "tenon" : {
+                    "class" : "HingeTenonGeneral",
+                    "args" : {
+	    		"parity_flip" : false,
+	    		"edge_flip" : true,
+			"gamma" : 1.2566370614359172
+                    }
+                }
+            },
+	    "(1, 12)" : {
+                "tenon" : {
+                    "class" : "NullTenon",
+                    "args" : {
+                    }
+                }
+            },
+	    "(5, 19)" : {
+                "tenon" : {
+                    "class" : "RegularFingerTenon",
+                    "args" : {
+	    		"finger_count" : 1,
+	    		"finger_length" : 2.0
+                    }
+                }
+            },
+	    "(17, 19)" : {
+                "tenon" : {
+                    "class" : "RegularFingerTenon",
+                    "args" : {
+	    		"finger_count" : 1,
+	    		"finger_length" : 2.0,
+			"parity_flip" : true
+                    }
+                }
+            }
+
+	    // Tetrahedron
+	    // "(1, 3)" : {
+            //     "tenon" : {
+            //         "class" : "HingeTenonGeneral",
+            //         "args" : {
+	    // 		"parity_flip" : true,
+	    // 		"edge_flip" : false,
+	    // 		"gamma" : 2.0943951023931953
+	    // 		"gamma" : 1.0471975511965976
+            //         }
+            //     }
+            // },
+	    // "(2, 3)" : {
+            //     "tenon" : {
+            //         "class" : "HingeTenonGeneral",
+            //         "args" : {
+	    // 		"parity_flip" : false,
+	    // 		"edge_flip" : true,
+	    // 		"gamma" : 2.0943951023931953
+            //         }
+            //     }
+            // },
+            // "(6, 7)" : {
+            //     "tenon" : {
+            //         "class" : "HingeTenonGeneral",
+            //         "args" : {
+	    // 		"edge_flip" : true
+            //         }
+            //     }
+            // },
+	    // "(4, 6)" : {
+            //     "tenon" : {
+            //         "class" : "NullTenon",
+            //         "args" : {
+            //         }
+            //     }
+            // },
+	    // "(5, 7)" : {
+            //     "tenon" : {
+            //         "class" : "RegularFingerTenon",
+            //         "args" : {
+	    // 		"finger_count" : 1,
+	    // 		"finger_length" : 1.5
+            //         }
+            //     }
+            // }
         },
-	"faces" : {
-	}
+        "faces" : {
+        }
     }
 }
