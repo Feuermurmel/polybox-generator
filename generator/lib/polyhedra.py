@@ -22,10 +22,9 @@ class PolyhedronView:
 	Represents the combination of a face, an adjacent edge and the vertex at the start of that edge when traversing the boundary of the face in positive order.
 	"""
 
-	def __init__(self, polyhedron : 'Polyhedron', vertex_id, edge_id, face_id):
+	def __init__(self, polyhedron : 'Polyhedron', vertex_id, face_id):
 		self._polyhedron = polyhedron
 		self._vertex_id = vertex_id
-		self._edge_id = edge_id
 		self._face_id = face_id
 
 		# These are filled by the Polyhedron.__init__()
@@ -53,7 +52,7 @@ class PolyhedronView:
 		Return the edge identifier (unique per polyhedron).
 		"""
 
-		return self._edge_id
+		return self._vertex_id, self.next._vertex_id
 
 	@property
 	def face_id(self):
@@ -236,7 +235,7 @@ class Polyhedron:
 		self._vertex_coordinates = vertices[:]
 
 		# Store topology
-		views_by_face = [[((j1, j2), PolyhedronView(self, j1, (j1,j2), fi))
+		views_by_face = [[((j1, j2), PolyhedronView(self, j1, fi))
 				  for j1, j2 in zip(i, i[1:] + i[:1])]
 				 for fi, i in enumerate(faces)]
 		views_by_edge = dict(j for i in views_by_face for j in i)
