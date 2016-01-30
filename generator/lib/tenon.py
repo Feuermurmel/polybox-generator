@@ -123,17 +123,32 @@ class Tenon(metaclass = abc.ABCMeta):
 
 		if hin is not None:
 			I = paths.half_plane((0, hin), (1, 0))
-			Ti = Sh / I
+			if hin > 0:
+				Ti = Sh / I
+			else:
+				Ti = Sh / (~I)
 		else:
 			Ti = Sh
+
 		if hout is not None:
 			O = paths.half_plane((0, -hout), (-1, 0))
-			To = Sm / O
+			if hout > 0:
+				To = Sm / O
+			else:
+				To = Sm / (~O)
 		else:
 			To = Sm
 
 		# Clip the fingers and slots to desired length
-		V = (H / Ti) | To
+		V = H
+		if hin > 0:
+			V /= Ti
+		else:
+			V |= Ti
+		if hout > 0:
+			V |= To
+		else:
+			V /= To
 
 		return V, H
 
@@ -227,6 +242,51 @@ class RegularFingerTenon(Tenon):
 		slotlength *= self._slot_length_factor
 		slotlength += self._slot_length_add
 		return slotlength, fingerlength
+
+
+class KerfCompensatedRegularFingerTenon(RegularFingerTenon):
+	"""
+	"""
+	def __init__(self, thickness=0.08, finger_count=8, kerf=0.0):
+		"""
+		:param thickness: The thickness of the material.
+		:param finger_count: The sum of fingers and slots.
+		"""
+		super().__init__(thickness, finger_count)
+		self._kerf = kerf
+
+
+	def fingers(self, polyview):
+		l = polyhedra.edge_length(polyview)
+		k = self._kerf
+		dx = l / self._finger_count
+
+		if k >= dx:
+			raise ValueError("Kerf is larger than finger slot width.")
+
+		fingers = []
+		for i in range(self._finger_count):
+			direction = (-1)**i
+			if direction > 0:
+				# Finger
+				position = i*dx - k/2.0
+				width = dx + k
+			else:
+				# Slot
+				position = i*dx + k/2.0
+				width = dx - k
+			fingers.append((position, width, direction))
+		return fingers
+
+
+	def finger_length_adapt_kerf(self, slotdepth, fingerlength):
+		k = self._kerf
+		return slotdepth - k/2.0, fingerlength + k/2.0
+
+
+	def finger_length_adapt(self, polyview, slotdepth, fingerlength):
+		fingerlength *= 2.0
+		return self.finger_length_adapt_kerf(slotdepth, fingerlength)
 
 
 class NullTenon(Tenon):
