@@ -1,5 +1,5 @@
 import functools, numpy, operator, abc, math
-from lib import polyhedra, stellations, paths, linalg
+from lib import polyhedra, stellations, paths, linalg, util
 
 
 class WoodWorker():
@@ -379,10 +379,10 @@ class HingeTenonGeneral(Tenon):
 
 		# Hinge parameters
 		self._gamma = gamma
-		self._dl = 0.15
+		self._dl = 0.2
 		self._w = 0.08
-		self._dr = 0.04
-		self._eps = 0.00002
+		self._dr = 0.08
+		self._eps = 0.0
 
 	def tenon(self, polyview, parity=True):
 		"""

@@ -17,7 +17,7 @@ def main(src_path):
 	cfg = configs.load_from_json("src/example.json")
 	WW = tenon.WoodWorker(cfg)
 
-	debug_mode = True
+	debug_mode = False
 
 	for face, (c, r) in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		if cfg.omitted(face):
@@ -27,7 +27,7 @@ def main(src_path):
 		centerx, centery = numpy.mean(polygon.paths[0].vertices, 0)
 		cut = WW.piece(face)
 
-		with file.transform('shift(({}, {}) * 100mm) * scale(20)', c, r):
+		with file.transform('shift(({}, {}) * 100mm) * scale(30)', c, r):
 			file.write('transform t = shift(({}, {}) * 1mm);', -centerx, -centery)
 
 			if debug_mode:
