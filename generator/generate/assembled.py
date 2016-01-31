@@ -2,14 +2,18 @@ import sys, numpy
 from lib import polyhedra, tenon, export, util, configs
 
 
-
 @util.main
 def main(src_path):
-	thickness = 0.08
-	gap = 0.005
 	file = export.OpenSCADFile(sys.stdout)
-	
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
+
+	# Both are in mm.
+	scale = 20
+	thickness = 1
+
+	# Gap size for visualization
+	gap = 0.005
+
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale = scale)
 	cfg = configs.load_from_json("src/example.json")
 	WW = tenon.WoodWorker(cfg)
 
