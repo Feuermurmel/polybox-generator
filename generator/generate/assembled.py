@@ -1,16 +1,20 @@
 import sys, numpy
 from lib import polyhedra, tenon, export, util
 
-
 @util.main
 def main(src_path):
-	thickness = 0.08
-	gap = 0.005
 	file = export.OpenSCADFile(sys.stdout)
-	
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path)
-	ten = tenon.RegularFingerTenon(0.08)
-	
+
+	# Both are in mm.
+	scale = 20
+	thickness = 1
+
+	# Gap size for visualization
+	gap = 0.005
+
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale = scale)
+	ten = tenon.RegularFingerTenon(thickness)
+
 	with file.group('render'):
 		for face in polyhedron.faces:
 			cut = ten.tenon(face)
@@ -30,8 +34,8 @@ def main(src_path):
 					with file.group('translate', [-center[0], -center[1], 0.7 * thickness]):
 						with file.group('linear_extrude', thickness):
 							fid = str(face.face_id)
-							
+
 							if all(i in '0689' for i in fid):
 								fid += '.'
-							
+
 							file.text(fid, size=0.3 * minr, halign='center', valign='center')
