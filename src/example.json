@@ -8,7 +8,8 @@
                 "tenon" : {
                     "class" : "RegularFingerTenon",
                     "args" : {
-                        "finger_count" : 5
+                        "finger_count" : 5,
+                        "finger_length_factor" : 2
                     }
                 }
                 // "tenon" : {
