@@ -11,7 +11,7 @@ def main(src_path):
 	thickness = 1
 
 	# Gap size for visualization
-	gap = 0.005
+	gap = 0.05
 
 	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale = scale)
 	cfg = configs.load_from_json("src/example.json")
