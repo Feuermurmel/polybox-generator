@@ -1,7 +1,6 @@
 import sys, numpy
 from lib import polyhedra, tenon, export, util, configs
 
-
 @util.main
 def main(src_path):
 	file = export.OpenSCADFile(sys.stdout)
@@ -39,8 +38,8 @@ def main(src_path):
 					with file.group('translate', [-center[0], -center[1], 0.7 * thickness]):
 						with file.group('linear_extrude', thickness):
 							fid = str(face.face_id)
-							
+
 							if all(i in '0689' for i in fid):
 								fid += '.'
-							
+
 							file.text(fid, size=0.3 * minr, halign='center', valign='center')
