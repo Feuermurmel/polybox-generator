@@ -1,5 +1,6 @@
+from . import helpers
+from .. import util, polyhedra, settings
 import contextlib, sys, os
-from . import util, polyhedra, settings
 
 
 @contextlib.contextmanager
@@ -16,8 +17,8 @@ class Configuration:
 	def __init__(self, config_fn):
 		self._config_fn = config_fn
 	
-	def apply(self, polyhedron : polyhedra.Polyhedron) -> settings.Properties:
-		properties = settings.Properties()
+	def apply(self, polyhedron : polyhedra.Polyhedron) -> helpers.Properties:
+		properties = helpers.Properties()
 		
 		self._config_fn(settings.Settings(properties, polyhedron))
 		

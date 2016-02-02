@@ -1,14 +1,18 @@
-from . import tenon, polyhedra
-import abc, collections, collections.abc
+"""
+This module can be * imported.
+"""
+
+from . import polyhedra as _polyhedra, config as _config
+import abc as _abc
 
 
-class Tenon(metaclass = abc.ABCMeta):
-	@abc.abstractmethod
-	def get_left_side(self, view : polyhedra.PolyhedronView):
+class Tenon(metaclass = _abc.ABCMeta):
+	@_abc.abstractmethod
+	def get_left_side(self, view : _polyhedra.PolyhedronView):
 		pass
 	
-	@abc.abstractmethod
-	def get_right_side(self, view : polyhedra.PolyhedronView):
+	@_abc.abstractmethod
+	def get_right_side(self, view : _polyhedra.PolyhedronView):
 		pass
 
 
@@ -40,10 +44,10 @@ class OppositeTenon(Tenon):
 	def __init__(self, decorated_tenon : Tenon):
 		self._decorated_tenon = decorated_tenon
 	
-	def get_left_side(self, view : polyhedra.PolyhedronView):
+	def get_left_side(self, view : _polyhedra.PolyhedronView):
 		return self._decorated_tenon.get_right_side(view)
 	
-	def get_right_side(self, view : polyhedra.PolyhedronView):
+	def get_right_side(self, view : _polyhedra.PolyhedronView):
 		return self._decorated_tenon.get_left_side(view)
 
 
@@ -51,18 +55,18 @@ class ReversedTenon(Tenon):
 	def __init__(self, decorated_tenon : Tenon):
 		self._decorated_tenon = decorated_tenon
 	
-	def get_left_side(self, view : polyhedra.PolyhedronView):
+	def get_left_side(self, view : _polyhedra.PolyhedronView):
 		# TODO: Reverse returned value here
 		return self._decorated_tenon.get_left_side(view)
 	
-	def get_right_side(self, view : polyhedra.PolyhedronView):
+	def get_right_side(self, view : _polyhedra.PolyhedronView):
 		# TODO: Reverse returned value here
 		return self._decorated_tenon.get_right_side(view)
 
 
-class Engraving(metaclass = abc.ABCMeta):
-	@abc.abstractmethod
-	def get_engraving(self, view : polyhedra.PolyhedronView):
+class Engraving(metaclass = _abc.ABCMeta):
+	@_abc.abstractmethod
+	def get_engraving(self, view : _polyhedra.PolyhedronView):
 		pass
 
 
@@ -87,71 +91,8 @@ class LayeredEngraving(Engraving):
 		return res
 
 
-class CanonicalizingPropertyMap:
-	"""
-	This is not a collections.abc.Mapping as it has no __len__ and __iter__.
-	"""
-	
-	def __init__(self, canonicalization_fn, default_factory):
-		self._canonicalization_fn = canonicalization_fn
-		self._map = collections.defaultdict(default_factory)
-	
-	def __getitem__(self, item):
-		return self._map[self._canonicalization_fn(item)]
-
-
-class EngravingWithOrigin:
-	def __init__(self, engraving : Engraving, origin : polyhedra.PolyhedronView):
-		self.engraving = engraving
-		self.origin = origin
-
-
-class PolyhedronProperties:
-	def __init__(self):
-		self.scale_factor = 1
-
-
-class FaceProperties:
-	def __init__(self):
-		self.material_thickness = None
-		self.engraving_with_orientation = None
-		self.omit = False
-
-
-class VertexProperties:
-	def __init__(self):
-		pass
-
-
-class EdgeProperties:
-	def __init__(self):
-		pass
-
-
-class ViewProperties:
-	def __init__(self):
-		self.tenon = tenon
-
-
-class Properties:
-	def __init__(self):
-		self.polyhedron_properties = PolyhedronProperties()
-		
-		# Indexed by the canonical face view.
-		self.face_properties = CanonicalizingPropertyMap(FaceSelectionType._canonicalize_view, FaceProperties)
-		
-		# Indexed by the canonical edge view.
-		self.edge_properties = CanonicalizingPropertyMap(EdgeSelectionType._canonicalize_view, EdgeProperties)
-		
-		# Indexed by the canonical vertex view.
-		self.vertex_properties = CanonicalizingPropertyMap(VertexSelectionType._canonicalize_view, VertexProperties)
-		
-		# Indexed by the view.
-		self.view_properties = CanonicalizingPropertyMap(lambda x: x, ViewProperties)
-
-
-class Selection(metaclass = abc.ABCMeta):
-	def __init__(self, properties : 'Properties', views : list):
+class Selection(metaclass = _abc.ABCMeta):
+	def __init__(self, properties : '_config.helpers.Properties', views : list):
 		self._properties = properties
 		self._views = views
 	
@@ -165,7 +106,7 @@ class Selection(metaclass = abc.ABCMeta):
 	
 	def engraving(self, engraving : Engraving):
 		for i in self._views:
-			self._properties.face_properties[i].engraving = EngravingWithOrigin(engraving, i)
+			self._properties.face_properties[i].engraving = _config.helpers.EngravingWithOrigin(engraving, i)
 	
 	def tenon(self, tenon : Tenon, *, apply_to_opposite = True):
 		for i in self._views:
@@ -176,93 +117,8 @@ class Selection(metaclass = abc.ABCMeta):
 				self._properties.view_properties[i.opposite].tenon = ReversedTenon(OppositeTenon(tenon))
 
 
-class SelectionType(metaclass = abc.ABCMeta):
-	@classmethod
-	@abc.abstractmethod
-	def _cast_view(cls, polyhedron : polyhedra.Polyhedron, element) -> polyhedra.PolyhedronView: pass
-	
-	@classmethod
-	@abc.abstractmethod
-	def _canonicalize_view(cls, view : polyhedra.PolyhedronView) -> polyhedra.PolyhedronView: pass
-	
-	@classmethod
-	@abc.abstractmethod
-	def _get_all_views(cls, polyhedron : polyhedra.Polyhedron) -> set: pass
-	
-	@classmethod
-	def create_selection(cls, properties : Properties, polyhedron : polyhedra.Polyhedron, elements : tuple, invert : bool):
-		"""
-		Process a list of elements and cast each non-PolyhedronView-element using the specified function and create a selection of the specified type selecting those elements.
-		"""
-		
-		if ... in elements:
-			elements = []
-			invert = not invert
-		
-		def cast(element):
-			if isinstance(element, polyhedra.PolyhedronView):
-				return element
-			else:
-				return cls._cast_view(polyhedron, element)
-		
-		views = list(map(cast, elements))
-		
-		if invert:
-			views = cls._get_all_views(polyhedron) - set(map(cls._canonicalize_view, views))
-		
-		return Selection(properties, views)
-
-
-class FaceSelectionType(SelectionType):
-	@classmethod
-	def _cast_view(cls, polyhedron, element):
-		return polyhedron.face_by_id(element)
-	
-	@classmethod
-	def _canonicalize_view(cls, view):
-		representative_view, = [i for i in view.face_cycle if i in view.polyhedron.faces]
-		
-		return representative_view
-	
-	@classmethod
-	def _get_all_views(cls, polyhedron):
-		return polyhedron.faces
-
-
-class EdgeSelectionType(SelectionType):
-	@classmethod
-	def _cast_view(cls, polyhedron, element):
-		return polyhedron.edge_by_id(*element)
-	
-	@classmethod
-	def _canonicalize_view(cls, view):
-		representative_view, = [i for i in [view, view.opposite] if i in view.polyhedron.edges]
-		
-		return representative_view
-	
-	@classmethod
-	def _get_all_views(cls, polyhedron):
-		return polyhedron.edges
-
-
-class VertexSelectionType(SelectionType):
-	@classmethod
-	def _cast_view(cls, polyhedron, element):
-		return polyhedron.vertex_by_id(element)
-	
-	@classmethod
-	def _canonicalize_view(cls, view):
-		representative_view, = [i for i in view.vertex_cycle if i in view.polyhedron.vertices]
-		
-		return representative_view
-	
-	@classmethod
-	def _get_all_views(cls, polyhedron):
-		return polyhedron.vertices
-
-
 class Settings:
-	def __init__(self, properties : Properties, polyhedron : polyhedra.Polyhedron):
+	def __init__(self, properties : _config.helpers.Properties, polyhedron : _polyhedra.Polyhedron):
 		self._properties = properties
 		self._polyhedron = polyhedron
 	
@@ -277,7 +133,7 @@ class Settings:
 		:param invert: If set to true, return a selection for all faces not specified in elements.
 		"""
 		
-		return FaceSelectionType.create_selection(self._properties, self._polyhedron, faces, invert)
+		return Selection(self._properties, _config.helpers.FaceSelectionType.parse_elements(self._polyhedron, faces, invert))
 	
 	def edge(self, *edges, invert = False):
 		"""
@@ -287,7 +143,7 @@ class Settings:
 		:param invert: If set to true, return a selection for all edges not specified in elements.
 		"""
 		
-		return EdgeSelectionType.create_selection(self._properties, self._polyhedron, edges, invert)
+		return Selection(self._properties, _config.helpers.EdgeSelectionType.parse_elements(self._polyhedron, edges, invert))
 	
 	def vertex(self, *vertices, invert = False):
 		"""
@@ -297,7 +153,7 @@ class Settings:
 		:param invert: If set to true, return a selection for all vertices not specified in elements.
 		"""
 		
-		return VertexSelectionType.create_selection(self._properties, self._polyhedron, vertices, invert)
+		return Selection(self._properties, _config.helpers.VertexSelectionType.parse_elements(self._polyhedron, vertices, invert))
 	
 	@property
 	def polyhedron(self):
