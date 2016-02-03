@@ -54,18 +54,19 @@ class OppositeTenon(Tenon):
 class ReversedTenon(Tenon):
 	def __init__(self, decorated_tenon : Tenon):
 		self._decorated_tenon = decorated_tenon
-
-	def _mirror(self, tenon, view):
-		l = _polyhedra.edge_length(view)
-		V, H = tenon(view)
-		V = _paths.move(x=l) * _paths.scale(x=-1) * V
-		return V, H
-
+	
 	def get_left_side(self, view : _polyhedra.PolyhedronView):
 		return self._mirror(self._decorated_tenon.get_left_side, view)
 
 	def get_right_side(self, view : _polyhedra.PolyhedronView):
 		return self._mirror(self._decorated_tenon.get_right_side, view)
+	
+	@classmethod
+	def _mirror(cls, tenon, view):
+		l = _polyhedra.edge_length(view)
+		V, H = tenon(view)
+		V = _paths.move(x=l) * _paths.scale(x=-1) * V
+		return V, H
 
 
 class Engraving(metaclass = _abc.ABCMeta):
