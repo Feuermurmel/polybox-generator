@@ -2,7 +2,7 @@
 This module can be * imported.
 """
 
-from . import polyhedra as _polyhedra, config as _config
+from . import polyhedra as _polyhedra, config as _config, paths as _paths
 import abc as _abc
 
 
@@ -54,14 +54,18 @@ class OppositeTenon(Tenon):
 class ReversedTenon(Tenon):
 	def __init__(self, decorated_tenon : Tenon):
 		self._decorated_tenon = decorated_tenon
-	
+
+	def _mirror(self, tenon, view):
+		l = _polyhedra.edge_length(view)
+		V, H = tenon(view)
+		V = _paths.move(x=l) * _paths.scale(x=-1) * V
+		return V, H
+
 	def get_left_side(self, view : _polyhedra.PolyhedronView):
-		# TODO: Reverse returned value here
-		return self._decorated_tenon.get_left_side(view)
-	
+		return self._mirror(self._decorated_tenon.get_left_side, view)
+
 	def get_right_side(self, view : _polyhedra.PolyhedronView):
-		# TODO: Reverse returned value here
-		return self._decorated_tenon.get_right_side(view)
+		return self._mirror(self._decorated_tenon.get_right_side, view)
 
 
 class Engraving(metaclass = _abc.ABCMeta):
