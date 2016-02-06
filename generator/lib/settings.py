@@ -5,113 +5,13 @@ This module can be * imported.
 from . import polyhedra as _polyhedra, config as _config, paths as _paths
 import abc as _abc
 
-
-class Tenon(metaclass = _abc.ABCMeta):
-	@_abc.abstractmethod
-	def get_left_side(self, view : _polyhedra.PolyhedronView):
-		pass
-	
-	@_abc.abstractmethod
-	def get_right_side(self, view : _polyhedra.PolyhedronView):
-		pass
-
-
-class FingerTenon(Tenon):
-	def get_left_side(self):
-		pass
-	
-	def get_right_side(self):
-		pass
-
-
-class HoleTenon(Tenon):
-	def get_left_side(self):
-		pass
-	
-	def get_right_side(self):
-		pass
-
-
-class HingeTenon(Tenon):
-	def get_left_side(self):
-		pass
-	
-	def get_right_side(self):
-		pass
-
-
-class OppositeTenon(Tenon):
-	def __init__(self, decorated_tenon : Tenon):
-		self._decorated_tenon = decorated_tenon
-	
-	def get_left_side(self, view : _polyhedra.PolyhedronView):
-		return self._decorated_tenon.get_right_side(view)
-	
-	def get_right_side(self, view : _polyhedra.PolyhedronView):
-		return self._decorated_tenon.get_left_side(view)
-
-
-class ReversedTenon(Tenon):
-	def __init__(self, decorated_tenon : Tenon):
-		self._decorated_tenon = decorated_tenon
-	
-	def get_left_side(self, view : _polyhedra.PolyhedronView):
-		return self._mirror(self._decorated_tenon.get_left_side, view)
-
-	def get_right_side(self, view : _polyhedra.PolyhedronView):
-		return self._mirror(self._decorated_tenon.get_right_side, view)
-	
-	@classmethod
-	def _mirror(cls, tenon, view):
-		l = _polyhedra.edge_length(view)
-		V, H = tenon(view)
-		V = _paths.move(x=l) * _paths.scale(x=-1) * V
-		return V, H
-
-
-class Engraving(metaclass = _abc.ABCMeta):
-	@_abc.abstractmethod
-	def get_engraving(self, view : _polyhedra.PolyhedronView):
-		pass
-
-
-class ImageEngraving(Engraving):
-	def __init__(self, image_path : str):
-		pass
-	
-	def get_engraving(self, view):
-		pass
-
-
-class LayeredEngraving(Engraving):
-	def __init__(self, *engravings):
-		self._engravings = engravings
-	
-	def get_engraving(self, view):
-		res = []
-		
-		for i in self._engravings:
-			pass # TODO: Insert magic.
-		
-		return res
+from lib.tenon import Tenon, ReversedTenon, OppositeTenon, RegularFingerTenon
 
 
 class Selection(metaclass = _abc.ABCMeta):
-	def __init__(self, properties : '_config.helpers.Properties', views : list):
+	def __init__(self, properties : _config.helpers.Properties, views : list):
 		self._properties = properties
 		self._views = views
-	
-	def material_thickness(self, thickness):
-		for i in self._views:
-			self._properties.face_properties[i].thickness = thickness
-	
-	def omit(self, omit = True):
-		for i in self._views:
-			self._properties.face_properties[i].omit = omit
-	
-	def engraving(self, engraving : Engraving):
-		for i in self._views:
-			self._properties.face_properties[i].engraving = _config.helpers.EngravingWithOrigin(engraving, i)
 	
 	def tenon(self, tenon : Tenon, *, apply_to_opposite = True):
 		for i in self._views:
@@ -130,7 +30,7 @@ class Settings:
 	def scale_factor(self, scale : float):
 		self._properties.polyhedron_properties.scale_factor = scale
 	
-	def face(self, *faces, invert = False):
+	def face(self, *faces, invert = False) -> Selection:
 		"""
 		Select one or more faces.
 		
@@ -140,7 +40,7 @@ class Settings:
 		
 		return Selection(self._properties, _config.helpers.FaceSelectionType.parse_elements(self._polyhedron, faces, invert))
 	
-	def edge(self, *edges, invert = False):
+	def edge(self, *edges, invert = False) -> Selection:
 		"""
 		Select one or more edges.
 		
@@ -150,7 +50,7 @@ class Settings:
 		
 		return Selection(self._properties, _config.helpers.EdgeSelectionType.parse_elements(self._polyhedron, edges, invert))
 	
-	def vertex(self, *vertices, invert = False):
+	def vertex(self, *vertices, invert = False) -> Selection:
 		"""
 		Select one or more edges.
 		

@@ -175,21 +175,21 @@ class Polyhedron:
 				view._next_view = next_view
 				view._opposite_view = self._edges_by_id[id2, id1]
 	
-	def face_by_id(self, id : int):
+	def face_by_id(self, id : int) -> PolyhedronView:
 		"""
 		Return the canonical view for the face with the specified id.
 		"""
 		
 		return self._faces_by_id[id]
 	
-	def edge_by_id(self, start : int, end : int):
+	def edge_by_id(self, start : int, end : int) -> PolyhedronView:
 		"""
 		Return the view for the edge oriented in the direction from vertex start to vertex end.
 		"""
 		
 		return self._edges_by_id[start, end]
 	
-	def vertex_by_id(self, id : int):
+	def vertex_by_id(self, id : int) -> PolyhedronView:
 		"""
 		Return the canonical view for the vertex with the specified id.
 		"""
