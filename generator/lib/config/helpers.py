@@ -117,7 +117,7 @@ class PolyhedronProperties:
 
 class FaceProperties:
 	def __init__(self):
-		self.material_thickness = None
+		self.material_thickness = 4
 		self.engraving_with_orientation = None
 		self.omit = False
 
@@ -134,7 +134,7 @@ class EdgeProperties:
 
 class ViewProperties:
 	def __init__(self):
-		self.tenon = _tenon
+		self.tenon = _tenon.RegularFingerTenon()
 
 
 class Properties:
