@@ -1,5 +1,5 @@
 import sys, math, numpy
-from lib import polyhedra, tenon, export, util, paths
+from lib import polyhedra, tenon, export, util, paths, config
 
 
 def arrange_grid(count):
@@ -17,17 +17,20 @@ def main(src_path):
 	# Both are in mm.
 	scale = 20
 	spacing = 100
-	
-	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale = scale)
-	fingertenon = tenon.RegularFingerTenon(4)
-	
+
 	debug_mode = True
+
+	polyhedron = polyhedra.Polyhedron.load_from_json(src_path, scale = scale)
+	configuration = config.load_configuration('src/config.py')
+	properties = configuration.apply(polyhedron)
+	
+	WW = tenon.WoodWorker(properties)
 	
 	for face, grid_pos in zip(polyhedron.faces, arrange_grid(len(polyhedron.faces))):
 		polygon = polyhedra.get_planar_polygon(face)
 		offset = -numpy.mean(polygon.paths[0].vertices, 0)
-		cut = fingertenon.tenon(face)
-		
+		cut = WW.piece(face)
+
 		polygon = paths.move(*offset) * polygon
 		cut = paths.move(*offset) * cut
 		
